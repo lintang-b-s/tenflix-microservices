@@ -27,21 +27,14 @@ public class MovieController {
         return ok(mapper.movieEntitytoMovieDto(movieService.addMovie(newMovie)));
     }
 
-    @GetMapping
-    public ResponseEntity<List<Movie>> getAllMovies() {
-        return ok(mapper.toListModel(movieService.getMoviesByUserId(123)));
 
-    }
 
     @PutMapping("/{movieId}")
     public ResponseEntity<Movie> updateMovieById(@PathVariable(value = "movieId") int movieId, @RequestBody AddMovieReq updateMovie) {
         return ok(mapper.movieEntitytoMovieDto(movieService.updateMovie(movieId, updateMovie)));
     }
 
-    @GetMapping("/{movieId}")
-    public ResponseEntity<Movie>  getMovieById(@PathVariable("movieId") int movieId) {
-        return ok(mapper.movieEntitytoMovieDto(movieService.getMovieById(movieId)));
-    }
+
 
     @DeleteMapping("/{movieId}")
     public ResponseEntity<String> deleteMovieById(@PathVariable("movieId") int movieId) {

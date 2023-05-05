@@ -1,6 +1,9 @@
 package com.lintang.netflik.movieservice.outbox.scheduler;
 
 
+import com.lintang.netflik.movieservice.event.AddMovieEventPayload;
+import com.lintang.netflik.movieservice.helper.eventMapper.EventPayloadMapper;
+import com.lintang.netflik.movieservice.helper.eventMapper.MovieEventMapper;
 import com.lintang.netflik.movieservice.outbox.MovieOutboxHelper;
 import com.lintang.netflik.movieservice.outbox.mapper.MovieOutboxDataAccessMapper;
 import com.lintang.netflik.movieservice.outbox.model.OutboxStatus;
@@ -27,6 +30,8 @@ public class MovieOutboxScheduler  {
     private final MovieProducer producer;
     private final MovieOutboxRepository movieOutboxRepository;
     private final MovieOutboxDataAccessMapper mapper;
+    private final EventPayloadMapper eventPayloadMapper;
+    private MovieEventMapper movieEventMapper;
 
 
     @Transactional
@@ -47,7 +52,8 @@ public class MovieOutboxScheduler  {
                         String.valueOf(outboxMessage.getId())
                     ).collect(Collectors.joining(",")));
             outboxMessages.forEach(outboxMessage -> {
-                producer.sendMessageAddMovie(outboxMessage);
+                producer.sendMessageAddMovie(movieEventMapper.addMovieEventPayloadToAddMovieEvent(eventPayloadMapper.getMovieEventPayload(outboxMessage.getPayload(),
+                        AddMovieEventPayload.class)));
                 updateOutboxStatus(outboxMessage, OutboxStatus.COMPLETED);
             });
             log.info("{} CreateMovieOutboxMessage sent to message bus!", outboxMessages.size());
@@ -72,7 +78,8 @@ public class MovieOutboxScheduler  {
                             String.valueOf(outboxMessage.getId())
                     ).collect(Collectors.joining(",")));
             outboxMessages.forEach(outboxMessage -> {
-                producer.sendMessageEmail(outboxMessage);
+                producer.sendMessageEmail(movieEventMapper.addMovieEventPayloadToAddMovieEvent( eventPayloadMapper.getMovieEventPayload(outboxMessage.getPayload(),
+                        AddMovieEventPayload.class)));
                 updateOutboxStatus(outboxMessage, OutboxStatus.COMPLETED);
             });
             log.info("{} NotificationMovieOutboxMessage sent to message bus!", outboxMessages.size());
@@ -97,7 +104,8 @@ public class MovieOutboxScheduler  {
                             String.valueOf(outboxMessage.getId())
                     ).collect(Collectors.joining(",")));
             outboxMessages.forEach(outboxMessage -> {
-                producer.sendMessageUpdateMovie(outboxMessage);
+                producer.sendMessageUpdateMovie( movieEventMapper.addMovieEventPayloadToAddMovieEvent( eventPayloadMapper.getMovieEventPayload(outboxMessage.getPayload(),
+                        AddMovieEventPayload.class)));
                 updateOutboxStatus(outboxMessage, OutboxStatus.COMPLETED);
             });
             log.info("{} UpdateMovieOutboxMessage sent to message bus!", outboxMessages.size());
@@ -124,7 +132,8 @@ public class MovieOutboxScheduler  {
                             String.valueOf(outboxMessage.getId())
                     ).collect(Collectors.joining(",")));
             outboxMessages.forEach(outboxMessage -> {
-                producer.sendMessageDeleteMovie(outboxMessage);
+                producer.sendMessageDeleteMovie( movieEventMapper.addMovieEventPayloadToAddMovieEvent( eventPayloadMapper.getMovieEventPayload(outboxMessage.getPayload(),
+                        AddMovieEventPayload.class)));
                 updateOutboxStatus(outboxMessage, OutboxStatus.COMPLETED);
             });
             log.info("{} DeleteMovieOutboxMessage sent to message bus!", outboxMessages.size());

@@ -28,11 +28,7 @@ public class ActorController {
         return ok(mapper.actorEntityToActorDto(actorService.addActor(newActor)));
     }
 //
-    @GetMapping("/{actorId}")
-    public ResponseEntity<Actor> getByActorId(@PathVariable  int actorId) {
-        return actorService.getByActorId(actorId).map(mapper::actorEntityToActorDto).map(ResponseEntity::ok)
-                .orElse(notFound().build());
-    }
+
 
     @PutMapping("/{actorId}")
     public ResponseEntity<Actor> updateActor(@PathVariable int actorId,@RequestBody AddActorReq newActor) {

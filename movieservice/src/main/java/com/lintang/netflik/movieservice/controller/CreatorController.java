@@ -26,11 +26,7 @@ public class CreatorController {
         return ok(mapper.creatorEntityToCreatorDto(creatorService.addCreator(newCreator)));
     }
 
-    @GetMapping("/{creatorId}")
-    public ResponseEntity<Creator> getByCreatorId(@PathVariable int creatorId) {
-        return creatorService.getByCreatorId(creatorId).map(mapper::creatorEntityToCreatorDto)
-                .map(ResponseEntity::ok).orElse(notFound().build());
-    }
+
 
     @PutMapping("/{creatorId}")
     public ResponseEntity<Creator> updateCreator(@PathVariable int creatorId,@RequestBody AddCreatorReq newCreator ) {

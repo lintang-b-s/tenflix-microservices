@@ -22,8 +22,6 @@ public class VideoController {
     private VideoDtoMapper mapper;
     private VideoService videoService;
 
-    @PostMapping("/tes")
-    public String tes() {return "tes";}
 
     @PostMapping
     public ResponseEntity<Video> save(@RequestBody AddVideoReq newVideo) {
@@ -36,16 +34,7 @@ public class VideoController {
 
     }
 
-    @GetMapping("/{movieId}")
-    public ResponseEntity<List<Video>> getVideosByMovieId(@PathVariable(value = "movieId") int movieId) {
-        return ok(mapper.toListModel(videoService.getVideosByMovieId(movieId)));
-    }
 
-    @GetMapping("/{movieId}/{videoId}")
-    public ResponseEntity<Video> getVideoByMovieIdAndId(@PathVariable(value = "movieId") int movieId,
-                                                        @PathVariable(value = "videoId") int videoId){
-        return ok(mapper.videoEntityToVideoDto(videoService.getVideoByMovieIdAndId(movieId, videoId)));
-    }
 
     @DeleteMapping("/{movieId}/{videoId}")
     public ResponseEntity<String> deleteVideoFromMovie(@PathVariable(value = "movieId") int movieId,

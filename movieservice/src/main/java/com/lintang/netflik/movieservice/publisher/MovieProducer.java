@@ -4,7 +4,7 @@ package com.lintang.netflik.movieservice.publisher;
 
 import com.lintang.netflik.movieservice.dto.MovieEvent;
 import com.lintang.netflik.movieservice.event.AddMovieEvent;
-import com.lintang.netflik.movieservice.outbox.model.movieQuery.MovieOutboxMessage;
+import com.lintang.netflik.movieservice.event.AddMovieEventPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -32,19 +32,19 @@ public class MovieProducer {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void sendMessageEmail(MovieOutboxMessage movieOutboxMessage) {
-        rabbitTemplate.convertAndSend(exchange, emailRoutingKey, movieOutboxMessage);
+    public void sendMessageEmail(AddMovieEvent addMovieEvent) {
+        rabbitTemplate.convertAndSend(exchange, emailRoutingKey, addMovieEvent);
     }
 
-    public void sendMessageAddMovie(MovieOutboxMessage movieOutboxMessage) {
-        rabbitTemplate.convertAndSend(exchange,addMovieRoutingKey, movieOutboxMessage );
+    public void sendMessageAddMovie(AddMovieEvent addMovieEvent) {
+        rabbitTemplate.convertAndSend(exchange,addMovieRoutingKey, addMovieEvent );
     }
 
-    public void sendMessageUpdateMovie(MovieOutboxMessage movieOutboxMessage) {
-        rabbitTemplate.convertAndSend(exchange, updateMovieRoutingKey, movieOutboxMessage);
+    public void sendMessageUpdateMovie(AddMovieEvent addMovieEvent) {
+        rabbitTemplate.convertAndSend(exchange, updateMovieRoutingKey, addMovieEvent);
     }
 
-    public void sendMessageDeleteMovie(MovieOutboxMessage movieOutboxMessage) {
-        rabbitTemplate.convertAndSend(exchange, deleteMovieRoutingKey, movieOutboxMessage);
+    public void sendMessageDeleteMovie(AddMovieEvent addMovieEvent) {
+        rabbitTemplate.convertAndSend(exchange, deleteMovieRoutingKey, addMovieEvent);
     }
 }
