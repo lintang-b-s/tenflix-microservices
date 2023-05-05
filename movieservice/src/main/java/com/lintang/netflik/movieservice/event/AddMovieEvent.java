@@ -55,6 +55,17 @@ public class AddMovieEvent {
 
     private String image ;
 
+    private String outboxType;
+
+    public String getOutboxType() {
+        return outboxType;
+    }
+
+    public AddMovieEvent setOutboxType(String outboxType) {
+        this.outboxType = outboxType;
+        return this;
+    }
+
     public LocalDate getrYear() {
         return rYear;
     }

@@ -10,6 +10,7 @@
       <list>
         <option value="$PROJECT_DIR$/movieservice/pom.xml" />
         <option value="$PROJECT_DIR$/notificationservice/pom.xml" />
+        <option value="$PROJECT_DIR$/movieQueryService/pom.xml" />
       </list>
     </option>
   </component>

@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/netflik-nodddkon.iml" filepath="$PROJECT_DIR$/.idea/netflik-nodddkon.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/notificationservice.main.iml" filepath="$PROJECT_DIR$/.idea/modules/notificationservice.main.iml" />
     </modules>
   </component>
 </project>

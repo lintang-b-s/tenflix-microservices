@@ -10,6 +10,8 @@ import com.lintang.netflik.movieservice.helper.entityMapper.CreatorEntityMapper;
 import com.lintang.netflik.movieservice.helper.entityMapper.MovieEntityMapper;
 import com.lintang.netflik.movieservice.helper.entityMapper.VideoEntityMapper;
 import com.lintang.netflik.movieservice.helper.eventMapper.MovieEventMapper;
+import com.lintang.netflik.movieservice.outbox.MovieOutboxHelper;
+import com.lintang.netflik.movieservice.outbox.scheduler.MovieOutboxScheduler;
 import com.lintang.netflik.movieservice.publisher.MovieProducer;
 import com.lintang.netflik.movieservice.repository.ActorRepository;
 import com.lintang.netflik.movieservice.repository.CreatorRepository;
@@ -43,6 +45,7 @@ public class MovieService {
     private VideoRepository videoRepository;
     private MovieProducer producer;
     private MovieEventMapper movieEventMapper;
+    private MovieOutboxHelper movieOutboxHelper;
 
 
     public MovieService(MovieRepository repository, ActorRepository actorRepository, CreatorRepository creatorRepository,
@@ -52,7 +55,8 @@ public class MovieService {
                         VideoEntityMapper videoEntityMapper,
                         VideoRepository videoRepository,
                         MovieProducer producer,
-                        MovieEventMapper movieEventMapper) { this.repository = repository;
+                        MovieEventMapper movieEventMapper,
+                        MovieOutboxHelper movieOutboxHelper) { this.repository = repository;
     this.actorRepository = actorRepository;
     this.creatorRepository= creatorRepository;
     this.actorEntityMapper =actorEntityMapper;
@@ -62,6 +66,7 @@ public class MovieService {
     this.videoRepository= videoRepository;
     this.producer = producer;
     this.movieEventMapper= movieEventMapper;
+    this.movieOutboxHelper= movieOutboxHelper;
     }
 
 
@@ -106,13 +111,9 @@ public class MovieService {
 
 
         MovieEntity savedMovie = repository.save(newMovieEntity);
-        MovieEvent event = new MovieEvent();
-        event.setStatus("PENDING");
-        event.setMessageContentBody(savedMovie.getSynopsis());
-        event.setMovieTitle(savedMovie.getName());
-        event.setImageUrl(savedMovie.getImage());
-        producer.sendMessageEmail(event);
-        producer.sendMessageAddMovie(movieEventMapper.movieEntityToAddMovieEvent(savedMovie));
+
+        movieOutboxHelper.notificationMovieOutboxMessage(movieEventMapper.movieEntityToAddMovieEvent(savedMovie));
+        movieOutboxHelper.createMovieOutboxMessage(movieEventMapper.movieEntityToAddMovieEvent(savedMovie));
         return savedMovie;
     }
 
@@ -175,7 +176,8 @@ public class MovieService {
             );
         }
 
-        producer.sendMessageUpdateMovie(movieEventMapper.movieEntityToAddMovieEvent(updatedMovie));
+        movieOutboxHelper.updateMovieOutboxMessage(movieEventMapper.movieEntityToAddMovieEvent(updatedMovie));
+//        producer.sendMessageUpdateMovie(movieEventMapper.movieEntityToAddMovieEvent(updatedMovie));
         return repository.save(updatedMovie);
     }
 
@@ -220,7 +222,8 @@ public class MovieService {
 
         MovieEntity deletedMovie = repository.save(movieEntity);
         repository.deleteById(movieId);
-        producer.sendMessageDeleteMovie(movieEventMapper.movieEntityToAddMovieEvent(deletedMovie));
+//        producer.sendMessageDeleteMovie(movieEventMapper.movieEntityToAddMovieEvent(deletedMovie));
+        movieOutboxHelper.deleteMovieOutboxMessage(movieEventMapper.movieEntityToAddMovieEvent(deletedMovie));
         String res = "movie deleted!";
         return res;
     }
