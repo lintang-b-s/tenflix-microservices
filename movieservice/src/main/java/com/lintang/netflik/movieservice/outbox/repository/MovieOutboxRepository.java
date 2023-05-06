@@ -9,8 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MovieOutboxRepository extends JpaRepository<MovieOutboxEntity, Integer> {
-    Optional<List<MovieOutboxEntity>> findByTypeAndOutboxStatus(OutboxStatus outboxStatus,
+
+
+    Optional<List<MovieOutboxEntity>> findByOutboxStatusAndType(OutboxStatus outboxStatus,
                                                                 String type);
+
 
     Optional<List<MovieOutboxEntity>> findByOutboxStatus(OutboxStatus outboxStatus);
 

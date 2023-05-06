@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ActorEntityMapper {
 
-    public ActorEntity toEntity(AddActorReq m) {
+    public ActorEntity toEntity(Actor m) {
         ActorEntity entity = new ActorEntity();
         return entity.setName(m.getName());
     }

@@ -28,7 +28,7 @@ public class ActorEntity {
     }
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "actors", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "actors", fetch = FetchType.EAGER)
     private Set<MovieEntity> movies = new HashSet<>();
 
 
@@ -67,8 +67,6 @@ public class ActorEntity {
     public void removeMovie(MovieEntity movie) {
         this.movies.remove(movie);
     }
-
-
 
 
     @Override

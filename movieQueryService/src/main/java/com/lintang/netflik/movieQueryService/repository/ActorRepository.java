@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface ActorRepository extends JpaRepository<ActorEntity, Integer> {
     Optional<ActorEntity> findById(int actorId);
 
-    Optional<ActorEntity>  save(ActorEntity entity);
+    ActorEntity  save(ActorEntity entity);
 }

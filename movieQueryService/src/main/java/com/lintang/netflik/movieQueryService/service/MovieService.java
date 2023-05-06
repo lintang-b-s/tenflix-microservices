@@ -1,9 +1,6 @@
 package com.lintang.netflik.movieQueryService.service;
 
-import com.lintang.netflik.movieQueryService.entity.ActorEntity;
-import com.lintang.netflik.movieQueryService.entity.CreatorEntity;
-import com.lintang.netflik.movieQueryService.entity.MovieEntity;
-import com.lintang.netflik.movieQueryService.entity.VideoEntity;
+import com.lintang.netflik.movieQueryService.entity.*;
 import com.lintang.netflik.movieQueryService.event.AddMovieEvent;
 import com.lintang.netflik.movieQueryService.helper.entityMapper.ActorEntityMapper;
 import com.lintang.netflik.movieQueryService.helper.entityMapper.CreatorEntityMapper;
@@ -11,10 +8,7 @@ import com.lintang.netflik.movieQueryService.helper.entityMapper.MovieEntityMapp
 import com.lintang.netflik.movieQueryService.helper.entityMapper.VideoEntityMapper;
 import com.lintang.netflik.movieQueryService.helper.eventMapper.MovieEventMapper;
 
-import com.lintang.netflik.movieQueryService.repository.ActorRepository;
-import com.lintang.netflik.movieQueryService.repository.CreatorRepository;
-import com.lintang.netflik.movieQueryService.repository.MovieRepository;
-import com.lintang.netflik.movieQueryService.repository.VideoRepository;
+import com.lintang.netflik.movieQueryService.repository.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +34,7 @@ public class MovieService {
     private VideoEntityMapper videoEntityMapper;
     private VideoRepository videoRepository;
     private MovieEventMapper movieEventMapper;
+    private GetAllMoviesRepository getAllMoviesRepository;
 
 
     public MovieService(MovieRepository repository, ActorRepository actorRepository, CreatorRepository creatorRepository,
@@ -48,7 +43,8 @@ public class MovieService {
                         MovieEntityMapper movieEntityMapper,
                         VideoEntityMapper videoEntityMapper,
                         VideoRepository videoRepository,
-                        MovieEventMapper movieEventMapper
+                        MovieEventMapper movieEventMapper,
+                        GetAllMoviesRepository getAllMoviesRepository
                     ) { this.repository = repository;
     this.actorRepository = actorRepository;
     this.creatorRepository= creatorRepository;
@@ -58,6 +54,7 @@ public class MovieService {
     this.videoEntityMapper = videoEntityMapper;
     this.videoRepository= videoRepository;
     this.movieEventMapper= movieEventMapper;
+    this.getAllMoviesRepository= getAllMoviesRepository;
 
     }
 
@@ -71,9 +68,13 @@ public class MovieService {
 
                     Optional<ActorEntity> actorEntityFromDb = actorRepository.findById(actorEntities.getId());
                     if (!actorEntityFromDb.isPresent()){
-                        actorEntityFromDb = actorRepository.save(actorEntities);
+                        actorEntities = actorEntityMapper.toEntity(actor);
+                        getActor = actorRepository.save(actorEntities);
+                    } else {
+                        getActor = actorEntityFromDb.get();
+
                     }
-                    getActor = actorEntityFromDb.get();
+                    log.info("getActor: {}", getActor.getName());
 
                     getActor.addMovie(newMovieEntity);
                     return getActor;
@@ -82,26 +83,32 @@ public class MovieService {
 
         newMovieEntity.setCreators(newMovie.getCreators().stream()
                 .map(creator -> {
+                    CreatorEntity getCreator;
                     CreatorEntity creatorEntities = creatorEntityMapper.creatorDtotoCreatorEntity(creator);
                     Optional<CreatorEntity> creatorEntityFromDb = creatorRepository.findById(creatorEntities.getId());
                     if (!creatorEntityFromDb.isPresent()) {
-                        creatorEntityFromDb = creatorRepository.save(creatorEntities);
-                    }
-                    CreatorEntity getActor = creatorEntityFromDb.get();
+                        getCreator = creatorRepository.save(creatorEntities);
+                    } else {
+                        getCreator = creatorEntityFromDb.get();
 
-                    getActor.addMovie(newMovieEntity);
-                    return getActor;
+                    }
+
+                    getCreator.addMovie(newMovieEntity);
+                    return getCreator;
                 }).collect(Collectors.toSet()));
 
             newMovieEntity.setVideos(
                     newMovie.getVideos().stream().map(
                             video -> {
+                                VideoEntity getVideo;
                                 VideoEntity videoEntity = videoEntityMapper.videoDtoToEntity(video, newMovieEntity);
                                 Optional<VideoEntity>  videoEntityFromDb = videoRepository.findById(videoEntity.getId());
                                 if (!videoEntityFromDb.isPresent()) {
-                                    videoEntityFromDb = videoRepository.save(videoEntity);
+                                    getVideo = videoRepository.save(videoEntity);
+                                } else {
+                                    getVideo = videoEntityFromDb.get();
+
                                 }
-                                VideoEntity getVideo = videoEntityFromDb.get();
                                 getVideo.addMovie(newMovieEntity);
                                 return getVideo;
                             }
@@ -117,8 +124,8 @@ public class MovieService {
 
 
 
-    public Iterable<MovieEntity> getMoviesByUserId( @Valid int userId) {
-        return repository.findAll();
+    public Iterable<GetAllMovies> getMoviesByUserId(@Valid int userId) {
+        return getAllMoviesRepository.findAll();
     }
 
 
@@ -143,9 +150,10 @@ public class MovieService {
 
                     Optional<ActorEntity> actorEntityFromDb = actorRepository.findById(actorEntities.getId());
                     if (!actorEntityFromDb.isPresent()){
-                        actorEntityFromDb = actorRepository.save(actorEntities);
+                            getActor  = actorRepository.save(actorEntities);
+                    } else {
+                        getActor = actorEntityFromDb.get();
                     }
-                    getActor = actorEntityFromDb.get();
 
                     getActor.addMovie(updatedMovie);
                     return getActor;
@@ -154,26 +162,31 @@ public class MovieService {
 
         updatedMovie.setCreators(newMovie.getCreators().stream()
                 .map(creator -> {
+                    CreatorEntity getCreator;
                     CreatorEntity creatorEntities = creatorEntityMapper.creatorDtotoCreatorEntity(creator);
                     Optional<CreatorEntity> creatorEntityFromDb = creatorRepository.findById(creatorEntities.getId());
                     if (!creatorEntityFromDb.isPresent()) {
-                        creatorEntityFromDb = creatorRepository.save(creatorEntities);
+                        getCreator = creatorRepository.save(creatorEntities);
                     }
-                    CreatorEntity getActor = creatorEntityFromDb.get();
+                    else {
+                         getCreator = creatorEntityFromDb.get();
+                    }
 
-                    getActor.addMovie(updatedMovie);
-                    return getActor;
+                    getCreator.addMovie(updatedMovie);
+                    return getCreator;
                 }).collect(Collectors.toSet()));
 
         updatedMovie.setVideos(
                 newMovie.getVideos().stream().map(
                         video -> {
+                            VideoEntity getVideo;
                             VideoEntity videoEntity = videoEntityMapper.videoDtoToEntity(video, updatedMovie);
                             Optional<VideoEntity>  videoEntityFromDb = videoRepository.findById(videoEntity.getId());
                             if (!videoEntityFromDb.isPresent()) {
-                                videoEntityFromDb = videoRepository.save(videoEntity);
+                                getVideo = videoRepository.save(videoEntity);
+                            }else {
+                                getVideo = videoEntityFromDb.get();
                             }
-                            VideoEntity getVideo = videoEntityFromDb.get();
                             getVideo.addMovie(updatedMovie);
                             return getVideo;
                         }

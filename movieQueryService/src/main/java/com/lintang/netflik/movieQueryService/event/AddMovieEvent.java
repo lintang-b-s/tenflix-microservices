@@ -32,7 +32,6 @@ public class AddMovieEvent {
     private String mpaRating;
 
 
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate rYear;
 
 

@@ -1,20 +1,21 @@
 package com.lintang.netflik.movieQueryService.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
 
 @Entity
-@Table(name = "movies")
-public class MovieEntity {
+public class GetAllMovies {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     private String name;
 
     private String type;
@@ -28,8 +29,24 @@ public class MovieEntity {
     private int idmbRating;
     private String image;
 
+//    private int actor_id;
+//
+//    private String actor_name;
+//    private int creator_id;
+//
+//    private String creator_name;
+//
+//    private int video_id;
+//
+//    private String url;
+//
+//    private int length;
+//
+//    private String title;
+//
+//    private String video_synopsis;
 
-    @ManyToMany( fetch = FetchType.EAGER)
+    @ManyToMany( fetch = FetchType.LAZY)
     @JoinTable(
             name="movie_actor",
             joinColumns = @JoinColumn(name = "movie_id", referencedColumnName = "id"),
@@ -39,7 +56,7 @@ public class MovieEntity {
     private Set<ActorEntity> actors= new HashSet<>();
 
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name="movie_creator",
             joinColumns = @JoinColumn(name = "movie_id", referencedColumnName = "id"),
@@ -49,7 +66,7 @@ public class MovieEntity {
     private Set<CreatorEntity> creators= new HashSet<>() ;
 
 
-    @OneToMany(mappedBy = "movie",  fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "movie",  fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<VideoEntity> videos = new HashSet<>();
 
@@ -58,7 +75,7 @@ public class MovieEntity {
         return id;
     }
 
-    public MovieEntity setId(int id) {
+    public GetAllMovies setId(int id) {
         this.id = id;
         return this;
     }
@@ -67,7 +84,7 @@ public class MovieEntity {
         return name;
     }
 
-    public MovieEntity setName(String name) {
+    public GetAllMovies setName(String name) {
         this.name = name;
         return this;
     }
@@ -76,7 +93,7 @@ public class MovieEntity {
         return type;
     }
 
-    public MovieEntity setType(String type) {
+    public GetAllMovies setType(String type) {
         this.type = type;
         return this;
     }
@@ -85,7 +102,7 @@ public class MovieEntity {
         return synopsis;
     }
 
-    public MovieEntity setSynopsis(String synopsis) {
+    public GetAllMovies setSynopsis(String synopsis) {
         this.synopsis = synopsis;
         return this;
     }
@@ -94,7 +111,7 @@ public class MovieEntity {
         return mpaRating;
     }
 
-    public MovieEntity setMpaRating(String mpaRating) {
+    public GetAllMovies setMpaRating(String mpaRating) {
         this.mpaRating = mpaRating;
         return this;
     }
@@ -103,7 +120,7 @@ public class MovieEntity {
         return rYear;
     }
 
-    public MovieEntity setrYear(Timestamp rYear) {
+    public GetAllMovies setrYear(Timestamp rYear) {
         this.rYear = rYear;
         return this;
     }
@@ -112,22 +129,17 @@ public class MovieEntity {
         return idmbRating;
     }
 
-    public MovieEntity setIdmbRating(int idmbRating) {
+    public GetAllMovies setIdmbRating(int idmbRating) {
         this.idmbRating = idmbRating;
         return this;
     }
 
-
-
-    public MovieEntity addActor(ActorEntity actor) {
-        this.actors.add(actor);
-        actor.getMovies().add(this);
-        return this;
+    public String getImage() {
+        return image;
     }
 
-    public MovieEntity addCreator(CreatorEntity creator) {
-        this.creators.add(creator);
-        creator.getMovies().add(this);
+    public GetAllMovies setImage(String image) {
+        this.image = image;
         return this;
     }
 
@@ -135,7 +147,7 @@ public class MovieEntity {
         return actors;
     }
 
-    public MovieEntity setActors(Set<ActorEntity> actors) {
+    public GetAllMovies setActors(Set<ActorEntity> actors) {
         this.actors = actors;
         return this;
     }
@@ -144,46 +156,17 @@ public class MovieEntity {
         return creators;
     }
 
-    public MovieEntity setCreators(Set<CreatorEntity> creators) {
+    public GetAllMovies setCreators(Set<CreatorEntity> creators) {
         this.creators = creators;
         return this;
     }
-
 
     public Set<VideoEntity> getVideos() {
         return videos;
     }
 
-    public MovieEntity setVideos(Set<VideoEntity> videos) {
+    public GetAllMovies setVideos(Set<VideoEntity> videos) {
         this.videos = videos;
         return this;
     }
-
-    public String getImage() {
-        return image;
-    }
-
-    public MovieEntity setImage(String image) {
-        this.image = image;
-        return this;
-    }
-
-    @Override
-    public String toString() {
-        return "MovieEntity{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", synopsis='" + synopsis + '\'' +
-                ", mpaRating='" + mpaRating + '\'' +
-                ", rYear=" + rYear +
-                ", idmbRating=" + idmbRating +
-                ", image='" + image + '\'' +
-                ", actors=" + actors +
-                ", creators=" + creators +
-                ", videos=" + videos +
-                '}';
-    }
-
-
 }

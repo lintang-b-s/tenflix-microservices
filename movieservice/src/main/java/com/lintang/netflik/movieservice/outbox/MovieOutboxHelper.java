@@ -53,13 +53,13 @@ public class MovieOutboxHelper {
                 deleteMovieOutboxMessageEntity(movieEvent) );
     }
 
-    public Optional<List<MovieOutboxMessage>> getMovieOutboxMessageByOutboxStatusAndType(OutboxStatus outboxStatus,
-                                                                                         String type) {
+    public Optional<List<MovieOutboxMessage>> getMovieOutboxMessageByOutboxStatusAndType(OutboxStatus outboxStatus, String type) {
+        log.info("outbox status: {}", outboxStatus.name());
+        log.info("type: {}", type);
         Optional<List<MovieOutboxMessage>> movieOutboxMessageList =
                 Optional.of(
                 movieOutboxDataAccessMapper.toListMovieOutboxMessage(
-                movieOutboxRepository.findByTypeAndOutboxStatus(outboxStatus, type).get()));
-
+                movieOutboxRepository.findByOutboxStatusAndType(outboxStatus, type).get()));
 
         return movieOutboxMessageList;
     }

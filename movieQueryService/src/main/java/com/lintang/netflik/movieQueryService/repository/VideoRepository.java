@@ -17,7 +17,7 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Integer> {
 
      Optional<VideoEntity> findById(int videoId);
 
-    Optional<VideoEntity> save(VideoEntity videoEntity);
+    VideoEntity save(VideoEntity videoEntity);
 
 
 }

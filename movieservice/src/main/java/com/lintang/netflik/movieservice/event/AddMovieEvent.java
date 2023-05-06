@@ -1,6 +1,9 @@
 package com.lintang.netflik.movieservice.event;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.lintang.netflik.movieservice.dto.Actor;
 import com.lintang.netflik.movieservice.dto.Creator;
 import com.lintang.netflik.movieservice.dto.Video;
@@ -33,8 +36,6 @@ public class AddMovieEvent {
 
     private String mpaRating;
 
-
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate rYear;
 
 

@@ -77,7 +77,6 @@ public class MovieService {
                     ActorEntity actorEntities = actorEntityMapper.toActorEntity(actor);
                     if (actorEntities.getId()>0) {
                         actorEntities = actorRepository.findById(actorEntities.getId()).get();
-                        log.info("actorEntities: {}", actorEntities);
                     }
                     actorEntities.addMovie(newMovieEntity);
                     return actorEntities;
@@ -144,7 +143,6 @@ public class MovieService {
                     ActorEntity actorEntities = actorEntityMapper.toActorEntity(actor);
                     if (actorEntities.getId()>0) {
                         actorEntities = actorRepository.findById(actorEntities.getId()).get();
-                        log.info("actorEntities: {}", actorEntities);
                     }
                     actorEntities.addMovie(updatedMovie);
                     return actorEntities;

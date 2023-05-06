@@ -9,6 +9,11 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Configuration
 public class RabbitMQConfig {
@@ -97,16 +102,29 @@ public class RabbitMQConfig {
     }
 
     // message converter
+//    @Bean
+//    public MessageConverter converter(){
+//        return new Jackson2JsonMessageConverter();
+//    }
+
     @Bean
-    public MessageConverter converter(){
-        return new Jackson2JsonMessageConverter();
+    public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
+        // Date and Time APIに対応したObjectMapperを作成する
+        ObjectMapper objectMapper = Jackson2ObjectMapperBuilder.json()
+                .modules(new JavaTimeModule())
+                .dateFormat(new StdDateFormat())
+                .timeZone("Asia/Tokyo")
+                .build();
+        Jackson2JsonMessageConverter jackson2JsonMessageConverter
+                = new Jackson2JsonMessageConverter(objectMapper);
+        return jackson2JsonMessageConverter;
     }
 
     // configure RabbitTemplate
     @Bean
     public AmqpTemplate amqpTemplate(ConnectionFactory connectionFactory){
         RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(converter());
+        rabbitTemplate.setMessageConverter(jackson2JsonMessageConverter());
         return rabbitTemplate;
     }
 }

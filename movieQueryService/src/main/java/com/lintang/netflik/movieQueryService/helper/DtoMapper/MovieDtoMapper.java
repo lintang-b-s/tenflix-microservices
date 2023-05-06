@@ -4,10 +4,7 @@ import com.lintang.netflik.movieQueryService.dto.Actor;
 import com.lintang.netflik.movieQueryService.dto.Creator;
 import com.lintang.netflik.movieQueryService.dto.Movie;
 import com.lintang.netflik.movieQueryService.dto.Video;
-import com.lintang.netflik.movieQueryService.entity.ActorEntity;
-import com.lintang.netflik.movieQueryService.entity.CreatorEntity;
-import com.lintang.netflik.movieQueryService.entity.MovieEntity;
-import com.lintang.netflik.movieQueryService.entity.VideoEntity;
+import com.lintang.netflik.movieQueryService.entity.*;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -43,6 +40,37 @@ public class MovieDtoMapper {
         return StreamSupport.stream(entities.spliterator(), false).map(e -> movieEntitytoMovieDto(e))
                 .collect(toList());
     }
+
+    public Movie getAllMoviesEntitytoMovieDto(GetAllMovies getAllMoviesEntity) {
+        Movie movie = new Movie();
+        LocalDate entityLDT = getAllMoviesEntity.getrYear().toLocalDateTime().toLocalDate();
+        movie.setName(getAllMoviesEntity.getName());movie.setImage(getAllMoviesEntity.getImage());
+        movie.setId(getAllMoviesEntity.getId());movie.setType(getAllMoviesEntity.getType());
+        movie.setSynopsis(getAllMoviesEntity.getSynopsis());movie.setMpaRating(getAllMoviesEntity.getMpaRating());
+        movie.setRYear(entityLDT );
+        movie.setIdmbRating(getAllMoviesEntity.getIdmbRating());
+        movie.setCreators(getAllMoviesEntity.getCreators().stream().map(m -> toCreatorModel(m)).collect(Collectors.toSet()));
+        movie.setActors(getAllMoviesEntity.getActors().stream().map(m -> toActorModel(m)).collect(Collectors.toSet()));
+        movie.setVideos(getAllMoviesEntity.getVideos().stream().map(m -> toVideoModel(m)).collect(Collectors.toSet()));
+        return movie;
+
+    }
+
+    public List<Movie> toListgetAllMoviesEntityDto(Iterable<GetAllMovies> getAllMoviesEntity) {
+
+        if (Objects.isNull(getAllMoviesEntity)) {
+            return Collections.emptyList();
+        }
+        return StreamSupport.stream(getAllMoviesEntity.spliterator(), false).map(e -> getAllMoviesEntitytoMovieDto(e))
+                .collect(toList());
+    }
+
+    public  Actor getAllMovieEntityToActorModel(int id, String name) {
+        Actor actor = new Actor();
+         actor.setId(id);actor.setName(name);
+         return actor;
+    }
+
 
     private Actor toActorModel(ActorEntity actorEntity) {
         Actor m = new Actor();

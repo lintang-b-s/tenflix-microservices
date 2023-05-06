@@ -33,7 +33,7 @@ public class CreatorEntity {
     }
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "creators", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "creators", fetch = FetchType.EAGER)
     private Set<MovieEntity> movies = new HashSet<MovieEntity>();
 
 

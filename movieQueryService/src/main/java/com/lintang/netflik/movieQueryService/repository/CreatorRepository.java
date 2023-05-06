@@ -9,5 +9,5 @@ public interface CreatorRepository  extends JpaRepository<CreatorEntity, Integer
 
     Optional<CreatorEntity> findById(int creatorId);
 
-    Optional<CreatorEntity> save(CreatorEntity creatorEntity);
+    CreatorEntity save(CreatorEntity creatorEntity);
 }

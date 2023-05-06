@@ -17,7 +17,7 @@ public class VideoEntity {
 
     private String synopsis;
 
-    @ManyToOne( fetch = FetchType.LAZY)
+    @ManyToOne( fetch = FetchType.EAGER)
     @JoinColumn(name = "movie_id", referencedColumnName = "id")
     private MovieEntity movie;
 

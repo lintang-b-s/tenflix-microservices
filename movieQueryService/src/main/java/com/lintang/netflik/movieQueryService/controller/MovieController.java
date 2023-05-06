@@ -1,6 +1,7 @@
 package com.lintang.netflik.movieQueryService.controller;
 
 import com.lintang.netflik.movieQueryService.dto.Movie;
+import com.lintang.netflik.movieQueryService.entity.GetAllMovies;
 import com.lintang.netflik.movieQueryService.helper.DtoMapper.MovieDtoMapper;
 import com.lintang.netflik.movieQueryService.service.MovieService;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,7 @@ public class MovieController {
 
     @GetMapping
     public ResponseEntity<List<Movie>> getAllMovies() {
-        return ok(mapper.toListModel(movieService.getMoviesByUserId(123)));
+        return ok(mapper.toListgetAllMoviesEntityDto(movieService.getMoviesByUserId(123)));
 
     }
 

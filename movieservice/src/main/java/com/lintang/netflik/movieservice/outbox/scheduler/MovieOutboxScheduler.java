@@ -35,8 +35,8 @@ public class MovieOutboxScheduler  {
 
 
     @Transactional
-    @Scheduled(fixedDelayString = "${movie-service.outbox-scheduler-fixed-rate}",
-            initialDelayString = "${movie-service.outbox-scheduler-initial-delay}")
+    @Scheduled(fixedDelay = 1000,
+            initialDelay = 1000)
     public void processCreateMovieOutboxMessage() {
         Optional<List<MovieOutboxMessage>> outboxMessageResponses=
                 movieOutboxHelper.getMovieOutboxMessageByOutboxStatusAndType(
@@ -61,8 +61,8 @@ public class MovieOutboxScheduler  {
     }
 
     @Transactional
-    @Scheduled(fixedDelayString = "${movie-service.outbox-scheduler-fixed-rate}",
-            initialDelayString = "${movie-service.outbox-scheduler-initial-delay}")
+    @Scheduled(fixedDelay = 1000,
+            initialDelay = 1000)
     public void processNotificationMovieOutboxMessage() {
         Optional<List<MovieOutboxMessage>> outboxMessageResponses =
                 movieOutboxHelper.getMovieOutboxMessageByOutboxStatusAndType(
@@ -87,8 +87,8 @@ public class MovieOutboxScheduler  {
     }
 
     @Transactional
-    @Scheduled(fixedDelayString = "${movie-service.outbox-scheduler-fixed-rate}",
-            initialDelayString = "${movie-service.outbox-scheduler-initial-delay}")
+    @Scheduled(fixedDelay = 1000,
+            initialDelay = 1000)
     public void processUpdateMovieOutboxMessage() {
         Optional<List<MovieOutboxMessage>> outboxMessageResponses=
                 movieOutboxHelper.getMovieOutboxMessageByOutboxStatusAndType(
@@ -115,8 +115,8 @@ public class MovieOutboxScheduler  {
 
 
     @Transactional
-    @Scheduled(fixedDelayString = "${movie-service.outbox-scheduler-fixed-rate}",
-            initialDelayString = "${movie-service.outbox-scheduler-initial-delay}")
+    @Scheduled(fixedDelay = 1000,
+            initialDelay = 1000)
     public void processDeleteMovieOutboxMessage() {
         Optional<List<MovieOutboxMessage>> outboxMessageResponses=
                 movieOutboxHelper.getMovieOutboxMessageByOutboxStatusAndType(
