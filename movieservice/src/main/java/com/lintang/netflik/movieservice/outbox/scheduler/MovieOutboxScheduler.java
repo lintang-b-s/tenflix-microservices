@@ -44,13 +44,23 @@ public class MovieOutboxScheduler  {
                         "create_movie"
                 );
 
+
         if (outboxMessageResponses.isPresent() && outboxMessageResponses.get().size() > 0) {
             List<MovieOutboxMessage> outboxMessages = outboxMessageResponses.get();
+
+            log.info("version movieOutboxMessage in get scheduler: {}",  outboxMessages.stream().map(movieOutboxMessage ->
+
+                String.valueOf(movieOutboxMessage.getVersion())
+
+            ).collect(Collectors.joining(",")));
+
+
             log.info("Received {} movieOutboxCreateMessage with ids: {} sending to message bus!",
                     outboxMessages.size(),
                     outboxMessages.stream().map(outboxMessage ->
                         String.valueOf(outboxMessage.getId())
                     ).collect(Collectors.joining(",")));
+
             outboxMessages.forEach(outboxMessage -> {
                 producer.sendMessageAddMovie(movieEventMapper.addMovieEventPayloadToAddMovieEvent(eventPayloadMapper.getMovieEventPayload(outboxMessage.getPayload(),
                         AddMovieEventPayload.class)));
@@ -87,8 +97,8 @@ public class MovieOutboxScheduler  {
     }
 
     @Transactional
-    @Scheduled(fixedDelay = 1000,
-            initialDelay = 1000)
+    @Scheduled(fixedDelay = 5000,
+            initialDelay = 5000)
     public void processUpdateMovieOutboxMessage() {
         Optional<List<MovieOutboxMessage>> outboxMessageResponses=
                 movieOutboxHelper.getMovieOutboxMessageByOutboxStatusAndType(

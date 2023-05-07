@@ -5,6 +5,7 @@ import com.lintang.netflik.movieservice.entity.MovieEntity;
 import com.lintang.netflik.movieservice.event.AddMovieEvent;
 import com.lintang.netflik.movieservice.outbox.entity.MovieOutboxEntity;
 import com.lintang.netflik.movieservice.outbox.mapper.MovieOutboxDataAccessMapper;
+import com.lintang.netflik.movieservice.outbox.mapper.MovieOutboxMessageMapper;
 import com.lintang.netflik.movieservice.outbox.model.OutboxStatus;
 import com.lintang.netflik.movieservice.outbox.model.movieQuery.MovieOutboxMessage;
 import com.lintang.netflik.movieservice.outbox.repository.MovieOutboxRepository;
@@ -23,44 +24,60 @@ public class MovieOutboxHelper {
 
     private MovieOutboxRepository movieOutboxRepository;
     private MovieOutboxDataAccessMapper movieOutboxDataAccessMapper;
+    private MovieOutboxMessageMapper movieOutboxMessageMapper;
 
-    public void createMovieOutboxMessage(AddMovieEvent movieEvent) {
+    @Transactional
+    public MovieOutboxMessage createMovieOutboxMessage(AddMovieEvent movieEvent) {
 
         log.info("movie created with id: {}", movieEvent.getId());
 
-        movieOutboxRepository.save(movieOutboxDataAccessMapper.
-                        createMovieOutboxMessageEntity(movieEvent));
-        return ;
+       return movieOutboxDataAccessMapper.movieOutboxEntityToMovieOutboxMessage( movieOutboxRepository.save(movieOutboxDataAccessMapper.
+                        createMovieOutboxMessageEntity(movieOutboxMessageMapper
+                                .createMovieEventToOutboxMessage(movieEvent))));
+
     }
 
-    public void notificationMovieOutboxMessage(AddMovieEvent movieEvent) {
+    @Transactional
+    public MovieOutboxMessage notificationMovieOutboxMessage(AddMovieEvent movieEvent) {
         log.info("movie event saved with id: {}", movieEvent.getId());
-        movieOutboxRepository.save(movieOutboxDataAccessMapper.
-                notificationMovieOutboxMessageToEntity(movieEvent));
+        return movieOutboxDataAccessMapper.movieOutboxEntityToMovieOutboxMessage(
+                movieOutboxRepository.save(
+                        movieOutboxDataAccessMapper.
+                                notificationMovieOutboxMessageToEntity(
+                                        movieOutboxMessageMapper.notificationMovieEventToOutboxMessage(movieEvent)
+                                )));
     }
 
-    public void updateMovieOutboxMessage(AddMovieEvent movieEvent) {
+    @Transactional
+    public MovieOutboxMessage updateMovieOutboxMessage(AddMovieEvent movieEvent) {
         log.info("movie updated with id: {}", movieEvent.getId());
 
-        movieOutboxRepository.save(movieOutboxDataAccessMapper.
-                    updateMovieOutboxMessageEntity(movieEvent));
+        return movieOutboxDataAccessMapper.movieOutboxEntityToMovieOutboxMessage(
+                movieOutboxRepository.save(movieOutboxDataAccessMapper.
+                    updateMovieOutboxMessageToEntity(movieOutboxMessageMapper
+                            .updateMovieEventToOutboxMessage(movieEvent))));
     }
 
-    public void deleteMovieOutboxMessage(AddMovieEvent movieEvent) {
+
+
+    @Transactional
+    public MovieOutboxMessage deleteMovieOutboxMessage(AddMovieEvent movieEvent) {
         log.info("movie deleted with id: {}", movieEvent.getId());
 
-        movieOutboxRepository.save(movieOutboxDataAccessMapper.
-                deleteMovieOutboxMessageEntity(movieEvent) );
+        return movieOutboxDataAccessMapper.movieOutboxEntityToMovieOutboxMessage( movieOutboxRepository.save(movieOutboxDataAccessMapper.
+                deleteMovieOutboxMessageEntity(
+                        movieOutboxMessageMapper.deleteMovieEvenToOutboxMessage(movieEvent)
+                ) ));
     }
 
     public Optional<List<MovieOutboxMessage>> getMovieOutboxMessageByOutboxStatusAndType(OutboxStatus outboxStatus, String type) {
-        log.info("outbox status: {}", outboxStatus.name());
-        log.info("type: {}", type);
+
+
         Optional<List<MovieOutboxMessage>> movieOutboxMessageList =
                 Optional.of(
                 movieOutboxDataAccessMapper.toListMovieOutboxMessage(
                 movieOutboxRepository.findByOutboxStatusAndType(outboxStatus, type).get()));
-
+        // scheduler nya ada 3 create_movie, update_movie sama delete_movie dijalankan di waktu bersaamaan, pas di update movie id 31 versinya jadi 2 padahal di scheduler create versinya 1 jadi muncul error optimistic locking
         return movieOutboxMessageList;
     }
 

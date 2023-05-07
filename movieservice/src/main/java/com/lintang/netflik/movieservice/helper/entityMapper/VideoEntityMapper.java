@@ -30,8 +30,8 @@ public class VideoEntityMapper {
 
     public VideoEntity videoDtoToEntity(Video video, MovieEntity movie) {
         VideoEntity entity = new VideoEntity();
-        movie.setId(video.getMovieId());
-        return entity.setId(video.getId());
+        return entity.setId(video.getId()).setSynopsis(video.getSynopsis()).setLength(video.getLength())
+                .setTitle(video.getTitle()).setUrl(video.getUrl());
 
     }
 }

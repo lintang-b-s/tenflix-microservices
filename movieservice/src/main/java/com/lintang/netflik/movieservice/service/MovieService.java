@@ -11,6 +11,7 @@ import com.lintang.netflik.movieservice.helper.entityMapper.MovieEntityMapper;
 import com.lintang.netflik.movieservice.helper.entityMapper.VideoEntityMapper;
 import com.lintang.netflik.movieservice.helper.eventMapper.MovieEventMapper;
 import com.lintang.netflik.movieservice.outbox.MovieOutboxHelper;
+import com.lintang.netflik.movieservice.outbox.model.movieQuery.MovieOutboxMessage;
 import com.lintang.netflik.movieservice.outbox.scheduler.MovieOutboxScheduler;
 import com.lintang.netflik.movieservice.publisher.MovieProducer;
 import com.lintang.netflik.movieservice.repository.ActorRepository;
@@ -20,6 +21,7 @@ import com.lintang.netflik.movieservice.repository.VideoRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -74,35 +76,55 @@ public class MovieService {
         MovieEntity newMovieEntity = movieEntityMapper.toEntity(newMovie);
         newMovieEntity.setActors(newMovie.getActors().stream()
                 .map(actor -> {
+                    Optional<ActorEntity> actorOptional;
+                    ActorEntity getActor;
                     ActorEntity actorEntities = actorEntityMapper.toActorEntity(actor);
-                    if (actorEntities.getId()>0) {
-                        actorEntities = actorRepository.findById(actorEntities.getId()).get();
+
+                    actorOptional = actorRepository.findById(actorEntities.getId());
+                    if (!actorOptional.isPresent()) {
+                        getActor=  actorRepository.save(actorEntities);
+                    }else {
+                        getActor = actorOptional.get();
                     }
-                    actorEntities.addMovie(newMovieEntity);
-                    return actorEntities;
+                    getActor.addMovie(newMovieEntity);
+                    return getActor;
                 })
                 .collect(Collectors.toSet()));
 
         newMovieEntity.setCreators(newMovie.getCreators().stream()
                 .map(creator -> {
+                    Optional<CreatorEntity> creatorOptional;
+                    CreatorEntity getCreator;
                     CreatorEntity creatorEntities = creatorEntityMapper.creatorDtotoCreatorEntity(creator);
-                    if (creatorEntities.getId()>0) {
-                        creatorEntities = creatorRepository.findById(creatorEntities.getId()).get();
+                    creatorOptional = creatorRepository.findById(creatorEntities.getId());
+                    if (!creatorOptional.isPresent() ) {
+                        getCreator = creatorRepository.save(creatorEntities);
                     }
-                    creatorEntities.addMovie(newMovieEntity);
-                    return creatorEntities;
+                    else {
+                        getCreator = creatorOptional.get();
+                    }
+                    getCreator.addMovie(newMovieEntity);
+                    return getCreator;
                 }).collect(Collectors.toSet()));
 
         if (newMovie.getVideos() != null) {
             newMovieEntity.setVideos(
                     newMovie.getVideos().stream().map(
                             video -> {
+                                VideoEntity getVideo;
+                                Optional<VideoEntity> optionalVid;
                                 VideoEntity videoEntity = videoEntityMapper.videoDtoToEntity(video, newMovieEntity);
-                                if (videoEntity.getId() > 0) {
-                                    videoEntity = videoRepository.findById(videoEntity.getId()).get();
+                                optionalVid = videoRepository.findById(videoEntity.getId());
+
+                                if (!optionalVid.isPresent()) {
+                                    getVideo = videoRepository.save(videoEntity);
                                 }
-                                videoEntity.addMovie(newMovieEntity);
-                                return videoEntity;
+                                else {
+                                    getVideo = optionalVid.get();
+                                }
+
+                                getVideo.addMovie(newMovieEntity);
+                                return getVideo;
                             }
                     ).collect(Collectors.toSet())
             );
@@ -111,8 +133,14 @@ public class MovieService {
 
         MovieEntity savedMovie = repository.save(newMovieEntity);
 
-        movieOutboxHelper.notificationMovieOutboxMessage(movieEventMapper.movieEntityToAddMovieEvent(savedMovie));
-        movieOutboxHelper.createMovieOutboxMessage(movieEventMapper.movieEntityToAddMovieEvent(savedMovie));
+        MovieOutboxMessage  notificationSavedOutboxMessage =movieOutboxHelper.notificationMovieOutboxMessage(
+                movieEventMapper.movieEntityToAddMovieEvent(savedMovie));
+        log.info("NotificationOutboxMessage saved with outbox id: {}", notificationSavedOutboxMessage);
+
+        MovieOutboxMessage movieSavedOutboxMessage=
+                movieOutboxHelper.createMovieOutboxMessage(movieEventMapper.movieEntityToAddMovieEvent(savedMovie));
+        log.info("MovieUpdatedOutboxMessage saved with outbox id: {}", movieSavedOutboxMessage
+                .getId());
         return savedMovie;
     }
 
@@ -123,6 +151,7 @@ public class MovieService {
     }
 
 
+    @Transactional
     public MovieEntity updateMovie(@NotNull @Valid int movieId,
                                    @NotNull @Valid AddMovieReq newMovie) {
 
@@ -134,49 +163,81 @@ public class MovieService {
         MovieEntity updatedMovie = movie.get();
         Timestamp modelTimestamp = Timestamp.valueOf(newMovie.getrYear().atStartOfDay());
 
-        updatedMovie.setName(newMovie.getName()).setrYear(modelTimestamp)
+        updatedMovie.setId(movieId).setName(newMovie.getName()).setrYear(modelTimestamp)
                 .setIdmbRating(newMovie.getIdmbRating()).setMpaRating(newMovie.getMpaRating())
                 .setSynopsis(newMovie.getSynopsis()).setType(newMovie.getType())
                 ;
         updatedMovie.setActors(newMovie.getActors().stream()
                 .map(actor -> {
+                    Optional<ActorEntity> actorOptional;
+                    ActorEntity getActor;
                     ActorEntity actorEntities = actorEntityMapper.toActorEntity(actor);
-                    if (actorEntities.getId()>0) {
-                        actorEntities = actorRepository.findById(actorEntities.getId()).get();
+                    actorOptional =actorRepository.findById(actorEntities.getId());
+                    if (!actorOptional.isPresent()) {
+                        getActor = actorRepository.save(actorEntities);
+                    }else {
+                        getActor = actorOptional.get();
                     }
-                    actorEntities.addMovie(updatedMovie);
-                    return actorEntities;
+
+                    getActor.addMovie(updatedMovie);
+                    return getActor;
                 })
                 .collect(Collectors.toSet()));
 
         updatedMovie.setCreators(newMovie.getCreators().stream()
                 .map(creator -> {
+                    Optional<CreatorEntity> creatorOptional;
+                    CreatorEntity getCreator;
                     CreatorEntity creatorEntities = creatorEntityMapper.creatorDtotoCreatorEntity(creator);
-                    if (creatorEntities.getId()>0) {
-                        creatorEntities = creatorRepository.findById(creatorEntities.getId()).get();
+                    creatorOptional = creatorRepository.findById(creatorEntities.getId());
+                    if (!creatorOptional.isPresent()) {
+                        getCreator = creatorRepository.save(creatorEntities);
                     }
-                    creatorEntities.addMovie(updatedMovie);
-                    return creatorEntities;
+                    else {
+                        getCreator = creatorOptional.get();
+                    }
+                    getCreator.addMovie(updatedMovie);
+                    return getCreator;
                 }).collect(Collectors.toSet()));
 
         if (newMovie.getVideos() != null) {
             updatedMovie.setVideos(
                     newMovie.getVideos().stream().map(
                             video -> {
+                                VideoEntity getVideo;
+                                Optional<VideoEntity> optionalVid;
                                 VideoEntity videoEntity = videoEntityMapper.videoDtoToEntity(video, updatedMovie);
-                                if (videoEntity.getId() > 0) {
-                                    videoEntity = videoRepository.findById(videoEntity.getId()).get();
+                                optionalVid = videoRepository.findById(videoEntity.getId());
+
+                                if (!optionalVid.isPresent()) {
+                                    getVideo = videoRepository.save(videoEntity);
                                 }
-                                videoEntity.addMovie(updatedMovie);
-                                return videoEntity;
+                                else {
+                                    getVideo = optionalVid.get();
+                                }
+
+                                getVideo.addMovie(updatedMovie);
+                                return getVideo;
                             }
                     ).collect(Collectors.toSet())
             );
         }
 
-        movieOutboxHelper.updateMovieOutboxMessage(movieEventMapper.movieEntityToAddMovieEvent(updatedMovie));
-//        producer.sendMessageUpdateMovie(movieEventMapper.movieEntityToAddMovieEvent(updatedMovie));
-        return repository.save(updatedMovie);
+        updatedMovie.setId(movieId);
+
+        MovieEntity savedUpdatedMovie = saveMovie(updatedMovie);
+        MovieOutboxMessage movieUpdatedOutboxMessage=
+                movieOutboxHelper.updateMovieOutboxMessage(movieEventMapper
+                        .movieEntityToAddMovieEvent(savedUpdatedMovie));
+        log.info("MovieUpdatedOutboxMessage saved  in updateMovie with outbox id: {} and version: {}", movieUpdatedOutboxMessage
+                .getId(), movieUpdatedOutboxMessage.getVersion());
+
+        return savedUpdatedMovie;
+    }
+
+    @Transactional
+    public MovieEntity saveMovie(MovieEntity movie) {
+        return repository.save(movie);
     }
 
 
@@ -210,18 +271,15 @@ public class MovieService {
             creator.removeMovie(movieEntity);
             return creator;
         });
-        if (movieEntity.getVideos() != null ) {
-            movieEntity.getVideos().stream().map(video -> {
-                video.removeMovie(movieEntity);
-                return video;
-            });
-        }
+        videoRepository.deleteByMovieId(movieEntity.getId());
+//       movieEntity.removeVideos();
 
 
         MovieEntity deletedMovie = repository.save(movieEntity);
         repository.deleteById(movieId);
-//        producer.sendMessageDeleteMovie(movieEventMapper.movieEntityToAddMovieEvent(deletedMovie));
-        movieOutboxHelper.deleteMovieOutboxMessage(movieEventMapper.movieEntityToAddMovieEvent(deletedMovie));
+        MovieOutboxMessage deleteMovieOutboxMessage = movieOutboxHelper.deleteMovieOutboxMessage(
+                movieEventMapper.movieEntityToAddMovieEvent(deletedMovie));
+        log.info("deleteMovieOutboxMessage saved with id: {}", deleteMovieOutboxMessage.getId());
         String res = "movie deleted!";
         return res;
     }

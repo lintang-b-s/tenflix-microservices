@@ -15,6 +15,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 
@@ -57,6 +58,16 @@ public class AddMovieEvent {
     private String image ;
 
     private String outboxType;
+    private ZonedDateTime createdAt;
+
+    public AddMovieEvent setCreatedAt(ZonedDateTime createdAt) {
+        this.createdAt = createdAt;
+        return this;
+    }
+
+    public ZonedDateTime getCreatedAt() {
+        return createdAt;
+    }
 
     public String getOutboxType() {
         return outboxType;

@@ -82,7 +82,7 @@ public class VideoEntity {
         this.movie = movie;
     }
 
-    public void removeMovie(MovieEntity movie) {
+    public void removeMovie() {
         this.movie = null;
     }
 

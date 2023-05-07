@@ -22,100 +22,57 @@ import java.util.stream.Collectors;
 public class MovieOutboxDataAccessMapper {
 
     private final ObjectMapper objectMapper;
+    private final MovieOutboxMessageMapper movieOutboxMessageMapper;
     public MovieOutboxEntity movieOutboxMessageToOutboxEntity(MovieOutboxMessage
                                                               movieOutboxMessage) {
-        return MovieOutboxEntity.builder()
-                .id(movieOutboxMessage.getId())
-                .createdAt(movieOutboxMessage.getCreatedAt())
-                .processedAt(movieOutboxMessage.getProcessedAt())
-                .type(movieOutboxMessage.getType())
-                .payload(movieOutboxMessage.getPayload())
-                .outboxStatus(movieOutboxMessage.getOutboxStatus())
-                .version(movieOutboxMessage.getVersion())
-                .build();
+
+        MovieOutboxEntity entity= new MovieOutboxEntity();
+
+                entity.setId(movieOutboxMessage.getId())
+                .setCreatedAt(movieOutboxMessage.getCreatedAt())
+                .setProcessedAt(movieOutboxMessage.getProcessedAt())
+                .setType(movieOutboxMessage.getType())
+                .setPayload(movieOutboxMessage.getPayload())
+                .setOutboxStatus(movieOutboxMessage.getOutboxStatus())
+                .setVersion(movieOutboxMessage.getVersion());
+
+        return entity;
     }
 
     public MovieOutboxMessage movieOutboxEntityToMovieOutboxMessage(MovieOutboxEntity
                                                                     movieOutboxEntity) {
-        return MovieOutboxMessage.builder()
-                .id(movieOutboxEntity.getId())
-                .createdAt(movieOutboxEntity.getCreatedAt())
-                .processedAt(movieOutboxEntity.getProcessedAt())
-                .type(movieOutboxEntity.getType())
-                .payload(movieOutboxEntity.getPayload())
-                .outboxStatus(movieOutboxEntity.getOutboxStatus())
-                .version(movieOutboxEntity.getVersion())
-                .build();
+
+        MovieOutboxMessage movieOutboxMessage = new MovieOutboxMessage();
+        movieOutboxMessage.setId(movieOutboxEntity.getId())
+                .setCreatedAt(movieOutboxEntity.getCreatedAt())
+                .setProcessedAt(movieOutboxEntity.getProcessedAt())
+                .setType(movieOutboxEntity.getType())
+                .setPayload(movieOutboxEntity.getPayload())
+                .setOutboxStatus(movieOutboxEntity.getOutboxStatus())
+                .setVersion(movieOutboxEntity.getVersion());
+        return movieOutboxMessage;
     }
 
     public List<MovieOutboxMessage> toListMovieOutboxMessage(List<MovieOutboxEntity> movieOutboxEntities) {
         return movieOutboxEntities.stream().map(e ->  movieOutboxEntityToMovieOutboxMessage(e)).collect(Collectors.toList());
     }
 
-    public MovieOutboxEntity createMovieOutboxMessageEntity(AddMovieEvent addMovieEvent) {
-        return MovieOutboxEntity.builder()
-                .id(addMovieEvent.getId())
-                .createdAt(ZonedDateTime.now())
-                .type("create_movie")
-                .payload(createPayload(addMovieEvent))
-                .outboxStatus(OutboxStatus.STARTED)
-                .build();
+    public MovieOutboxEntity createMovieOutboxMessageEntity(MovieOutboxMessage movieOutboxMessage) {
+        return movieOutboxMessageMapper.movieOutboxMessageToMovieOutboxEntity(movieOutboxMessage);
     }
 
-    public MovieOutboxEntity notificationMovieOutboxMessageToEntity(AddMovieEvent addMovieEvent) {
-        return MovieOutboxEntity.builder()
-                .id(addMovieEvent.getId())
-                .createdAt(ZonedDateTime.now())
-                .type("notification_movie")
-                .payload(createPayload(addMovieEvent))
-                .outboxStatus(OutboxStatus.STARTED)
-                .build();
+    public MovieOutboxEntity notificationMovieOutboxMessageToEntity(MovieOutboxMessage movieOutboxMessage) {
+        return movieOutboxMessageMapper.movieOutboxMessageToMovieOutboxEntity(movieOutboxMessage);
     }
 
-    public MovieOutboxEntity updateMovieOutboxMessageEntity(AddMovieEvent addMovieEvent) {
-        return MovieOutboxEntity.builder()
-                .id(addMovieEvent.getId())
-                .createdAt(ZonedDateTime.now())
-                .type("update_movie")
-                .payload(createPayload(addMovieEvent))
-                .outboxStatus(OutboxStatus.STARTED)
-                .build();
+    public MovieOutboxEntity updateMovieOutboxMessageToEntity(MovieOutboxMessage movieOutboxMessage) {
+        return movieOutboxMessageMapper.movieOutboxMessageToMovieOutboxEntity(movieOutboxMessage);
     }
 
-    public MovieOutboxEntity deleteMovieOutboxMessageEntity(AddMovieEvent addMovieEvent) {
-        return MovieOutboxEntity.builder()
-                .id(addMovieEvent.getId())
-                .createdAt(ZonedDateTime.now())
-                .type("delete_movie")
-                .payload(createPayload(addMovieEvent))
-                .outboxStatus(OutboxStatus.STARTED)
-                .build();
+    public MovieOutboxEntity deleteMovieOutboxMessageEntity(MovieOutboxMessage movieOutboxMessage) {
+        return movieOutboxMessageMapper.movieOutboxMessageToMovieOutboxEntity(movieOutboxMessage);
     }
 
-    public String createPayload(AddMovieEvent addMovieEvent) {
-        try {
-            AddMovieEventPayload addMovieEventPayload =
-                    AddMovieEventPayload.builder()
-                            .id(addMovieEvent.getId())
-                            .name(addMovieEvent.getName())
-                            .type(addMovieEvent.getType())
-                            .synopsis(addMovieEvent.getSynopsis())
-                            .mpaRating(addMovieEvent.getMpaRating())
-                            .rYear(addMovieEvent.getrYear())
-                            .idmbRating(addMovieEvent.getIdmbRating())
-                            .actors(addMovieEvent.getActors())
-                            .creators(addMovieEvent.getCreators())
-                            .videos(addMovieEvent.getVideos())
-                            .outboxType("create_movie")
-                            .build();
 
-            return objectMapper.writeValueAsString(addMovieEventPayload);
-        } catch (JsonProcessingException e) {
-            String error = "Could not create addMovieEventPayload object for  id: {}" + addMovieEvent.getId()
-                    + e;
-            log.error(error);
-            return error;
-        }
-    }
 
 }

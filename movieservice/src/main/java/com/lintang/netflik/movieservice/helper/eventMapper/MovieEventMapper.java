@@ -13,7 +13,11 @@ import com.lintang.netflik.movieservice.event.AddMovieEventPayload;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.stream.Collectors;
+
+import static java.time.ZoneOffset.UTC;
 
 @Component
 public class MovieEventMapper {
@@ -25,7 +29,8 @@ public class MovieEventMapper {
                  .setSynopsis(entity.getSynopsis()).setMpaRating(entity.getMpaRating()).setrYear(entityLDT)
                 .setIdmbRating(entity.getIdmbRating()).setCreators(entity.getCreators().stream().map(m -> toCreatorModel(m)).collect(Collectors.toSet()))
                 .setActors(entity.getActors().stream().map(m -> toActorModel(m)).collect(Collectors.toSet()))
-                .setImage(entity.getImage()).setVideos(entity.getVideos().stream().map(m -> toVideoModel(m)).collect(Collectors.toSet()));
+                .setImage(entity.getImage()).setVideos(entity.getVideos().stream().map(m -> toVideoModel(m)).collect(Collectors.toSet()))
+                .setCreatedAt(ZonedDateTime.now(ZoneId.of("UTC")));
 
     }
 

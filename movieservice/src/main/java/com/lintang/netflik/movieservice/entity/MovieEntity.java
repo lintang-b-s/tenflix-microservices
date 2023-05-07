@@ -50,7 +50,7 @@ public class MovieEntity {
     private Set<CreatorEntity> creators= new HashSet<>() ;
 
 
-    @OneToMany(mappedBy = "movie",  fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "movie",  fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<VideoEntity> videos = new HashSet<>();
 
@@ -167,6 +167,10 @@ public class MovieEntity {
     public MovieEntity setImage(String image) {
         this.image = image;
         return this;
+    }
+
+    public void removeVideos() {
+        this.videos.clear();
     }
 
     @Override

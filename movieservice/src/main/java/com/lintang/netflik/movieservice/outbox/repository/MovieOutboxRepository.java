@@ -7,13 +7,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-public interface MovieOutboxRepository extends JpaRepository<MovieOutboxEntity, Integer> {
+public interface MovieOutboxRepository extends JpaRepository<MovieOutboxEntity, UUID> {
 
 
     Optional<List<MovieOutboxEntity>> findByOutboxStatusAndType(OutboxStatus outboxStatus,
                                                                 String type);
-
 
     Optional<List<MovieOutboxEntity>> findByOutboxStatus(OutboxStatus outboxStatus);
 
