@@ -28,9 +28,7 @@ public class AddMovieEvent {
 
     private String name;
 
-
     private String type;
-
 
     private String synopsis;
 

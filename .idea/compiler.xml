@@ -11,19 +11,22 @@
         <module name="movieQueryService" />
         <module name="discovery-server" />
         <module name="movieservice" />
+        <module name="notificationservice" />
       </profile>
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.26/8f8cf0372abf564913e9796623aac4c8ea44025a/lombok-1.18.26.jar" />
         </processorPath>
-        <module name="notificationservice.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="notification-service-mq" target="17" />
       <module name="notification-service-mq.main" target="17" />
       <module name="notification-service-mq.test" target="17" />
+      <module name="notificationservice.main" target="17" />
+      <module name="notificationservice.test" target="17" />
+      <module name="notificationservices" target="17" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
@@ -34,6 +37,7 @@
       <module name="movieservice" options="-parameters" />
       <module name="netflik" options="" />
       <module name="notificationservice" options="-parameters" />
+      <module name="notificationservices" options="-parameters" />
     </option>
   </component>
 </project>

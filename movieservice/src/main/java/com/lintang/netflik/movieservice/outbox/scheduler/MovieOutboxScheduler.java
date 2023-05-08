@@ -88,7 +88,7 @@ public class MovieOutboxScheduler  {
                             String.valueOf(outboxMessage.getId())
                     ).collect(Collectors.joining(",")));
             outboxMessages.forEach(outboxMessage -> {
-                producer.sendMessageEmail(movieEventMapper.addMovieEventPayloadToAddMovieEvent( eventPayloadMapper.getMovieEventPayload(outboxMessage.getPayload(),
+                producer.sendMessageEmail( movieEventMapper.addMovieEventPayloadToAddMovieEvent( eventPayloadMapper.getMovieEventPayload(outboxMessage.getPayload(),
                         AddMovieEventPayload.class)));
                 updateOutboxStatus(outboxMessage, OutboxStatus.COMPLETED);
             });

@@ -32,7 +32,7 @@ public class EmailSenderServiceImpl {
             helper.setText(email, true);
             helper.setTo(to);
             helper.setSubject("Film" + movie + "telah tersedia di netflik");
-            helper.setFrom("lintangbirdasaputra@gmail.com");
+            helper.setFrom("cobadoancoba@gmail.com");
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
             LOGGER.error("failed to send email", e);

@@ -6,7 +6,7 @@ import com.lintang.netflik.movieQueryService.service.MovieService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Component;
+
 import org.springframework.stereotype.Service;
 
 @Slf4j

@@ -7,7 +7,8 @@
     <file url="file://$PROJECT_DIR$/movieQueryService/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/movieservice/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/notificationservice/src/main/java" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/notificationservice/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/notificationservices/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/notificationservices/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
   </component>

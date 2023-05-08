@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.util.StdDateFormat;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.messaging.support.MessageBuilder;
 
 @Configuration
 public class RabbitMQConfig {

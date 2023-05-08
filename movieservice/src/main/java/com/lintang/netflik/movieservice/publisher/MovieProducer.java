@@ -7,6 +7,7 @@ import com.lintang.netflik.movieservice.event.AddMovieEvent;
 import com.lintang.netflik.movieservice.event.AddMovieEventPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class MovieProducer {
         rabbitTemplate.convertAndSend(exchange, emailRoutingKey, addMovieEvent);
     }
 
-    public void sendMessageAddMovie(AddMovieEvent addMovieEvent) {
+    public void sendMessageAddMovie( AddMovieEvent addMovieEvent) {
         rabbitTemplate.convertAndSend(exchange,addMovieRoutingKey, addMovieEvent );
     }
 

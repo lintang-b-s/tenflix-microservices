@@ -21,10 +21,11 @@ public class EmailConsumerService {
 
 
   public void emailNotifNewMovie(MovieEvent message) {
+    String messageContentBody = "film" +  message.getName() + "telah tersedia di netflik. " + message.getSynopsis();
 
-    emailService.send("uyayiu123@gmail.com", message.getMovieTitle(),
-      buildEmail(message.getMovieTitle(), message.getMessageContentBody(),
-      message.getImageUrl()));
+    emailService.send("uyayiu123@gmail.com", message.getName(),
+      buildEmail(message.getName(), messageContentBody,
+      message.getImage()));
     return ;
   }
 
