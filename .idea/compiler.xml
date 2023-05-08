@@ -7,8 +7,10 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="movieservice" />
+        <module name="api-gateway" />
         <module name="movieQueryService" />
+        <module name="discovery-server" />
+        <module name="movieservice" />
       </profile>
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
@@ -26,8 +28,11 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="-parameters" />
+      <module name="discovery-server" options="-parameters" />
       <module name="movieQueryService" options="-parameters" />
       <module name="movieservice" options="-parameters" />
+      <module name="netflik" options="" />
       <module name="notificationservice" options="-parameters" />
     </option>
   </component>

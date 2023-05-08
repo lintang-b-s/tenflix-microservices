@@ -12,13 +12,14 @@ import com.lintang.netflik.movieQueryService.event.AddMovieEvent;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.stream.Collectors;
 
 @Component
 public class MovieEventMapper {
     public AddMovieEvent movieEntityToAddMovieEvent(MovieEntity entity) {
         AddMovieEvent newMovieEvent = new AddMovieEvent();
-        LocalDate entityLDT = entity.getrYear().toLocalDateTime().toLocalDate();
+        LocalDate entityLDT = entity.getrYear().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
         return newMovieEvent.setId(entity.getId()).setName(entity.getName()).setType(entity.getType())
                  .setSynopsis(entity.getSynopsis()).setMpaRating(entity.getMpaRating()).setrYear(entityLDT)

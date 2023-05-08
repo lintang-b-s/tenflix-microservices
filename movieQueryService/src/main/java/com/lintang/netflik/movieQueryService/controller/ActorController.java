@@ -15,7 +15,7 @@ import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("/api/v1/actors")
+@RequestMapping("/api/query/v1/actors")
 @AllArgsConstructor
 public class ActorController {
     private static final Logger log = LoggerFactory.getLogger(ActorController.class);

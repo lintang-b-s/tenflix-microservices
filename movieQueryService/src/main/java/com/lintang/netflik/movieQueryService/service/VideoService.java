@@ -26,7 +26,7 @@ public class VideoService {
     }
 
     public Iterable<VideoEntity> getVideosByMovieId(@NotNull @Valid int movieId) {
-        return repository.findVideoEntitiesByMovieEntityId(movieId);
+        return repository.findByMovieId(movieId);
     }
 
     public VideoEntity getVideoByMovieIdAndId(@NotNull @Valid int movieId,@NotNull @Valid int videoId) {

@@ -2,21 +2,19 @@ package com.lintang.netflik.movieQueryService.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
 
-@Entity
-@Table(name = "actors")
 @NoArgsConstructor
 //@AllArgsConstructor
 public class ActorEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @NotNull(message = "Actor name is required")
@@ -28,7 +26,7 @@ public class ActorEntity {
     }
 
     @JsonIgnore
-    @ManyToMany(mappedBy = "actors", fetch = FetchType.EAGER)
+    @DBRef
     private Set<MovieEntity> movies = new HashSet<>();
 
 

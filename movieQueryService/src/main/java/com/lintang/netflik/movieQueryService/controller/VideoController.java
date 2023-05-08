@@ -15,7 +15,7 @@ import java.util.List;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
-@RequestMapping("/api/v1/videos")
+@RequestMapping("/api/query/v1/videos")
 @AllArgsConstructor
 public class VideoController {
     private VideoDtoMapper mapper;

@@ -1,12 +1,14 @@
 package com.lintang.netflik.movieQueryService.entity;
 
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-@Entity
-@Table(name = "videos")
+
+@Document("videos")
 public class VideoEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String url;
@@ -17,8 +19,7 @@ public class VideoEntity {
 
     private String synopsis;
 
-    @ManyToOne( fetch = FetchType.EAGER)
-    @JoinColumn(name = "movie_id", referencedColumnName = "id")
+    @DocumentReference(lazy = true)
     private MovieEntity movie;
 
     public int getId() {

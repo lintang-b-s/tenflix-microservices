@@ -1,18 +1,20 @@
 package com.lintang.netflik.movieQueryService.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 
-@Entity
-@Table(name = "movies")
+@Document("movies")
 public class MovieEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
@@ -23,33 +25,22 @@ public class MovieEntity {
 
     private String mpaRating;
 
-    private Timestamp rYear;
+    private Date rYear;
 
     private int idmbRating;
     private String image;
 
 
-    @ManyToMany( fetch = FetchType.EAGER)
-    @JoinTable(
-            name="movie_actor",
-            joinColumns = @JoinColumn(name = "movie_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "actor_id", referencedColumnName = "id")
-    )
     @JsonIgnore
     private Set<ActorEntity> actors= new HashSet<>();
 
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name="movie_creator",
-            joinColumns = @JoinColumn(name = "movie_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "creator_id", referencedColumnName = "id")
-    )
+
     @JsonIgnore
     private Set<CreatorEntity> creators= new HashSet<>() ;
 
 
-    @OneToMany(mappedBy = "movie",  fetch = FetchType.EAGER)
+    @DocumentReference
     @JsonIgnore
     private Set<VideoEntity> videos = new HashSet<>();
 
@@ -99,7 +90,7 @@ public class MovieEntity {
         return this;
     }
 
-    public Timestamp getrYear() {
+    public Date getrYear() {
         return rYear;
     }
 

@@ -10,12 +10,14 @@ import com.lintang.netflik.movieQueryService.helper.eventMapper.MovieEventMapper
 
 import com.lintang.netflik.movieQueryService.repository.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,7 +36,6 @@ public class MovieService {
     private VideoEntityMapper videoEntityMapper;
     private VideoRepository videoRepository;
     private MovieEventMapper movieEventMapper;
-    private GetAllMoviesRepository getAllMoviesRepository;
 
 
     public MovieService(MovieRepository repository, ActorRepository actorRepository, CreatorRepository creatorRepository,
@@ -43,9 +44,7 @@ public class MovieService {
                         MovieEntityMapper movieEntityMapper,
                         VideoEntityMapper videoEntityMapper,
                         VideoRepository videoRepository,
-                        MovieEventMapper movieEventMapper,
-                        GetAllMoviesRepository getAllMoviesRepository
-                    ) { this.repository = repository;
+                        MovieEventMapper movieEventMapper) { this.repository = repository;
     this.actorRepository = actorRepository;
     this.creatorRepository= creatorRepository;
     this.actorEntityMapper =actorEntityMapper;
@@ -54,48 +53,12 @@ public class MovieService {
     this.videoEntityMapper = videoEntityMapper;
     this.videoRepository= videoRepository;
     this.movieEventMapper= movieEventMapper;
-    this.getAllMoviesRepository= getAllMoviesRepository;
 
     }
 
 
     public MovieEntity addMovie(@Valid AddMovieEvent newMovie) {
         MovieEntity newMovieEntity = movieEntityMapper.addMovieEventToEntity(newMovie);
-        newMovieEntity.setActors(newMovie.getActors().stream()
-                .map(actor -> {
-                    ActorEntity getActor;
-                    ActorEntity actorEntities = actorEntityMapper.toActorEntity(actor);
-
-                    Optional<ActorEntity> actorEntityFromDb = actorRepository.findById(actorEntities.getId());
-                    if (!actorEntityFromDb.isPresent()){
-                        actorEntities = actorEntityMapper.toEntity(actor);
-                        getActor = actorRepository.save(actorEntities);
-                    } else {
-                        getActor = actorEntityFromDb.get();
-
-                    }
-                    log.info("getActor: {}", getActor.getName());
-
-                    getActor.addMovie(newMovieEntity);
-                    return getActor;
-                })
-                .collect(Collectors.toSet()));
-
-        newMovieEntity.setCreators(newMovie.getCreators().stream()
-                .map(creator -> {
-                    CreatorEntity getCreator;
-                    CreatorEntity creatorEntities = creatorEntityMapper.creatorDtotoCreatorEntity(creator);
-                    Optional<CreatorEntity> creatorEntityFromDb = creatorRepository.findById(creatorEntities.getId());
-                    if (!creatorEntityFromDb.isPresent()) {
-                        getCreator = creatorRepository.save(creatorEntities);
-                    } else {
-                        getCreator = creatorEntityFromDb.get();
-
-                    }
-
-                    getCreator.addMovie(newMovieEntity);
-                    return getCreator;
-                }).collect(Collectors.toSet()));
 
             newMovieEntity.setVideos(
                     newMovie.getVideos().stream().map(
@@ -116,7 +79,7 @@ public class MovieService {
             );
 
 
-
+        newMovieEntity.setId(newMovie.getId());
         MovieEntity savedMovie = repository.save(newMovieEntity);
 
         return savedMovie;
@@ -124,8 +87,8 @@ public class MovieService {
 
 
 
-    public Iterable<GetAllMovies> getMoviesByUserId(@Valid int userId) {
-        return getAllMoviesRepository.findAll();
+    public Iterable<MovieEntity> getMoviesByUserId(@Valid int userId) {
+        return repository.findAll();
     }
 
 
@@ -136,45 +99,11 @@ public class MovieService {
 //            throw new ResourceNotFoundException("invalid movie Id.");
             log.error("error");
         }
-        MovieEntity updatedMovie = movie.get();
+        MovieEntity getMovie = movie.get();
         Timestamp modelTimestamp = Timestamp.valueOf(newMovie.getrYear().atStartOfDay());
 
-        updatedMovie.setName(newMovie.getName()).setrYear(modelTimestamp)
-                .setIdmbRating(newMovie.getIdmbRating()).setMpaRating(newMovie.getMpaRating())
-                .setSynopsis(newMovie.getSynopsis()).setType(newMovie.getType())
-                ;
-        updatedMovie.setActors(newMovie.getActors().stream()
-                .map(actor -> {
-                    ActorEntity getActor;
-                    ActorEntity actorEntities = actorEntityMapper.toActorEntity(actor);
+        MovieEntity updatedMovie = movieEntityMapper.updateMovietoEntity( newMovie,getMovie);
 
-                    Optional<ActorEntity> actorEntityFromDb = actorRepository.findById(actorEntities.getId());
-                    if (!actorEntityFromDb.isPresent()){
-                            getActor  = actorRepository.save(actorEntities);
-                    } else {
-                        getActor = actorEntityFromDb.get();
-                    }
-
-                    getActor.addMovie(updatedMovie);
-                    return getActor;
-                })
-                .collect(Collectors.toSet()));
-
-        updatedMovie.setCreators(newMovie.getCreators().stream()
-                .map(creator -> {
-                    CreatorEntity getCreator;
-                    CreatorEntity creatorEntities = creatorEntityMapper.creatorDtotoCreatorEntity(creator);
-                    Optional<CreatorEntity> creatorEntityFromDb = creatorRepository.findById(creatorEntities.getId());
-                    if (!creatorEntityFromDb.isPresent()) {
-                        getCreator = creatorRepository.save(creatorEntities);
-                    }
-                    else {
-                         getCreator = creatorEntityFromDb.get();
-                    }
-
-                    getCreator.addMovie(updatedMovie);
-                    return getCreator;
-                }).collect(Collectors.toSet()));
 
         updatedMovie.setVideos(
                 newMovie.getVideos().stream().map(
@@ -184,14 +113,18 @@ public class MovieService {
                             Optional<VideoEntity>  videoEntityFromDb = videoRepository.findById(videoEntity.getId());
                             if (!videoEntityFromDb.isPresent()) {
                                 getVideo = videoRepository.save(videoEntity);
-                            }else {
+                            } else {
                                 getVideo = videoEntityFromDb.get();
+
                             }
                             getVideo.addMovie(updatedMovie);
                             return getVideo;
                         }
                 ).collect(Collectors.toSet())
         );
+
+
+        updatedMovie.setId(newMovie.getId());
 
         return repository.save(updatedMovie);
     }
@@ -227,12 +160,16 @@ public class MovieService {
             creator.removeMovie(movieEntity);
             return creator;
         });
-        if (movieEntity.getVideos() != null ) {
-            movieEntity.getVideos().stream().map(video -> {
-                video.removeMovie(movieEntity);
-                return video;
-            });
-        }
+
+        log.info("videoentitites id: {}", movieEntity.getVideos().stream().map(videoEntity -> String.valueOf(videoEntity.getId())).collect(Collectors.joining(",")));
+         List<VideoEntity> videoEntities = movieEntity.getVideos().stream().map(
+                videoEntity -> {
+                     videoRepository.delete(videoEntity);
+                     return videoEntity;
+                }
+        ).collect(Collectors.toList());
+        log.info("delted response string : {}", videoEntities.stream().map(v -> String.valueOf(v) ).collect(Collectors.joining(",")));
+
 
 
         MovieEntity deletedMovie = repository.save(movieEntity);
