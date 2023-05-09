@@ -8,8 +8,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="api-gateway" />
-        <module name="movieQueryService" />
         <module name="discovery-server" />
+        <module name="movie-query-service" />
         <module name="movieservice" />
         <module name="notificationservice" />
       </profile>
@@ -33,7 +33,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="api-gateway" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
-      <module name="movieQueryService" options="-parameters" />
+      <module name="movie-query-service" options="-parameters" />
       <module name="movieservice" options="-parameters" />
       <module name="netflik" options="" />
       <module name="notificationservice" options="-parameters" />

@@ -16,7 +16,7 @@
     <description>Demo project for Spring Boot</description>
     <modules>
         <module>discovery-server</module>
-        <module>movieQueryService</module>
+        <module>movie-query-service</module>
         <module>movieservice</module>
         <module>api-gateway</module>
         <module>notificationservice</module>

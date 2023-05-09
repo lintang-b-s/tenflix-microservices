@@ -11,8 +11,11 @@ services:
       PGDATA: /data/postgres
     volumes:
       - ./postgres-movie:/data/postgres
+    expose:
+      - "5431"
     ports:
-      - "5432:5432"
+      - "5431:5431"
+    command: -p 5431
     restart: unless-stopped
 
   mongo-movie-query:
@@ -28,7 +31,7 @@ services:
 
   keycloak-mysql:
     container_name: keycloak-mysql
-    image: mysql:5.7
+    image: mysql:latest
     volumes:
       - ./mysql_keycloak_data:/var/lib/mysql
     environment:
@@ -69,9 +72,8 @@ services:
       - "9411:9411"
 
   discovery-server:
-    image: lintangbs/discovery-server:latest
     container_name: discovery-server
-    pull_policy: always
+    build: ./discovery-server
     ports:
       - "8761:8761"
     environment:
@@ -80,9 +82,8 @@ services:
       - zipkin
 
   api-gateway:
-    image: lintangbs/api-gateway:latest
+    build: ./api-gateway
     container_name: api-gateway
-    pull_policy: always
     ports:
       - "8181:8080"
     expose:
@@ -97,10 +98,10 @@ services:
 
   movie-service:
     container_name: movie-service
-    image: lintangbs/movieservice:latest
-    pull_policy: always
+    build: ./movieservice
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-movie:5431/movie-service
     depends_on:
       - postgres-movie
       - discovery-server
@@ -110,8 +111,7 @@ services:
 
   movie-query-service:
     container_name: movie-query-service
-    image: lintangbs/moviequeryservice:latest
-    pull_policy: always
+    build: ./movie-query-service
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
@@ -122,8 +122,7 @@ services:
 
   notification-service:
     container_name: notification
-    image: lintangbs/notificationservice:latest
-    pull_policy: always
+    build: ./notificationservice
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     depends_on:
