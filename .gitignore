@@ -1,0 +1,5 @@
+./postgres-movie
+./realms
+./mysql_keycloak_data
+./mongo-data
+.idea
