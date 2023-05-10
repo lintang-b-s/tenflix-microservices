@@ -1,0 +1,18 @@
+---
+version: '3'
+services:
+  postgres-movie:
+    container_name: postgres-movie
+    image: postgres:15-alpine
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: netflik
+      POSTGRES_USER: netflik
+      POSTGRES_PASSWORD: netflik
+    ports:
+      -  5432:5432
+    volumes:
+      - ./postgres-movie:/var/lib/postgresql/data
+
+    platform: linux/arm64/v8

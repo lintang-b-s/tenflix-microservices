@@ -3,20 +3,27 @@ version: '3'
 services:
   postgres-movie:
     container_name: postgres-movie
-    image: postgres
-    environment:
-      POSTGRES_DB: movie-service
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: password
-      PGDATA: /data/postgres
-    volumes:
-      - ./postgres-movie:/data/postgres
-    expose:
-      - "5431"
-    ports:
-      - "5431:5431"
-    command: -p 5431
+    image: postgres:15-alpine
     restart: unless-stopped
+    environment:
+      POSTGRES_DB: netflik
+      POSTGRES_USER: netflik
+      POSTGRES_PASSWORD: netflik
+    ports:
+      -  5432:5432
+    platform: linux/arm64/v8
+
+  pg-admin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@email.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=5050
+    ports:
+      - 5050:5050
+    depends_on:
+      - postgres-movie
+
 
   mongo-movie-query:
     container_name: mongo-movie-query
@@ -28,6 +35,7 @@ services:
       - "27017"
     volumes:
       - ./mongo-data:/data/db
+    platform: linux/arm64/v8
 
   keycloak-mysql:
     container_name: keycloak-mysql
@@ -39,6 +47,7 @@ services:
       MYSQL_DATABASE: keycloak
       MYSQL_USER: keycloak
       MYSQL_PASSWORD: password
+    platform: linux/arm64/v8
 
   keycloak:
     container_name: keycloak
@@ -53,82 +62,137 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
-      - "8080:8080"
+      - 8080:8080
     volumes:
       - ./realms/:/opt/keycloak/data/import/
     depends_on:
       - keycloak-mysql
+    platform: linux/arm64/v8
+
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:3-management
     ports:
       - "5672:5672"
       - "15672:15672"
+    platform: linux/arm64/v8
 
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
-      - "9411:9411"
+      - 9411:9411
+    platform: linux/arm64/v8
 
   discovery-server:
     container_name: discovery-server
+#    image: lintangbs/discovery-server:v1
     build: ./discovery-server
     ports:
-      - "8761:8761"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - 8761:8761
+    volumes:
+      - $PWD/config-repo:/config-repo
     depends_on:
       - zipkin
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/discovery-server.properties
 
   api-gateway:
     build: ./api-gateway
     container_name: api-gateway
     ports:
-      - "8181:8080"
-    expose:
-      - "8181"
+      - 8181:8181
     environment:
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+      - SPRING_CLOUD_GATEWAY_ROUTES[0]_ID=movie-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[0]_URI=http://movie-service:8200/movie-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[0]_PREDICATES[0]=Path=/api/v1/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[1]_ID=movie-query-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[1]_URI=http://movie-query-service:8100/movie-query-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[1]_PREDICATES[0]=Path=/api/query/v1/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_ID=discovery-server
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_URI=http://eureka:password@discovery-server:8761
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_PREDICATES[0]=Path=/eureka/web
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_FILTERS[0]=SetPath=/
+      - SPRING_CLOUD_GATEWAY_ROUTES[3]_ID=discovery-server-static
+      - SPRING_CLOUD_GATEWAY_ROUTES[3]_URI=http://eureka:password@discovery-server:8761
+      - SPRING_CLOUD_GATEWAY_ROUTES[3]_PREDICATES[0]=Path=/eureka/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[4]_ID=notification-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[4]_URI=http://notification-service:8300/notification-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[4]_PREDICATES[0]=Path=/api/v1/websocket/**
       - SPRING_PROFILES_ACTIVE=docker
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY= TRACE
+      - SPRING_CONFIG_LOCATION=file:/config-repo/api-gateway.properties
+    volumes:
+      - $PWD/config-repo:/config-repo
     depends_on:
-      - zipkin
-      - discovery-server
       - keycloak
+      - discovery-server
+      - zipkin
+    platform: linux/arm64/v8
 
   movie-service:
+#    image: lintangbs/movieservice.properties:v1
     container_name: movie-service
     build: ./movieservice
     environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-movie:5432/netflik
+      - SPRING_DATASOURCE_USERNAME=netflik
+      - SPRING_DATASOURCE_PASSWORD=netflik
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://eureka:password@discovery-server:8761/eureka
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-movie:5431/movie-service
+      - SPRING_CONFIG_LOCATION=file:/config-repo/movieservice.properties
+    ports:
+      - 8200:8200
+    volumes:
+      - $PWD/config-repo:/config-repo
     depends_on:
       - postgres-movie
+      - rabbitmq
       - discovery-server
       - api-gateway
-      - rabbitmq
-      - zipkin
+    platform: linux/arm64/v8
 
   movie-query-service:
+#    image: lintangbs/movie-query-service:v1
     container_name: movie-query-service
     build: ./movie-query-service
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - 8100:8100
     depends_on:
       - mongo-movie-query
-      - discovery-server
+      - rabbitmq
       - api-gateway
-      - zipkin
+      - discovery-server
+    volumes:
+      - $PWD/config-repo:/config-repo
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://eureka:password@discovery-server:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/movie-query-service.properties
+
+    platform: linux/arm64/v8
 
   notification-service:
-    container_name: notification
+    container_name: notification-service
     build: ./notificationservice
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
+    ports:
+      - 8300:8300
     depends_on:
-      - discovery-server
+      - mongo-movie-query
+      - rabbitmq
       - api-gateway
-      - zipkin
+      - discovery-server
+    volumes:
+      - $PWD/config-repo:/config-repo
+    environment:
+      - RABBITMQ_QUEUE_EMAIL_NAME=email
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://eureka:password@discovery-server:8761/eureka
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_LOCATION=file:/config-repo/notificationservice.properties
+    platform: linux/arm64/v8
 
-
-
+volumes:
+  postgres-movie:

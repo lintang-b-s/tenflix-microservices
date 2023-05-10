@@ -13,34 +13,29 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 @Configuration
-public class SecurityConfig  {
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf().ignoringRequestMatchers();
-        return httpSecurity.build();
+
+    @Value("${eureka.username}")
+    private String username;
+    @Value("${eureka.password}")
+    private String password;
+
+    @Override
+    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws  Exception {
+        authenticationManagerBuilder.inMemoryAuthentication()
+                .passwordEncoder(NoOpPasswordEncoder.getInstance())
+                .withUser("eureka").password("password")
+                .authorities("USER");
     }
 
-//    @Value("${eureka.username}")
-//    private String username;
-//    @Value("${eureka.password}")
-//    private String password;
-//
-//    @Override
-//    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws  Exception {
-//        authenticationManagerBuilder.inMemoryAuthentication()
-//                .passwordEncoder(NoOpPasswordEncoder.getInstance())
-//                .withUser("eureka").password("password")
-//                .authorities("USER");
-//    }
-//
-//
-//    @Override
-//    public void configure(HttpSecurity httpSecurity) throws  Exception {
-//        httpSecurity.csrf().disable()
-//                .authorizeRequests().anyRequest()
-//                .authenticated()
-//                .and()
-//                .httpBasic();
-//    }
+
+    @Override
+    public void configure(HttpSecurity httpSecurity) throws  Exception {
+        httpSecurity.csrf().disable()
+                .authorizeRequests().anyRequest()
+                .authenticated()
+                .and()
+                .httpBasic();
+    }
 }
