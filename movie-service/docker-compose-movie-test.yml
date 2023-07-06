@@ -1,0 +1,51 @@
+---
+version: "3"
+services:
+
+  postgres-movie:
+    container_name: postgres-movie
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: netflik
+      POSTGRES_USER: netflik
+      POSTGRES_PASSWORD: netflik
+    ports:
+      - 5431:5432
+    platform: linux/arm64/v8
+
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    platform: linux/arm64/v8
+
+
+  pg-admin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@email.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=5050
+    ports:
+      - 5050:5050
+    depends_on:
+      - postgres-movie
+  
+  mongo-movie-query:
+    container_name: mongo-movie-query
+    image: mongo:4.4.14-rc0-focal
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    volumes:
+      - ./mongo-data:/data/db
+    platform: linux/arm64/v8
+  
+
+

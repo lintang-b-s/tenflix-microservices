@@ -1,0 +1,13 @@
+---
+version: '3'
+services:
+  mongo-movie-query:
+    container_name: mongo-movie-query
+    image: mongo:4.4.14-rc0-focal
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    volumes:
+      - ./mongo-data:/data/db

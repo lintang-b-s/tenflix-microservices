@@ -1,0 +1,50 @@
+syntax = "proto3";
+package com.lintang.netflik.models;
+
+
+
+option java_multiple_files = true;
+
+message PlanDto{
+  uint64 plan_id = 1;
+  string name = 2;
+  uint64 price = 3;
+  string description = 4;
+  uint32 active_period = 5;
+  uint32 discount_price = 6;
+}
+
+message CreatePlanDto{
+  string name = 2;
+  uint64 price = 3;
+  string description = 4;
+  uint32 active_period = 5;
+  uint32 discount_price = 6;
+}
+
+message  CreateOrder {
+  string userId = 1;
+  uint64 planId = 2;
+}
+
+
+message GetPlanGrpcRequest{
+  CreateOrder createOrder= 1;
+}
+message CreatePlanGrpcRequest{
+  CreatePlanDto createPlanDto =1;
+}
+
+message CreatePlanGrpcResponse{
+  PlanDto planDto =1;
+}
+
+
+message GetPlanGrpcResponse{
+  PlanDto plan = 1;
+}
+
+service SubscriptionService{
+  rpc getPlan(GetPlanGrpcRequest) returns (GetPlanGrpcResponse);
+  rpc createPlan(CreatePlanGrpcRequest) returns (CreatePlanGrpcResponse);
+}

@@ -1,0 +1,35 @@
+---
+version: '3'
+services:
+
+  keycloak-mysql:
+    container_name: keycloak-mysql
+    image: mysql:latest
+    volumes:
+      - ./mysql_keycloak_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+    platform: linux/arm64/v8
+
+  keycloak-tenflix:
+    container_name: keycloak-tenflix
+    image: quay.io/keycloak/keycloak:18.0.0
+    command: ["start-dev", "--import-realm"]
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - 8080:8080
+    volumes:
+      - ./realms/tenflix-realm.json:/opt/keycloak/data/import/tenflix-realm.json:ro
+    depends_on:
+      - keycloak-mysql
+    platform: linux/arm64/v8

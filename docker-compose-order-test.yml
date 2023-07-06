@@ -1,0 +1,264 @@
+---
+version: '3'
+services:
+
+  discovery-server:
+    container_name: discovery-server
+    build: ./discovery-server
+    ports:
+      - 8761:8761
+    env_file:
+      - config-repo/discovery-server.env
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_CLIENT_FETCHREGISTRY=false
+      - EUREKA_CLIENT_REGISTERWITHEUREKA=false
+      - EUREKA_INSTANCE_HOSTNAME=discovery-server
+      - EUREKA_CLIENT_REGISTER_WITH-EUREKA=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
+      - SERVER_PORT=8761
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - 8181:8181
+    env_file:
+      - config-repo/api-gateway.env
+    environment:
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+      - SPRING_CLOUD_GATEWAY_ROUTES[0]_ID=movie-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[0]_URI=http://movie-service:8200/movie-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[0]_PREDICATES[0]=Path=/api/v1/movie-service/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[1]_ID=movie-query-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[1]_URI=http://movie-query-service:8100/movie-query-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[1]_PREDICATES[0]=Path=/api/v1/movie-query/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_ID=discovery-server
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_URI=http://discovery-server:8761
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_PREDICATES[0]=Path=/eureka/web
+      - SPRING_CLOUD_GATEWAY_ROUTES[2]_FILTERS[0]=SetPath=/
+      - SPRING_CLOUD_GATEWAY_ROUTES[3]_ID=discovery-server-static
+      - SPRING_CLOUD_GATEWAY_ROUTES[3]_URI=http://discovery-server:8761
+      - SPRING_CLOUD_GATEWAY_ROUTES[3]_PREDICATES[0]=Path=/eureka/**
+      - SPRING_CLOUD_GATEWAY_ROUTES[4]_ID=notification-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[4]_URI=http://notification-service:8300/notification-service
+      - SPRING_CLOUD_GATEWAY_ROUTES[4]_PREDICATES[0]=Path=/api/v1/websocket/**
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - discovery-server
+      - keycloak-tenflix
+    platform: linux/arm64/v8
+
+  # order-subcription-aggregator-service:
+  #   container_name: order-subcription-aggregator-service
+  #   build: ./order-subcription-aggregator-service
+  #   ports:
+  #     - 9200:9200
+  #     - 5005:5005
+  #   env_file:
+  #     - config-repo/order-aggregator-service.env
+  #   environment:
+  #     - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 #remote debugging
+  #     - SPRING_PROFILES_ACTIVE=docker
+  #     - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI=http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/certs
+  #   depends_on:
+  #     - keycloak-tenflix
+  #   platform: linux/arm64/v8
+
+  # subscription-service:
+  #   container_name: subscription-service
+  #   build: ./subscription-service
+  #   ports:
+  #     - 9100:9100
+  #     - 5008:5008
+  #   env_file:
+  #     - config-repo/subscription-service.env
+  #   environment:
+  #     - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008 #remote debugging
+  #     - SPRING_PROFILES_ACTIVE=docker
+  #     - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://discovery-server:8761/eureka
+  #   depends_on:
+  #     - postgres-subscription
+
+  # order-service:
+  #   container_name: order-service
+  #   build: ./order-service
+  #   ports:
+  #     - 9000:9000
+  #     - 5007:5007
+  #   env_file:
+  #     - config-repo/order-service.env
+  #   environment:
+  #     - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 # remote debugging
+  #     - SPRING_PROFILES_ACTIVE=docker
+  #     - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://discovery-server:8761/eureka
+  #   depends_on:
+  #     - postgres-order
+  #   platform: linux/arm64/v8
+
+  # payment-service:
+  #   container_name: payment-service
+  #   build: ./payment-service
+  #   ports:
+  #     - 8800:8800
+  #     - 5006:5006 # debug port
+  #   env_file:
+  #     - config-repo/payment-service.env
+  #   environment:
+  #     - MIDTRANS_SERVERKEY=${MIDTRANS_SERVERKEY}
+  #     - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 # remote debugging
+  #     - SPRING_PROFILES_ACTIVE=docker
+  #     - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://discovery-server:8761/eureka
+  #   depends_on:
+  #     - postgres-payment
+  #   platform: linux/arm64/v8
+
+  # user-service:
+  #   container_name: user-service
+  #   build: ./user-service
+  #   ports:
+  #     - 8700:8700
+  #   env_file:
+  #     - config-repo/user-service.env
+  #   environment:
+  #     - SPRING_DATASOURCE_URL=jdbc:mysql://keycloak-mysql:3306/keycloak
+  #     - SPRING_DATASOURCE_USERNAME=keycloak
+  #     - SPRING_DATASOURCE_PASSWORD=password
+  #     - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+  #     - SPRING_DATASOURCE_DRIVER-CLASS-NAME=com.mysql.cj.jdbc.Driver
+  #     - SPRING_PROFILES_ACTIVE=docker
+  #     - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://discovery-server:8761/eureka
+  #   depends_on:
+  #     - keycloak-mysql
+  #     - keycloak-tenflix
+  #   platform: linux/arm64/v8
+
+  postgres-subscription:
+    container_name: postgres-subscription
+    image: debezium/postgres:15-alpine
+    ports:
+      - 5430:5432
+    environment:
+      POSTGRES_DB: subscription
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+
+  postgres-order:
+    container_name: postgres-order
+    image: debezium/postgres:15-alpine
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_DB: order
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+
+  postgres-payment:
+    container_name: postgres-payment
+    image: debezium/postgres:15-alpine
+    ports:
+      - 5435:5432
+    environment:
+      POSTGRES_DB: payment
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+
+  keycloak-mysql:
+    container_name: keycloak-mysql
+    image: mysql:latest
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql_keycloak_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+    platform: linux/arm64/v8
+
+  keycloak-tenflix:
+    container_name: keycloak-tenflix
+    image: quay.io/keycloak/keycloak:18.0.0
+    command: [ "start-dev", "--import-realm" ]
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    ports:
+      - 8080:8080
+    volumes:
+      - ./realms/tenflix-realm.json:/opt/keycloak/data/import/tenflix-realm.json:ro
+    depends_on:
+      - keycloak-mysql
+    platform: linux/arm64/v8
+
+  pg-admin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@email.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=5050
+    ports:
+      - 5050:5050
+
+    depends_on:
+      - postgres-order
+      - postgres-subscription
+      - postgres-payment
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    restart: unless-stopped
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    restart: unless-stopped
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1 # identifier
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # replikasi setiap partisi topik
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 # zookeper address
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092 # yang bisa dikonek client
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+    depends_on:
+      - zookeeper
+
+  kafka-connect:
+    image: debezium/connect:latest
+    container_name: kafka-connect
+    restart: unless-stopped
+    ports:
+      - 8083:8083
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092 # kafka-connect perlu konek ke 1 bootstrap server agar dapat konek ke kafka cluster
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: ms_connect_configs
+      OFFSET_STORAGE_TOPIC: ms_connect_offsets
+      STATUS_STORAGE_TOPIC: ms_connect_statuses
+    depends_on:
+      - kafka
+
+  kafka_manager:
+    image: hlebalbau/kafka-manager:stable
+    ports:
+      - "9500:9000"
+    environment:
+      ZK_HOSTS: "localhost:2181"
+      APPLICATION_SECRET: "random-secret"
+    depends_on:
+      - zookeeper
+      - kafka
+      - kafka-connect

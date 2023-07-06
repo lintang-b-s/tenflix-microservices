@@ -1,0 +1,44 @@
+syntax = "proto3";
+package com.lintang.netflik.models;
+
+import "user-service.proto";
+option java_multiple_files = true;
+
+
+
+
+message ItemDetails{
+  uint64 planId = 1;
+  uint64 price = 2;
+  string name = 3;
+}
+
+
+
+message TransactionDetails{
+  string order_id =1;
+  uint64  gross_amount=2;
+  bool  credit_card=3;
+  CustomerDetails customerDetails =4;
+  ItemDetails itemDetails = 5;
+}
+
+
+message GetRedirectUrl{
+  string token =1 ;
+  string redirect_url = 2;
+}
+
+
+message PaymentGetRedirectUrlGrpcRequest {
+  TransactionDetails transactionDetail = 1;
+}
+
+message PaymentGetRedirectUrlGrpcResponse{
+  GetRedirectUrl getRedirectUrl=1;
+}
+
+service PaymentService{
+  rpc getPaymentRedirectUrl(PaymentGetRedirectUrlGrpcRequest) returns (PaymentGetRedirectUrlGrpcResponse);
+}
+

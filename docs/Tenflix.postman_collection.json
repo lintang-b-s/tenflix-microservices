@@ -1,0 +1,1254 @@
+{
+	"info": {
+		"_postman_id": "a920690c-d236-40dd-9913-e6a695274806",
+		"name": "Tenflix",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23925296",
+		"_collection_link": "https://orange-comet-51695.postman.co/workspace/netflik~35c0e208-27dd-4c2a-a67f-44e4ee221c8b/collection/23925296-a920690c-d236-40dd-9913-e6a695274806?action=share&creator=23925296&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "user&auth",
+			"item": [
+				{
+					"name": "auth code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://keycloak:8080/realms/tenflix/protocol/openid-connect/auth?client_id=tenflix-client&response_type=code&scope=openid profile&redirect_uri=http://localhost:8181/api/query/v1/movies&state=asoasosaoasosoas",
+							"protocol": "http",
+							"host": [
+								"keycloak"
+							],
+							"port": "8080",
+							"path": [
+								"realms",
+								"tenflix",
+								"protocol",
+								"openid-connect",
+								"auth"
+							],
+							"query": [
+								{
+									"key": "client_id",
+									"value": "tenflix-client"
+								},
+								{
+									"key": "response_type",
+									"value": "code"
+								},
+								{
+									"key": "scope",
+									"value": "openid profile"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8181/api/query/v1/movies"
+								},
+								{
+									"key": "state",
+									"value": "asoasosaoasosoas"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "access token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "authorization_code",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "tenflix-client",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "ZW9DhkCa6TYXwvohFFBXHrBCve0OAWM5",
+									"type": "text"
+								},
+								{
+									"key": "code",
+									"value": "6f2ea6b7-8bf2-484f-8fa2-baf128928909.506520e4-f417-4e25-867d-1067627de5d2.e7409c95-243d-4168-91c1-d9dc85a71daa",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8181/api/query/v1/movies",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "profile",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/realms/tenflix/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"realms",
+								"tenflix",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/admin/realms/tenflix/users/c8451efa-08eb-431f-ae12-6bd763c146eb",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"admin",
+								"realms",
+								"tenflix",
+								"users",
+								"c8451efa-08eb-431f-ae12-6bd763c146eb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get acc",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "tenflix-client",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "lintang@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "lintang",
+									"type": "text"
+								},
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "ZW9DhkCa6TYXwvohFFBXHrBCve0OAWM5",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://keycloak:8080/realms/tenflix/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"keycloak"
+							],
+							"port": "8080",
+							"path": [
+								"realms",
+								"tenflix",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user detail",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://keycloak:8080/admin/realms/tenflix/users/c8451efa-08eb-431f-ae12-6bd763c146eb",
+							"protocol": "http",
+							"host": [
+								"keycloak"
+							],
+							"port": "8080",
+							"path": [
+								"admin",
+								"realms",
+								"tenflix",
+								"users",
+								"c8451efa-08eb-431f-ae12-6bd763c146eb"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "movie command",
+			"item": [
+				{
+					"name": "createor",
+					"item": [
+						{
+							"name": "addcreator",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"shinikkawa\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8181/api/v1/creators",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8181",
+									"path": [
+										"api",
+										"v1",
+										"creators"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "actor",
+					"item": [
+						{
+							"name": "add actor",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Idris Elba\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8181/api/v1/actors",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8181",
+									"path": [
+										"api",
+										"v1",
+										"actors"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "video",
+					"item": [
+						{
+							"name": "upload videos",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "yt5s.io-SPIDER-MAN_ ACROSS THE SPIDER-VERSE - Official Trailer (HD).mp4"
+										},
+										{
+											"key": "folderPath",
+											"value": "spiderman",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8181/api/v1/upload/video",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8181",
+									"path": [
+										"api",
+										"v1",
+										"upload",
+										"video"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "upload video 2",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "yt5s.io-SPIDER-MAN_ NO WAY HOME - Official Trailer (HD).mp4"
+										},
+										{
+											"key": "folderPath",
+											"value": "netflik",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8181/api/v1/upload/video",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8181",
+									"path": [
+										"api",
+										"v1",
+										"upload",
+										"video"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "upload video 2 Copy",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"type": "file",
+											"src": "Spider-Man_Across_the_SpiderVerse_rekomendasi_film_1.jpg"
+										},
+										{
+											"key": "folderPath",
+											"value": "netflik",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8181/api/v1/upload/video",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8181",
+									"path": [
+										"api",
+										"v1",
+										"upload",
+										"video"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create video episode/movie",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"url\": \"https://res.cloudinary.com/tutorial-lntng/video/upload/v1687774972/netflik/pysi8vm1vnwgtbcqqvsq.mp4\",\n    \"length\": 120,\n    \"title\": \"Spider-Man: Across the Spider-Verse\",\n    \"synopsis\": \"Spider-Man: Across the Spider-Verse\"\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8181/api/v1/videos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8181",
+									"path": [
+										"api",
+										"v1",
+										"videos"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "movie",
+					"item": [
+						{
+							"name": "create movie without video",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Spider-Man: Across the Spider-Verse\",\n    \"type\": \"Movie\",\n    \"synopsis\": \"spiderman kartun\",\n    \"mpaRating\": \"TEEN\",\n    \"rYear\": \"2023-05-30\",\n    \"idmbRating\": 8,\n    \"actors\":[{\n        \"id\": 1,\n        \"name\": \"Idris Elba\"\n    }],\n    \"creators\":[ {\n        \"id\": 1,\n        \"name\": \"shinikkawa\"\n    }],\n    \"videos\": [{\n        \"id\": 2,\n        \"url\": \"https://res.cloudinary.com/tutorial-lntng/video/upload/v1687774972/netflik/pysi8vm1vnwgtbcqqvsq.mp4\",\n        \"length\": 120,\n        \"title\": \"Spider-Man: Across the Spider-Verse\",\n        \"synopsis\": \"Spider-Man: Across the Spider-Verse\"\n\n    }],\n    \"image\": \"https://images.bisnis.com/upload/img/Spider-Man_Across_the_SpiderVerse_rekomendasi_film_1.jpg\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8181/api/v1/movies",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8181",
+									"path": [
+										"api",
+										"v1",
+										"movies"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create movie without video Copy",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Spider-Man: No Way Home\",\n    \"type\": \"Movie\",\n    \"synopsis\": \"Spider-Man: No Way Home \",\n    \"mpaRating\": \"TEEN\",\n    \"rYear\": \"2021-12-15\",\n    \"idmbRating\": 8,\n    \"actors\":[{\n        \"id\": 1,\n        \"name\": \"Idris Elba\"\n    }],\n    \"creators\":[ {\n        \"id\": 1,\n        \"name\": \"shinikkawa\"\n    }],\n    \"videos\": [{\n        \"id\": 1,\n        \"url\": \"https://res.cloudinary.com/tutorial-lntng/video/upload/v1687775179/netflik/f87qz76bojrgb0yobbuz.mp4\",\n        \"length\": 120,\n        \"title\": \"Spider-Man: Far From Home\",\n        \"synopsis\": \"spiderman\"\n\n    }],\n    \"image\": \"https://m.media-amazon.com/images/M/MV5BZWMyYzFjYTYtNTRjYi00OGExLWE2YzgtOGRmYjAxZTU3NzBiXkEyXkFqcGdeQXVyMzQ0MzA0NTM@._V1_FMjpg_UX1000_.jpg\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8181/api/v1/movies",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8181",
+									"path": [
+										"api",
+										"v1",
+										"movies"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "movie query",
+			"item": [
+				{
+					"name": "get movies",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8181/api/query/v1/movies",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8181",
+							"path": [
+								"api",
+								"query",
+								"v1",
+								"movies"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get movies Copy",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8181/api/query/v1/movies/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8181",
+							"path": [
+								"api",
+								"query",
+								"v1",
+								"movies",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "subscription",
+			"item": [
+				{
+					"name": "create plan",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"30 days subscription\",\n    \"price\": 70,\n    \"description\": \"30 days subscription\",\n    \"activePeriod\": 30,\n    \"discountPrice\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8090/api/v1/subscription",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8090",
+							"path": [
+								"api",
+								"v1",
+								"subscription"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "order-service",
+			"item": [
+				{
+					"name": "create order",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"c8451efa-08eb-431f-ae12-6bd763c146eb\",\n    \"planId\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8090/api/v1/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8090",
+							"path": [
+								"api",
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
