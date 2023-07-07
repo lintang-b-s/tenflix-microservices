@@ -1,0 +1,44 @@
+spring:
+  config:
+    profiles: docker
+    activate:
+      on-profile: docker
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres-order:5432/order?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    username: root
+    password: root
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  application:
+    name: order-service
+  kafka:
+    listener:
+      missing-topics-fatal: false
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: order-service-cg
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+grpc:
+  server:
+    port: 9002
+
+logging:
+  level:
+    org:
+      apache:
+        kafka: OFF
+
+
+ 
+ 

@@ -1,0 +1,72 @@
+spring:
+  config:
+    profiles: docker
+    activate:
+      on-profile: docker
+  datasource:
+    url: jdbc:postgresql://postgres-movie:5431/netflik?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    username: netflik
+    password: netflik
+    driver-class-name: org.postgresql.Driver
+    hibernate:
+      ddl-auto: update
+  jackson:
+    time-zone: Asia/Kolkata
+  servlet:
+    multipart:
+      max-request-size: 50MB
+      max-file-size: 50MB
+  application:
+    name: movie-service
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/certs
+
+server:
+  port: 8200
+
+log4j:
+  logger:
+    org:
+      springframework:
+        web: INFO
+
+rabbitmq:
+  exchange:
+    name: movie_exchange
+  queue:
+    email:
+      name: email
+    movie:
+      add: add_movie
+    movie:
+      update: update_movie
+    movie:
+      delete: delete_movie
+  binding:
+    email:
+      routing:
+        key: email_routing_key
+    movieAdd:
+      routing:
+        key: addMovie_routing_key
+    movieUpdate:
+      routing:
+        key: updateMovie_routing_key
+    movieDelete:
+      routing:
+        key: deleteMovie_routing_key
+
+managements:
+  endpoints:
+    web:
+      exposure:
+        inclue: mappings
+
+
+

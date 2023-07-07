@@ -1,0 +1,33 @@
+spring:
+  config:
+    profiles: docker
+    activate:
+      on-profile: docker
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+  application:
+    name: notification-service
+
+
+server:
+  port: 8300
+
+rabbitmq:
+  queue:
+    email:
+      name: email
+  binding:
+    email:
+      routing:
+        key: email_routing_key
+    

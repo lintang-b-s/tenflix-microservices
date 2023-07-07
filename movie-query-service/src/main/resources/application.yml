@@ -1,0 +1,57 @@
+spring:
+  config:
+    profiles: docker
+    activate:
+      on-profile: docker
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+  data:
+    mongodb:
+      database: netflik
+      port: 27017
+      host: mongo-movie-query
+  jackson:
+    time-zone: Asia/Kolkata
+  application:
+    name: movie-query-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/certs
+  
+server:
+  port: 8100
+
+rabbitmq:
+  exchange:
+    name: movie_exchange
+  queue:
+    email:
+      name: email
+    movie:
+      add: add_movie
+    movie:
+      update: update_movie
+    movie:
+      delete: delete_movie
+  binding:
+    email:
+      routing:
+        key: email_routing_key
+    movieAdd:
+      routing:
+        key: addMovie_routing_key
+    movieUpdate:
+      routing:
+        key: updateMovie_routing_key
+    movieDelete:
+      routing:
+        key: deleteMovie_routing_key
+
+
+
+ 
+   
+  

@@ -1,0 +1,45 @@
+spring:
+  config:
+    profiles: docker
+    activate:
+      on-profile: docker
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres-payment:5432/payment?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  kafka:
+    listener:
+      missing-topics-fatal: false
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: payment-service-cg
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+  application:
+    name: payment-service
+
+logging:
+  level:
+    org:
+      apache:
+        kafka: OFF
+
+
+grpc:
+  server:
+    port: 9003
+
+
+  
+  

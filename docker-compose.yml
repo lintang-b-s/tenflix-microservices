@@ -4,21 +4,32 @@ services:
 
 
 
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    volumes:
+     - ./ngrok.yml:/etc/ngrok.yml
+    ports:
+      - 4040:4040
+    environment:
+      - NGROK_AUTH=${NGROK_AUTH}
+    command: ["start", "--none", "--authtoken", "${NGROK_AUTH}"]
+
   order-aggregator-service:
     container_name: order-aggregator-service
     build: ./order-aggregator-service
     ports:
       - 9200:9200
       - 5005:5005
-    env_file:
-      - config-repo/order-aggregator-service.env
+    # env_file:
+    #   - config-repo/order-aggregator-service.env
     environment:
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 #remote debugging
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI=http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/certs
-      - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://discovery-server:8761/eureka
     depends_on:
       - keycloak-tenflix
+      - payment-service
+      - order-service
+      - subscription-service
     platform: linux/arm64/v8
 
   subscription-service:
@@ -27,12 +38,10 @@ services:
     ports:
       - 9100:9100
       - 5008:5008
-    env_file:
-      - config-repo/subscription-service.env
+    # env_file:
+    #   - config-repo/subscription-service.env
     environment:
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008 #remote debugging
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://discovery-server:8761/eureka
     depends_on:
       - postgres-subscription
 
@@ -49,6 +58,8 @@ services:
       POSTGRES_PASSWORD: root
     volumes:
       - postgres-subscription:/var/lib/postgresql/data
+      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
 
   order-service:
     container_name: order-service
@@ -56,12 +67,10 @@ services:
     ports:
       - 9000:9000
       - 5007:5007
-    env_file:
-      - config-repo/order-service.env
+    # env_file:
+    #   - config-repo/order-service.env
     environment:
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 # remote debugging
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://discovery-server:8761/eureka
     depends_on:
       - postgres-order
     platform: linux/arm64/v8
@@ -77,6 +86,9 @@ services:
       POSTGRES_PASSWORD: root
     volumes:
       - postgres-order:/var/lib/postgresql/data
+      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -99,7 +111,6 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-
     depends_on:
       - zookeeper
 
@@ -124,13 +135,11 @@ services:
     ports:
       - 8800:8800
       - 5006:5006 # debug port
-    env_file:
-      - config-repo/payment-service.env
+    # env_file:
+    #   - config-repo/payment-service.env
     environment:
       - MIDTRANS_SERVERKEY=${MIDTRANS_SERVERKEY}
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 # remote debugging
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://discovery-server:8761/eureka
     depends_on:
       - postgres-payment
 
@@ -147,6 +156,9 @@ services:
       POSTGRES_PASSWORD: root
     volumes:
       - postgres-payment:/var/lib/postgresql/data
+      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
 
 
 
@@ -226,71 +238,55 @@ services:
       - "15672:15672"
     platform: linux/arm64/v8
 
-  discovery-server:
-    container_name: discovery-server
-    build: ./discovery-server
-    ports:
-      - 8761:8761
-    env_file:
-      - config-repo/discovery-server.env
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - EUREKA_CLIENT_FETCHREGISTRY=false
-      - EUREKA_CLIENT_REGISTERWITHEUREKA=false
-      - EUREKA_INSTANCE_HOSTNAME=discovery-server
-      - EUREKA_CLIENT_REGISTER_WITH-EUREKA=false
-      - EUREKA_CLIENT_FETCH_REGISTRY=false
-      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery-server:8761/eureka
-      - SERVER_PORT=8761
+  # discovery-server:
+  #   container_name: discovery-server
+  #   build: ./discovery-server
+  #   ports:
+  #     - 8761:8761
+  #   # env_file:
+  #   #   - config-repo/discovery-server.env
 
 
-  api-gateway:
-    build: ./api-gateway
-    container_name: api-gateway
-    ports:
-      - 8181:8181
-    env_file:
-      - config-repo/api-gateway.env
-    environment:
-      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
-      - SPRING_CLOUD_GATEWAY_ROUTES[0]_ID=movie-service
-      - SPRING_CLOUD_GATEWAY_ROUTES[0]_URI=http://movie-service:8200/movie-service
-      - SPRING_CLOUD_GATEWAY_ROUTES[0]_PREDICATES[0]=Path=/api/v1/**
-      - SPRING_CLOUD_GATEWAY_ROUTES[1]_ID=movie-query-service
-      - SPRING_CLOUD_GATEWAY_ROUTES[1]_URI=http://movie-query-service:8100/movie-query-service
-      - SPRING_CLOUD_GATEWAY_ROUTES[1]_PREDICATES[0]=Path=/api/query/v1/**
-      - SPRING_CLOUD_GATEWAY_ROUTES[2]_ID=discovery-server
-      - SPRING_CLOUD_GATEWAY_ROUTES[2]_URI=http://discovery-server:8761
-      - SPRING_CLOUD_GATEWAY_ROUTES[2]_PREDICATES[0]=Path=/eureka/web
-      - SPRING_CLOUD_GATEWAY_ROUTES[2]_FILTERS[0]=SetPath=/
-      - SPRING_CLOUD_GATEWAY_ROUTES[3]_ID=discovery-server-static
-      - SPRING_CLOUD_GATEWAY_ROUTES[3]_URI=http://discovery-server:8761
-      - SPRING_CLOUD_GATEWAY_ROUTES[3]_PREDICATES[0]=Path=/eureka/**
-      - SPRING_CLOUD_GATEWAY_ROUTES[4]_ID=notification-service
-      - SPRING_CLOUD_GATEWAY_ROUTES[4]_URI=http://notification-service:8300/notification-service
-      - SPRING_CLOUD_GATEWAY_ROUTES[4]_PREDICATES[0]=Path=/api/v1/websocket/**
-      - SPRING_PROFILES_ACTIVE=docker
-    depends_on:
-      - discovery-server
-      - keycloak-tenflix
-    platform: linux/arm64/v8
+
+  # api-gateway:
+  #   build: ./api-gateway
+  #   container_name: api-gateway
+  #   ports:
+  #     - 8181:8181
+  #   env_file:
+  #     - config-repo/api-gateway.env
+  #   environment:
+  #     - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[0]_ID=movie-service
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[0]_URI=http://movie-service:8200/movie-service
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[0]_PREDICATES[0]=Path=/api/v1/movie-service/**
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[1]_ID=movie-query-service
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[1]_URI=http://movie-query-service:8100/movie-query-service
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[1]_PREDICATES[0]=Path=/api/v1/movie-query/**
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[2]_ID=discovery-server
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[2]_URI=http://discovery-server:8761
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[2]_PREDICATES[0]=Path=/eureka/web
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[2]_FILTERS[0]=SetPath=/
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[3]_ID=discovery-server-static
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[3]_URI=http://discovery-server:8761
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[3]_PREDICATES[0]=Path=/eureka/**
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[4]_ID=notification-service
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[4]_URI=http://notification-service:8300/notification-service
+  #     - SPRING_CLOUD_GATEWAY_ROUTES[4]_PREDICATES[0]=Path=/api/v1/websocket/**
+  #     - SPRING_PROFILES_ACTIVE=docker
+  #   depends_on:
+  #     - discovery-server
+  #     - keycloak-tenflix
+  #   platform: linux/arm64/v8
 
   movie-service:
-    #    image: lintangbs/movieservice.env:v1
     container_name: movie-service
     build: ./movie-service
     env_file:
       - config-repo/movieservice.env
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-movie:5432/netflik
-      - SPRING_DATASOURCE_USERNAME=netflik
-      - SPRING_DATASOURCE_PASSWORD=netflik
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
-      - SPRING_DATASOURCE_DRIVER-CLASS-NAME=org.postgresql.Driver
-      - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://discovery-server:8761/eureka
-      - SPRING_PROFILES_ACTIVE=docker
       - CLOUDINARY_URL=${CLOUDINARY_URL}
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI=http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/certs
+   
     ports:
       - 8200:8200
     depends_on:
@@ -307,8 +303,8 @@ services:
     build: ./movie-query-service
     ports:
       - 8100:8100
-    env_file:
-      - config-repo/movie-query-service.env
+    # env_file:
+    #   - config-repo/movie-query-service.env
     depends_on:
       - mongo-movie-query
       - rabbitmq
@@ -317,8 +313,6 @@ services:
       - keycloak-tenflix
     environment:
       - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://discovery-server:8761/eureka
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI=http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/certs
     platform: linux/arm64/v8
 
   notification-service:
@@ -326,8 +320,8 @@ services:
     build: ./notificationservice
     ports:
       - 8300:8300
-    env_file:
-      - config-repo/notificationservice.env
+    # env_file:
+    #   - config-repo/notificationservice.env
     depends_on:
       - mongo-movie-query
       - rabbitmq
@@ -335,10 +329,6 @@ services:
       - discovery-server
       - keycloak-tenflix
     environment:
-      - RABBITMQ_QUEUE_EMAIL_NAME=email
-      - SPRING_RABBITMQ_HOST=rabbitmq
-      - EUREKA_CLIENT_SERVICEURL_DEAFULTZONE=http://discovery-server:8761/eureka
-      - SPRING_PROFILES_ACTIVE=docker
       - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
       - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
     platform: linux/arm64/v8

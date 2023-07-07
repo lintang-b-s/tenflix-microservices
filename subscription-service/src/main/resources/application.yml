@@ -1,0 +1,40 @@
+spring:
+  config:
+    profiles: docker
+    activate:
+      on-profile: docker
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres-subscription:5432/subscription?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+  kafka:
+    listener:
+      missing-topics-fatal: false
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: subscription-service-cg
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+  application:
+    name: subscription-service
+
+logging:
+  level:
+    org:
+      apache:
+        kafka: OFF
+  
+grpc:
+  server:
+    port: 9000
+
+

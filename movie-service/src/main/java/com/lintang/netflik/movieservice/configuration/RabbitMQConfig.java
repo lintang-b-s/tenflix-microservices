@@ -16,7 +16,6 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 @Configuration
 public class RabbitMQConfig {
 
-
     @Value("${rabbitmq.queue.email.name}")
     private String emailQueue;
 
@@ -33,11 +32,11 @@ public class RabbitMQConfig {
     private String addMovieRoutingKey;
     @Value("${rabbitmq.queue.movie.update}")
     private String updateMovieQueue;
-    @Value("${rabbitmq.queue.movieUpdate.routing.key}")
+    @Value("${rabbitmq.binding.movieUpdate.routing.key}")
     private String updateMovieRoutingKey;
     @Value("${rabbitmq.queue.movie.delete}")
     private String deleteMovieQueue;
-    @Value("${rabbitmq.queue.movieDelete.routing.key}")
+    @Value("${rabbitmq.binding.movieDelete.routing.key}")
     private String deleteMovieRoutingKey;
 
 
