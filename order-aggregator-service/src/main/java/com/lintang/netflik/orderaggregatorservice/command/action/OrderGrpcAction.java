@@ -90,7 +90,7 @@ public class OrderGrpcAction {
 
         Map token = getAccessToken(restTemplate).getBody();
         String accToken = (String) token.get("access_token");
-        String url = "http://keycloak:8080/admin/realms/tenflix/users/" + userId;
+        String url = "http://keycloak-tenflix:8080/admin/realms/tenflix/users/" + userId;
 
         ResponseEntity<Map> response = null;
         try{
@@ -187,8 +187,8 @@ public class OrderGrpcAction {
         map.add("username", "lintang@gmail.com");
         map.add("password", "lintang");
         map.add("client_id", "tenflix-client");
-        map.add("client_secret", "ZW9DhkCa6TYXwvohFFBXHrBCve0OAWM5");
-        String url = "http://keycloak:8080/realms/tenflix/protocol/openid-connect/token";
+        map.add("client_secret", "y57aHOaRWrUO5PHdzk5jcUIm3RGWsKEg");
+        String url = "http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/token";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         HttpEntity<MultiValueMap<String, String>> requestBodyFormUrlEncoded =

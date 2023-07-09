@@ -1,0 +1,6 @@
+{
+  "Name": "kong-database",
+  "Tags": ["v1", "v2"],
+  "Address": "kong-database",
+  "Port": 5432
+}

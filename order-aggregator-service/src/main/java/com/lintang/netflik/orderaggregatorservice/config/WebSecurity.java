@@ -40,9 +40,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 //        return http.build();
 
          http
-                 .cors().disable() .authorizeRequests().antMatchers(HttpMethod.POST, "/api/v1/**")
-                .hasAnyAuthority("ROLE_admin", "ROLE_user")
-                .antMatchers(HttpMethod.PUT, "/api/v1/**").hasAnyRole("admin", "user")
+                 .cors().disable().csrf().disable().authorizeRequests()
+                .antMatchers(HttpMethod.POST, "/api/v1/orders").hasAnyRole("admin", "user")
+                .antMatchers(HttpMethod.POST,  "/api/v1/orders/notificationMidtrans").permitAll()
+                .antMatchers("/actuator/**").permitAll()
                 .anyRequest().authenticated()
                 .and().oauth2ResourceServer().jwt()
                 .jwtAuthenticationConverter(jwtAuthenticationConverter);

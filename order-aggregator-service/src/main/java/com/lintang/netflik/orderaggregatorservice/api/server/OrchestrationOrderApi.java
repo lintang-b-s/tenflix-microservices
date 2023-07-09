@@ -22,7 +22,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/orders")
 @AllArgsConstructor
-@PreAuthorize("hasAuthority('ROLE_user')")
 public class OrchestrationOrderApi {
 
     @Autowired
@@ -30,6 +29,7 @@ public class OrchestrationOrderApi {
 
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ROLE_user', 'ROLE_ADMIN')")
     public ResponseEntity<CreateOrderResponse> createOrder(
             @RequestBody(required = true) CreateOrderRequest requestBody, @AuthenticationPrincipal Jwt principal) throws MidtransError {
         CreateOrderResponse responseBody = orderGrpcService.createOrder(requestBody, principal.getSubject());

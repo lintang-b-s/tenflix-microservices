@@ -1,8 +1,8 @@
 spring:
-  profiles: docker
+  profiles: local
   cloud:
     consul:
-      host: consul-tenflix
+      host: localhost
       port: 8500
       discovery:
         instanceId: ${spring.application.name}:${random.value}

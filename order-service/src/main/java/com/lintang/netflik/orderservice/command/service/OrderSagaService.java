@@ -1,24 +1,33 @@
 package com.lintang.netflik.orderservice.command.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.lintang.netflik.orderservice.broker.listener.SagaPaymentResponseListener;
 import com.lintang.netflik.orderservice.broker.message.*;
 import com.lintang.netflik.orderservice.command.action.OrderOutboxAction;
 import com.lintang.netflik.orderservice.command.action.OrderSagaAction;
 import com.lintang.netflik.orderservice.entity.*;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class OrderSagaService {
+    private static final Logger LOG = LoggerFactory.getLogger(OrderSagaService.class);
+
 
     @Autowired
     private OrderSagaAction orderSagaAction;
     @Autowired
     private OrderOutboxAction outboxAction;
 
+    
+/*
+    Step 2 saga: get messaagee from order service . Update order status in order db
+    */
 
     @Transactional
     public void updateOrderStatusToPaid(PaymentValidatedMessage paymentValidatedMessage) throws JsonProcessingException {
@@ -41,6 +50,7 @@ public class OrderSagaService {
                     OutboxEventType.ADD_SUBSCRIPTION, subscriptionMessage, SagaStatus.PROCESSING
             );
             outboxAction.deleteOutbox(orderOutbox);
+            LOG.debug("Step 2 saga: get messaagee from order service . Update order status in order db");
     }
 
     @Transactional

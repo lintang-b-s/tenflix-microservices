@@ -1,15 +1,17 @@
 spring:
-  config:
-    profiles: docker
-    activate:
-      on-profile: docker
+  profiles:
+    active: docker
   datasource:
-    url: jdbc:postgresql://postgres-movie:5431/netflik?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://postgres-movie:5432/netflik?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
     username: netflik
     password: netflik
     driver-class-name: org.postgresql.Driver
+  jpa:
+    database: postgresql
     hibernate:
       ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
   jackson:
     time-zone: Asia/Kolkata
   servlet:
@@ -62,11 +64,106 @@ rabbitmq:
       routing:
         key: deleteMovie_routing_key
 
-managements:
+management:
+  endpoint:
+    health:
+      show-details: always
   endpoints:
     web:
       exposure:
-        inclue: mappings
+        include: health,info
+  info:
+    env: 
+      enabled: true
+  server:
+    port: 8200
+info:
+  app:
+    name: movie-service
+    description: movie command service
 
 
+# ---
+# spring:
+#   profiles:
+#     active: local
+#   datasource:
+#     url: jdbc:postgresql://localhost:5431/netflik?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+#     username: netflik
+#     password: netflik
+#     driver-class-name: org.postgresql.Driver
+#   jpa:
+#     database: postgresql
+#     hibernate:
+#       ddl-auto: update
+#     database-platform: org.hibernate.dialect.PostgreSQLDialect
+#     show-sql: true
+#   jackson:
+#     time-zone: Asia/Kolkata
+#   servlet:
+#     multipart:
+#       max-request-size: 50MB
+#       max-file-size: 50MB
+#   application:
+#     name: movie-service
+#   rabbitmq:
+#     host: localhost
+#     port: 5672
+#   security:
+#     oauth2:
+#       resourceserver:
+#         jwt:
+#           jwk-set-uri: http://localhost:8080/realms/tenflix/protocol/openid-connect/certs
 
+# server:
+#   port: 8200
+
+# log4j:
+#   logger:
+#     org:
+#       springframework:
+#         web: INFO
+
+# rabbitmq:
+#   exchange:
+#     name: movie_exchange
+#   queue:
+#     email:
+#       name: email
+#     movie:
+#       add: add_movie
+#     movie:
+#       update: update_movie
+#     movie:
+#       delete: delete_movie
+#   binding:
+#     email:
+#       routing:
+#         key: email_routing_key
+#     movieAdd:
+#       routing:
+#         key: addMovie_routing_key
+#     movieUpdate:
+#       routing:
+#         key: updateMovie_routing_key
+#     movieDelete:
+#       routing:
+#         key: deleteMovie_routing_key
+
+# management:
+#   endpoint:
+#     health:
+#       show-details: always
+#   endpoints:
+#     web:
+#       exposure:
+#         include: health,info
+#   info:
+#     env: 
+#       enabled: true
+#   server:
+#     port: 8200
+# info:
+#   app:
+#     name: movie-service
+#     description: movie command service

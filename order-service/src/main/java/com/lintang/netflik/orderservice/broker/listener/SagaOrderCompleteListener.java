@@ -32,14 +32,14 @@ public class SagaOrderCompleteListener {
     private OrderSagaService sagaService;
 
     /*
-    Step 5 saga: get message from order-requeest topic. Update order status in order db to COMPLETED
+    Step 4 saga: get message from order-requeest topic. Update order status in order db to COMPLETED
     */
 
     @KafkaListener(topics = "t.saga.order.outbox.order.request",containerFactory = "stringDeserializerContainerFactory")
     public void onAddedSubscription(@Header(name = KafkaHeaders.RECEIVED_TIMESTAMP) long timestamp,
                                     @Payload String message) throws JsonMappingException, JsonProcessingException {
         var outboxMessage=  objectMapper.readValue(message, OutboxMessage.class);
-        LOG.debug("step 5 saga: get message from order.request topic!!");
+        LOG.debug("step 4 saga: get message from order.request topic!!");
         if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.COMPLETE_ORDER)
                 && outboxMessage.getPayload().getSagaStatus() == SagaStatus.SUCCEEDED
         ) {

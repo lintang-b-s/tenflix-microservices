@@ -76,7 +76,7 @@ public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
         }
 
 //        Map<String, Any> map
-        var mapNotificationMidtrans = request.getPaymentNotification().getNotificationResMap();
+        var mapNotificationMidtrans = request.getPaymentNotification().getNotificationResMap(); // salah disini
         try {
             var paymentOutbox = orderOutboxAction.insertOutbox(
                     "payment-validate.request",
@@ -86,7 +86,8 @@ public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
             LOG.debug("Step 1 Saga:  Send MapNotifMidtrans to Payment-Service !");
             orderOutboxAction.deleteOutbox(paymentOutbox);
         } catch (JsonProcessingException e) {
-            responseObserver.onError(new BadRequestException("Json processing error"));
+            responseObserver.onError(new BadRequestException("Json processing error")); // error disini
+            LOG.debug("erorr in step 1 saga: proccessOrderSaga insertoutbox");
         }
 
         responseObserver.onNext(Empty.newBuilder().build());

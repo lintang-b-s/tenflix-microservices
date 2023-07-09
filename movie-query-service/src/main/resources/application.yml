@@ -1,8 +1,6 @@
 spring:
-  config:
-    profiles: docker
-    activate:
-      on-profile: docker
+  profiles:
+    active: docker
   rabbitmq:
     host: rabbitmq
     port: 5672
@@ -52,6 +50,94 @@ rabbitmq:
 
 
 
- 
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  info:
+    env: 
+      enabled: true
+  server:
+    port: 8100
+info:
+  app:
+    name: movie query
+    description: query movie
+
    
+# ---
+# spring:
+#   profiles:
+#     active: local
+#   rabbitmq:
+#     host: locahost
+#     port: 5672
+#   data:
+#     mongodb:
+#       database: netflik
+#       port: 27017
+#       host: localhost
+#   jackson:
+#     time-zone: Asia/Kolkata
+#   application:
+#     name: movie-query-service
+#   security:
+#     oauth2:
+#       resourceserver:
+#         jwt:
+#           jwk-set-uri: http://localhost:8080/realms/tenflix/protocol/openid-connect/certs
   
+# server:
+#   port: 8100
+
+# rabbitmq:
+#   exchange:
+#     name: movie_exchange
+#   queue:
+#     email:
+#       name: email
+#     movie:
+#       add: add_movie
+#     movie:
+#       update: update_movie
+#     movie:
+#       delete: delete_movie
+#   binding:
+#     email:
+#       routing:
+#         key: email_routing_key
+#     movieAdd:
+#       routing:
+#         key: addMovie_routing_key
+#     movieUpdate:
+#       routing:
+#         key: updateMovie_routing_key
+#     movieDelete:
+#       routing:
+#         key: deleteMovie_routing_key
+
+
+
+# management:
+#   endpoint:
+#     health:
+#       show-details: always
+#   endpoints:
+#     web:
+#       exposure:
+#         include: health,info
+#   info:
+#     env: 
+#       enabled: true
+#   server:
+#     port: 8100
+# info:
+#   app:
+#     name: movie query
+#     description: query movie
+
+   

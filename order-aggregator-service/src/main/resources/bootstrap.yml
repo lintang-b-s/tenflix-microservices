@@ -1,8 +1,24 @@
+# spring:
+#   profiles:
+#     active: docker
+#   cloud:
+#     consul:
+#       host: 172.1.1.17
+#       port: 8500
+#       discovery:
+#         instanceId: ${spring.application.name}:${random.value}
+#       enabled: true
+# eureka:
+#   client:
+#     enabled: false
+
+# ---
 spring:
-  profiles: docker
+  profiles:
+    active: local
   cloud:
     consul:
-      host: consul-tenflix
+      host: localhost
       port: 8500
       discovery:
         instanceId: ${spring.application.name}:${random.value}

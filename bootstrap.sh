@@ -5,23 +5,16 @@ echo "* [1/3] Compile and package all services *"
 echo "******************************************"
 echo ""
 
-cd proto
-mvn compile
-cd ..
+mvn clean && 
 
-if ! mvn  package -DskipTests; then
+cd proto && 
+mvn compile &&
+cd .. && 
+
+if ! mvn  package -DskipTests; then # kalo install gakbisa jadi 404
     echo ""
     echo "Error: Maven encountered errors, unable to continue!"
     exit
 fi
 
-echo ""
-echo "*****************************************************************"
-echo "* [3/3] Start all services (and their dependencies) with Docker *"
-echo "*****************************************************************"
-echo ""
 
-
-docker-compose up -d
-echo ""
-echo "Congratulations, everything was successful!"

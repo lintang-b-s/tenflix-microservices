@@ -1,8 +1,6 @@
 spring:
-  config:
-    profiles: docker
-    activate:
-      on-profile: docker
+  profiles:
+    active: docker
   application:
     name: order-aggregator-service
   security:
@@ -10,30 +8,137 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/certs
-  
+
 
 # grpc
 grpc:
   client:
     order-service:
-      address: static://order-service:9002
+      address: 'discovery:///order-service'
       negotiation-type: plaintext
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
     payment-service:
-      address: static://payment-service:9003
+      address: 'discovery:///payment-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
       negotiation-type: plaintext
     subscription-service:
-      address: static://subscription-service:9000
+      address: 'discovery:///subscription-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
       negotiation-type: plaintext
     user-service:
-      address: static://user-service:9001
+      address: 'discovery:///user-service'
+      enableKeepAlive: true
+      keepAliveWithoutCalls: true
       negotiation-type: plaintext
-  
-  
-server:
-  port: 9200
+
+
+
 
 # keycloak
 keycloak:
   realm: tenflix
   resource: tenflix-client
-  auth-server-url: http://keyloak-tenflix:8080
+  auth-server-url: http://keycloak-tenflix:8080
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  info:
+    env:
+      enabled: true
+  server:
+    port: 9900
+info:
+  app:
+    name: order-aggregator-service
+    description: aggregate multiple response from other service
+
+# ---
+# spring:
+#   profiles:
+#     active: local
+#   application:
+#     name: order-aggregator-service
+#   security:
+#     oauth2:
+#       resourceserver:
+#         jwt:
+#           jwk-set-uri: http://localhost:8080/realms/tenflix/protocol/openid-connect/certs
+
+
+#  # grpc
+# #  grpc:
+# #    client:
+# #      order-service:
+# #        address: static://localhost:9002
+# #        negotiation-type: plaintext
+# #      payment-service:
+# #        address: static://localhost:9003
+# #        negotiation-type: plaintext
+# #      subscription-service:
+# #        address: static://localhost:9000
+# #        negotiation-type: plaintext
+# #      user-service:
+# #        address: static://localhost:9001
+# #        negotiation-type: plaintext
+
+# # grpc
+# grpc:
+#   client:
+#     order-service:
+#       address: 'discovery:///order-service'
+#       negotiation-type: plaintext
+#       enableKeepAlive: true
+#       keepAliveWithoutCalls: true
+#     payment-service:
+#       address: 'discovery:///payment-service'
+#       enableKeepAlive: true
+#       keepAliveWithoutCalls: true
+#       negotiation-type: plaintext
+#     subscription-service:
+#       address: 'discovery:///subscription-service'
+#       enableKeepAlive: true
+#       keepAliveWithoutCalls: true
+#       negotiation-type: plaintext
+#     user-service:
+#       address: 'discovery:///user-service'
+#       enableKeepAlive: true
+#       keepAliveWithoutCalls: true
+#       negotiation-type: plaintext
+
+
+# server:
+#   port: 9900
+
+# # keycloak
+# keycloak:
+#   realm: tenflix
+#   resource: tenflix-client
+#   auth-server-url: http://localhost:8080
+
+
+# management:
+#   endpoint:
+#     health:
+#       show-details: always
+#   endpoints:
+#     web:
+#       exposure:
+#         include: "*"
+#   info:
+#     env:
+#       enabled: true
+#   server:
+#     port: 9900
+# info:
+#   app:
+#     name: order-aggregator-service
+#     description: aggregate multiple response from other service

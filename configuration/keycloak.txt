@@ -1,0 +1,23 @@
+# execute this command to disable https keycloak
+
+docker exec -it keycloak-tenflix bash 
+
+
+cd opt/keycloak/bin 
+./kcadm.sh config credentials --server http://localhost:8080 --realm master --user admin --password admin 
+./kcadm.sh update realms/master -s sslRequired=NONE
+
+
+
+
+
+
+curl -s -X POST http://localhost:8001/plugins \
+  -d name=oidc \
+  -d config.client_id=kong \
+  -d config.client_secret=y57aHOaRWrUO5PHdzk5jcUIm3RGWsKEg \
+  -d config.bearer_only=yes \
+  -d config.realm=tenflix \
+  -d config.introspection_endpoint=http://192.168.116.122:8080/realms/tenflix/protocol/openid-connect/token/introspect \
+  -d config.discovery=http://192.168.116.122:8080/auth/realms/tenflix/.well-known/openid-configuration \
+  | jq

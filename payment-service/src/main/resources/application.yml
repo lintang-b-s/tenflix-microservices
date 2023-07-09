@@ -1,8 +1,6 @@
 spring:
-  config:
-    profiles: docker
-    activate:
-      on-profile: docker
+  profiles:
+    active: docker
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://postgres-payment:5432/payment?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
@@ -40,6 +38,90 @@ grpc:
   server:
     port: 9003
 
+server:
+  port: 8800
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  info:
+    env:
+      enabled: true
+  server:
+    port: 8800
+info:
+  app:
+    name: payment-service
+    description: payment-service
 
-  
-  
+#
+
+# ---
+
+# spring:
+#   profiles:
+#     active: local
+#   datasource:
+#     driver-class-name: org.postgresql.Driver
+#     url: jdbc:postgresql://localhost:5435/payment?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+#     username: root
+#     password: root
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+#     database-platform: org.hibernate.dialect.PostgreSQLDialect
+#     show-sql: true
+#   kafka:
+#     listener:
+#       missing-topics-fatal: false
+#     producer:
+#       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#     consumer:
+#       group-id: payment-service-cg
+#       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+#       properties:
+#         spring:
+#           json:
+#             trusted:
+#               packages: "*"
+#   application:
+#     name: payment-service
+#
+# logging:
+#   level:
+#     org:
+#       apache:
+#         kafka: OFF
+#
+#
+# grpc:
+#   server:
+#     port: 9003
+#
+#
+#
+# server:
+#   port: 8800
+# management:
+#   endpoint:
+#     health:
+#       show-details: always
+#   endpoints:
+#     web:
+#       exposure:
+#         include: health,info
+#   info:
+#     env:
+#       enabled: true
+#   server:
+#     port: 8800
+# info:
+#   app:
+#     name: payment-service
+#     description: payment-service
+# midtrans:
+#   serverkey: ${MIDTRANS_SERVERKEY}

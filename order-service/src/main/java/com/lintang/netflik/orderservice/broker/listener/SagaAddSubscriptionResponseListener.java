@@ -31,14 +31,14 @@ public class SagaAddSubscriptionResponseListener {
     private OrderSagaService sagaService;
 
     /*
-    Step 4 saga: get message from  subscription service. Sending message to order.request topic
+    Step 3 saga: get message from  subscription service. Sending message to order.request topic
     */
 
     @KafkaListener(topics = "t.saga.order.outbox.subscription.response", containerFactory = "stringDeserializerContainerFactory")
     public void onAddedSubscription(@Header(name = KafkaHeaders.RECEIVED_TIMESTAMP) long timestamp,
                                     @Payload String message) throws JsonMappingException, JsonProcessingException {
         var outboxMessage = objectMapper.readValue(message, OutboxMessage.class);
-        LOG.debug("step 4 saga :get message from subscription service !");
+        LOG.debug("step 3 saga :get message from subscription service !");
 
         if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.ADDED_SUBSCRIPTION)
          && outboxMessage.getPayload().getSagaStatus() == SagaStatus.PROCESSING) {
