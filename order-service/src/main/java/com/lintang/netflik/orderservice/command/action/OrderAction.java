@@ -53,6 +53,10 @@ public class OrderAction {
     public boolean userHasMoreThanOneOrder(String userId) {
         boolean isExists= orderJpaRepository.existsByUserIdAndOrderStatus(UUID.fromString(userId), OrderStatus.PENDING);
        return isExists;
+    }
 
+    public List<OrderEntity> findByUserId(String userId ) {
+        List<OrderEntity> orders = orderJpaRepository.findByUserId(UUID.fromString(userId));
+        return orders;
     }
 }

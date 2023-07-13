@@ -5,6 +5,7 @@ import com.lintang.netflik.models.CustomerDetails;
 import com.lintang.netflik.models.ItemDetails;
 import com.lintang.netflik.models.PaymentGetRedirectUrlGrpcRequest;
 import com.lintang.netflik.models.TransactionDetails;
+import com.lintang.netflik.paymentservice.entity.PaymentEntity;
 import com.lintang.netflik.paymentservice.repository.PaymentJpaRepository;
 import com.midtrans.Midtrans;
 import com.midtrans.httpclient.SnapApi;
@@ -13,10 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class PaymentGrpcAction {
@@ -26,6 +24,14 @@ public class PaymentGrpcAction {
 
     @Value("${midtrans.serverkey}")
     private String midtransServerKey;
+
+  /*
+    find payment detail by orderId
+    */
+    public Optional<PaymentEntity> findByOrderId(String orderId ) {
+        Optional<PaymentEntity> paymentEntity = paymentJpaRepository.findByOrderId(orderId);
+        return paymentEntity;
+    }
     public String getToken(PaymentGetRedirectUrlGrpcRequest request) throws MidtransError {
         Midtrans.serverKey = midtransServerKey;
         Midtrans.isProduction = false;

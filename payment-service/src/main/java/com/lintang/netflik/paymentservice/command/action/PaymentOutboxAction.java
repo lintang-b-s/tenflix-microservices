@@ -21,11 +21,12 @@ public class PaymentOutboxAction {
         outboxRepository.delete(outbox);
     }
     public OutboxEntity insertOutbox(OutboxEntity outbox) {
-        return outboxRepository.save(outbox);
+        OutboxEntity saved=  outboxRepository.save(outbox);
+        return saved;
     }
 
     public OutboxEntity insertOutbox(String aggregateType, String aggregateId, String type, Object payload,
-                                     SagaStatus sagaStatus)
+                                     String sagaStatus)
             throws JsonProcessingException {
         var outbox = new OutboxEntity();
 
@@ -33,7 +34,7 @@ public class PaymentOutboxAction {
         outbox.setAggregateId(aggregateId);
         outbox.setType(type);
         outbox.setPayload(objectMapper.writeValueAsString(payload));
-        outbox.setSagaStatus(sagaStatus.name());
+        outbox.setSagaStatus(sagaStatus);
 
         return insertOutbox(outbox);
     }

@@ -3,6 +3,8 @@ package com.lintang.netflik.orderaggregatorservice.api.server;
 import com.lintang.netflik.orderaggregatorservice.command.request.CreateOrderRequest;
 import com.lintang.netflik.orderaggregatorservice.command.response.CreateOrderResponse;
 import com.lintang.netflik.orderaggregatorservice.command.service.OrderGrpcService;
+import com.lintang.netflik.orderaggregatorservice.query.response.GetOrderDetailResponse;
+import com.lintang.netflik.orderaggregatorservice.query.response.GetOrdersResponse;
 import com.midtrans.httpclient.error.MidtransError;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+import static org.springframework.http.ResponseEntity.ok;
+
 
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -27,6 +31,9 @@ public class OrchestrationOrderApi {
     @Autowired
     private OrderGrpcService orderGrpcService;
 
+/*
+    create user order
+*/
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ROLE_user', 'ROLE_ADMIN')")
@@ -35,9 +42,14 @@ public class OrchestrationOrderApi {
         CreateOrderResponse responseBody = orderGrpcService.createOrder(requestBody, principal.getSubject());
 
 
-        return ResponseEntity.ok().body(responseBody);
+        return ok().body(responseBody);
     }
 
+
+    /*
+    Process order setelah dapet notifikasi dari midtrans
+    pake transactional Saga + outbox pattern
+   */
 
     @PostMapping("/notificationMidtrans")
     public ResponseEntity<String> processOrder(
@@ -47,4 +59,28 @@ public class OrchestrationOrderApi {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+
+    /*
+        Get user order Detail with payment detail , subscription detail from 3 service
+    */
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_user', 'ROLE_ADMIN')")
+    public ResponseEntity<GetOrderDetailResponse> getOrderDetail(
+            @PathVariable("id") String orderId, @AuthenticationPrincipal Jwt principal
+    ) {
+        GetOrderDetailResponse response = orderGrpcService.getOrderDetail(orderId, principal.getSubject());
+        return ok(response);
+    }
+
+/*
+    Get user oder history
+    */
+    @GetMapping
+    @PreAuthorize("hasAnyAuthority('ROLE_user', 'ROLE_ADMIN')")
+    public ResponseEntity<GetOrdersResponse> getOrderHistory(
+            @AuthenticationPrincipal Jwt principal
+    ) {
+        GetOrdersResponse response = orderGrpcService.getOrderHistory(principal.getSubject());
+        return ok(response);
+    }
 }

@@ -20,19 +20,20 @@ public class OrderOutboxAction {
         outboxRepository.delete(outbox);
     }
     public OutboxEntity insertOutbox(OutboxEntity cqrsOutbox) {
-        return outboxRepository.save(cqrsOutbox);
+        OutboxEntity saved= outboxRepository.save(cqrsOutbox);
+        return saved;
     }
 
     public OutboxEntity insertOutbox(String aggregateType, String aggregateId, String type, Object payload,
-                                     SagaStatus sagaStatus)
+                                     String sagaStatus)
             throws JsonProcessingException {
         var outbox = new OutboxEntity();
 
         outbox.setAggregateType(aggregateType);
         outbox.setAggregateId(aggregateId);
         outbox.setType(type);
-        outbox.setPayload(objectMapper.writeValueAsString(payload));
-        outbox.setSagaStatus(sagaStatus.name());
+        outbox.setPayload(objectMapper.writeValueAsString(payload)); //error nya disini
+        outbox.setSagaStatus(sagaStatus);
 
         return insertOutbox(outbox);
     }

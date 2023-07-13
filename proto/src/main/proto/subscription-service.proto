@@ -1,5 +1,8 @@
 syntax = "proto3";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 package com.lintang.netflik.models;
+
 
 
 
@@ -44,7 +47,47 @@ message GetPlanGrpcResponse{
   PlanDto plan = 1;
 }
 
+// check active subscription
+message GetActiveSubscriptionDto{
+  string userId =1;
+}
+
+message  SubscriptionDto{
+  int32 id =1;
+  string userId = 2;
+  string status = 3;
+  google.protobuf.Timestamp endSubscriptionDate = 4;
+  PlanDto plan = 5;
+}
+
+
+
+message GetActiveSubscriptionRequest{
+    GetActiveSubscriptionDto  getActiveSubscriptionDto = 1;
+}
+
+message GetUserCurrentSubscriptionRequest{
+  GetActiveSubscriptionDto getSubscriptionRequestDto = 1;
+}
+
+message GetUserCurrentSubscriptionResponse{
+  SubscriptionDto subscriptionDto = 1;
+}
+
+message  GetUserSubscriptionByOrderIdRequest{
+  string orderId =1;
+  string userId =2;
+}
+
+message GetUserSubscriptionByOrderIdResponse {
+  SubscriptionDto subscriptionDto = 1;
+}
+
+
 service SubscriptionService{
   rpc getPlan(GetPlanGrpcRequest) returns (GetPlanGrpcResponse);
   rpc createPlan(CreatePlanGrpcRequest) returns (CreatePlanGrpcResponse);
+  rpc getActiveSubscription(GetActiveSubscriptionRequest) returns (google.protobuf.Empty);
+  rpc getUserCurrentSubscription(GetUserCurrentSubscriptionRequest) returns (GetUserCurrentSubscriptionResponse);
+  rpc getUserSubscriptionByOrderId(GetUserSubscriptionByOrderIdRequest) returns (GetUserSubscriptionByOrderIdResponse);
 }

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,9 +41,11 @@ public class SubscriptionSagaService {
         // get plan. If not exists , compensating previous transaction in order & payment service
 
          plan = planSagaAction.findById(planId);
-         if (!plan.isPresent()) {
+        List<SubscriptionEntity> activeUserSubscription = subscriptionSagaAction.findActiveSubscription(userId.toString());
+
+        if (!plan.isPresent()) {
              AddSubscriptionErrorMessage addSubscriptionErrorMessage = AddSubscriptionErrorMessage.builder()
-                     .errorMessage("Cannot find planId " + planId).grossAmount(addSubscriptionMessage.getPrice().toString())
+                     .errorMessage("Cannot find planId " + planId ).grossAmount(addSubscriptionMessage.getPrice().toString())
                      .orderId(addSubscriptionMessage.getOrderId())
                      .build();
              var subscriptionOutbox = outboxAction.insertOutbox(
@@ -55,18 +58,21 @@ public class SubscriptionSagaService {
              return;
          }
 
-        SubscriptionEntity subscriptionEntity = subscriptionSagaAction.addSubscriptionToUserAction(userId.toString(), plan.get());
-        AddedSubscriptionMessage addedSubscriptionMessage = AddedSubscriptionMessage
-                .builder().failureMessages("").orderStatus(OrderStatus.PAID)
-                .orderId(addSubscriptionMessage.getOrderId())
-                .build();
-        var subscriptionOutbox = outboxAction.insertOutbox(
-                "subscription.response",
-                addSubscriptionMessage.getOrderId(),
-                OutboxEventType.ADDED_SUBSCRIPTION,
-                addedSubscriptionMessage, SagaStatus.PROCESSING
-        );
-        outboxAction.deleteOutbox(subscriptionOutbox);
+//        user gak punya subscription yg aktif (juga dicek pas createorder)
+        if ( activeUserSubscription.size() == 0)  {
+            SubscriptionEntity subscriptionEntity = subscriptionSagaAction.addSubscriptionToUserAction(userId.toString(), plan.get(), addSubscriptionMessage.getOrderId());
+            AddedSubscriptionMessage addedSubscriptionMessage = AddedSubscriptionMessage
+                    .builder().failureMessages("").orderStatus(OrderStatus.PAID)
+                    .orderId(addSubscriptionMessage.getOrderId())
+                    .build();
+            var subscriptionOutbox = outboxAction.insertOutbox(
+                    "subscription.response",
+                    addSubscriptionMessage.getOrderId(),
+                    OutboxEventType.ADDED_SUBSCRIPTION,
+                    addedSubscriptionMessage, SagaStatus.PROCESSING
+            );
+            outboxAction.deleteOutbox(subscriptionOutbox);
+        }
 
     }
 

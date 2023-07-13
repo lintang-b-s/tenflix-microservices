@@ -26,12 +26,14 @@ public class OutboxEntity {
 
 //    di postman debezium connector nya tambahin di reqbody:
     // "table.fields.additional.placement":"sagaStatus:envelope"
+
+    @Column(nullable = false, name = "sagastatus")
     private String sagaStatus;
 
     /**
      * JSON structure with the actual event contents
      */
-    @Column(columnDefinition = "TEXT")
+    @Column(nullable = false, length = 4000)
     private String payload;
 
     @Column(nullable = false, length = 255)

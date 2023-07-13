@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreateOrderRequest {
-    private String userId;
+
     private long planId;
 
 }

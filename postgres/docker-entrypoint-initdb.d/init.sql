@@ -1,0 +1,28 @@
+-- -- CREATE USER postgres_user with encrypted password 'postgres_password' REPLICATION LOGIN;
+-- -- CREATE DATABASE orders;
+-- -- CREATE DATABASE payment;
+-- -- CREATE DATABASE subscription;
+--
+-- CREATE SCHEMA orders;
+-- CREATE SCHEMA payment;
+-- CREATE SCHEMA subscription;
+--
+-- -- GRANT ALL PRIVILEGES ON DATABASE postgres TO postgres_user;
+-- -- GRANT ALL PRIVILEGES ON DATABASE orders TO postgres_user;
+-- -- GRANT ALL PRIVILEGES ON DATABASE payment TO postgres_user;
+-- -- GRANT ALL PRIVILEGES ON DATABASE subscription TO postgres_user;
+--
+--
+-- -- GRANT ALL PRIVILEGES ON SCHEMA  orders  TO postgres_user;
+-- -- GRANT ALL PRIVILEGES ON SCHEMA payment TO postgres_user;
+-- -- GRANT ALL PRIVILEGES ON SCHEMA subscription TO postgres_user;
+--
+-- GRANT ALL PRIVILEGES ON SCHEMA orders TO root;
+-- GRANT ALL PRIVILEGES ON SCHEMA payment TO root;
+-- GRANT ALL PRIVILEGES ON SCHEMA subscription TO root;
+--
+-- -- CREATE PUBLICATION dbz_publication FOR ALL TABLES;
+--
+--
+--
+--

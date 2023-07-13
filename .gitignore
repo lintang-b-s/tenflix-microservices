@@ -73,6 +73,7 @@ mysql_keycloak_data/
 mongo-data/
 lib/
 keycloak/
+kafka/
 .idea
 kafka/
 data/

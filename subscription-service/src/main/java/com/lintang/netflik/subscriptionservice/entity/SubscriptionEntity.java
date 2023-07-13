@@ -24,8 +24,12 @@ public class SubscriptionEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date endSubscriptionDate;
 
+    @Enumerated(EnumType.STRING)
+    private SubscriptionStatus status;
 
-    @ManyToOne( fetch = FetchType.LAZY)
+    private String orderId;
+
+    @ManyToOne( fetch = FetchType.EAGER)
     @JoinColumn(name = "plan_id", referencedColumnName = "planId")
     private PlanEntity plan;
 

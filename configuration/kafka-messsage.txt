@@ -1,0 +1,6 @@
+docker exec -ti kafka bash
+
+cd opt/bitnami/kafka/bin
+
+./kafka-console-consumer.sh --bootstrap-server kafka:29092 --topic t.saga.order.outbox.payment-validate.request --from-beginning
+./kafka-console-consumer.sh --bootstrap-server kafka:29092 --topic t.saga.order.outbox.{aggregatetype}   --from-beginning

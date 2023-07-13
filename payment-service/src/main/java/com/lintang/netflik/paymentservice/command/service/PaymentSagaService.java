@@ -6,6 +6,7 @@ import com.lintang.netflik.paymentservice.broker.message.CompensatingOrderSubscr
 import com.lintang.netflik.paymentservice.broker.message.PaymentCanceledMessage;
 import com.lintang.netflik.paymentservice.broker.message.PaymentTransactionErrorMessage;
 import com.lintang.netflik.paymentservice.broker.message.PaymentValidatedMessage;
+import com.lintang.netflik.paymentservice.command.action.MidtransAction;
 import com.lintang.netflik.paymentservice.command.action.PaymentOutboxAction;
 import com.lintang.netflik.paymentservice.command.action.PaymentSagaAction;
 import com.lintang.netflik.paymentservice.entity.OrderStatus;
@@ -32,23 +33,20 @@ public class PaymentSagaService {
     @Autowired
     private PaymentOutboxAction outboxAction;
 
+    @Autowired
+    private MidtransAction midtransAction;
+
    /*
     insert outbox && insert payment to db
     if transactionstatus rejected -> refund / cancel payment
-    if transactionstatus is settlement -> insert PaymentValidatedMessage to outbox table
+    if transactionstatus is settlement/capture -> insert PaymentValidatedMessage to outbox table
     */
     @Transactional
-    public void validatePayment(Map<String, Any> mapNotificationMidtrans) throws JsonProcessingException {
+    public void validatePayment(PaymentEntity mapNotificationMidtrans) throws JsonProcessingException {
 
-        String orderId = (String) SerializationUtils.deserialize(mapNotificationMidtrans.get("order_id")
-                .getValue().toByteArray());
-        String transactionStatus = (String) SerializationUtils.deserialize(mapNotificationMidtrans.get("transaction_status")
-                .getValue().toByteArray());
-        String fraudStatus = (String) SerializationUtils.deserialize(mapNotificationMidtrans.get("fraud_status")
-                .getValue().toByteArray());
-        String transactionId = ((String)  SerializationUtils.deserialize(mapNotificationMidtrans.get("transaction_id").getValue().toByteArray()));
-
-        if (transactionStatus.equals("capture")) {
+        String transactionStatus = mapNotificationMidtrans.getTransactionStatus();
+        String fraudStatus = mapNotificationMidtrans.getFraudStatus();
+        if (transactionStatus.equals("capture") || transactionStatus.equals("settlement")) { // settlemen kalo bank transfer, capture kalo credit card
             if (fraudStatus.equals("challenge")) {
                 // TODO set transaction status on your database to 'challenge' e.g: 'Payment status challenged. Please take action on your Merchant Administration Portal
                     // save outbox message and send to t.saga.order.outbox.payment-validate.response
@@ -57,32 +55,32 @@ public class PaymentSagaService {
                     paymentSagaAction.savePayment(mapNotificationMidtrans);
                     PaymentCanceledMessage paymentCanceledMessage = PaymentCanceledMessage.builder()
                             .orderStatus(OrderStatus.CANCELLED)
-                            .paymentId((String) SerializationUtils.deserialize(mapNotificationMidtrans.get("transaction_id").getValue().toByteArray()))
+                            .paymentId(mapNotificationMidtrans.getTransactionId())
                             .failureMessages("")
-                            .grossAmunt((String) SerializationUtils.deserialize(mapNotificationMidtrans.get("gross_amount").getValue().toByteArray()))
-                            .orderId(orderId)
+                            .grossAmunt(mapNotificationMidtrans.getGrossAmount())
+                            .orderId(mapNotificationMidtrans.getOrderId())
                             .build();
                     var paymentOutbox = outboxAction.insertOutbox(
                             "payment-validate.response",
-                            orderId,
+                            mapNotificationMidtrans.getOrderId(),
                             OutboxEventType.CANCELLED_PAYMENT, paymentCanceledMessage, SagaStatus.PROCESSING
                     );
                     outboxAction.deleteOutbox(paymentOutbox);
                     // cancel payment
-                    cancelPayment(mapNotificationMidtrans);
+                    midtransAction.cancelPayment(mapNotificationMidtrans);
             } else if (fraudStatus.equals("accept")) {
                 // TODO set transaction status on your database to 'success'
                 paymentSagaAction.savePayment(mapNotificationMidtrans);
                 PaymentValidatedMessage paymentValidatedMessage = PaymentValidatedMessage.builder()
                         .orderStatus(OrderStatus.PAID)
-                        .paymentId((String) SerializationUtils.deserialize(mapNotificationMidtrans.get("transaction_id").getValue().toByteArray()))
+                        .paymentId(mapNotificationMidtrans.getTransactionId())
                         .failureMessages("")
-                        .grossAmunt((String) SerializationUtils.deserialize(mapNotificationMidtrans.get("gross_amount").getValue().toByteArray()))
-                        .orderId(orderId)
+                        .grossAmunt(mapNotificationMidtrans.getGrossAmount())
+                        .orderId(mapNotificationMidtrans.getOrderId())
                         .build();
                 var paymentOutbox = outboxAction.insertOutbox(
                         "payment-validate.response",
-                        orderId,
+                        mapNotificationMidtrans.getOrderId(),
                         OutboxEventType.VALIDATED_PAYMENT, paymentValidatedMessage, SagaStatus.PROCESSING
                 );
                 outboxAction.deleteOutbox(paymentOutbox);
@@ -93,21 +91,24 @@ public class PaymentSagaService {
             paymentSagaAction.savePayment(mapNotificationMidtrans);
             PaymentCanceledMessage paymentCanceledMessage = PaymentCanceledMessage.builder()
                     .orderStatus(OrderStatus.CANCELLED)
-                    .paymentId((String) SerializationUtils.deserialize(mapNotificationMidtrans.get("transaction_id").getValue().toByteArray()))
+                    .paymentId(mapNotificationMidtrans.getTransactionId())
                     .failureMessages("")
-                    .grossAmunt((String) SerializationUtils.deserialize(mapNotificationMidtrans.get("gross_amount").getValue().toByteArray()))
-                    .orderId(orderId)
+                    .grossAmunt(mapNotificationMidtrans.getGrossAmount())
+                    .orderId( mapNotificationMidtrans.getOrderId())
                     .build();
             var paymentOutbox = outboxAction.insertOutbox(
                     "payment-validate.response",
-                    orderId,
+                    mapNotificationMidtrans.getOrderId(),
                     OutboxEventType.CANCELLED_PAYMENT, paymentCanceledMessage, SagaStatus.PROCESSING
             );
             outboxAction.deleteOutbox(paymentOutbox);
 
-        } else if (transactionStatus.equals("pending")) {
+        } else if (transactionStatus.equals("pending")) { // if payment not already exist save payment in database
             // TODO set transaction status on your database to 'pending' / waiting payment
-            paymentSagaAction.savePayment(mapNotificationMidtrans);
+            Optional<PaymentEntity> paymentAlreadyExists = this.paymentSagaAction.getPaymentById(mapNotificationMidtrans.getId());
+            if (!paymentAlreadyExists.isPresent()) {
+                paymentSagaAction.savePayment(mapNotificationMidtrans);
+            }
         }
     }
 
@@ -117,74 +118,14 @@ public class PaymentSagaService {
         String orderId=  compensatingOrderSubscriptionMessage.getOrder().getId().toString();
         String grossAmount = compensatingOrderSubscriptionMessage.getOrder().getPrice().toString();
         // refund
-        refundPayment(orderId, grossAmount);
+        midtransAction.refundPayment(orderId, grossAmount);
 
         // delete payment data in db
         paymentSagaAction.deletePaymentById(paymentId);
     }
 
 
-//    cancel payment , if transactionStatus pending/capture
-    public void  cancelPayment (Map<String, Any> mapNotificationMidtrans) {
-        OkHttpClient client = new OkHttpClient();
-        String orderId = (String) SerializationUtils.deserialize(mapNotificationMidtrans.get("order_id")
-                .getValue().toByteArray());
 
-        Request request = new Request.Builder()
-                .url("https://api.sandbox.midtrans.com/v2/" + orderId + "/cancel")
-                .post(null)
-                .addHeader("accept", "application/json")
-                .build();
-
-        try {
-            Response response = client.newCall(request).execute();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    public void refundPayment(Map<String, Any> mapNotificationMidtrans) {
-        OkHttpClient client = new OkHttpClient();
-        String orderId = (String) SerializationUtils.deserialize(mapNotificationMidtrans.get("order_id")
-                .getValue().toByteArray());
-
-        MediaType mediaType = MediaType.parse("application/json");
-        String grossAmount = (String) SerializationUtils.deserialize(mapNotificationMidtrans.get("gross_amount")
-                .getValue().toByteArray());
-        RequestBody body =
-                RequestBody.create(mediaType, "{\"refund_key\":\"reference1\",\"amount\":" + grossAmount + ",\"reason\":\"for some reason\"}");
-        Request request = new Request.Builder()
-                .url("https://api.sandbox.midtrans.com/v2/" + orderId + "/refund")
-                .post(body)
-                .addHeader("accept", "application/json")
-                .addHeader("content-type", "application/json")
-                .build();
-
-        try {
-            Response response = client.newCall(request).execute();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    public void refundPayment(String orderId, String grossAmount ) {
-        OkHttpClient client = new OkHttpClient();
-        MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body =
-                RequestBody.create(mediaType, "{\"refund_key\":\"reference1\",\"amount\":" + grossAmount + ",\"reason\":\"for some reason\"}");
-        Request request = new Request.Builder()
-                .url("https://api.sandbox.midtrans.com/v2/" + orderId + "/refund")
-                .post(body)
-                .addHeader("accept", "application/json")
-                .addHeader("content-type", "application/json")
-                .build();
-
-        try {
-            Response response = client.newCall(request).execute();
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
 
 
 }

@@ -6,6 +6,7 @@ import com.lintang.netflik.orderservice.broker.message.*;
 import com.lintang.netflik.orderservice.command.action.OrderOutboxAction;
 import com.lintang.netflik.orderservice.command.action.OrderSagaAction;
 import com.lintang.netflik.orderservice.entity.*;
+import com.lintang.netflik.orderservice.util.OrderMessageMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.slf4j.Logger;
@@ -24,7 +25,10 @@ public class OrderSagaService {
     @Autowired
     private OrderOutboxAction outboxAction;
 
-    
+    @Autowired
+    private OrderMessageMapper orderMessageMapper;
+
+
 /*
     Step 2 saga: get messaagee from order service . Update order status in order db
     */
@@ -71,13 +75,14 @@ public class OrderSagaService {
         String orderId = addedSubscriptionMessage.getOrderId();
         OrderStatus orderStatus = OrderStatus.COMPLETED;
         OrderEntity order = orderSagaAction.findById(orderId);
+        OrderMessage orderMessage = orderMessageMapper.orderEntityToOrderMessage(order);
         CompleteOrderMessage completeOrderMessage = CompleteOrderMessage.builder()
-                .order(order).build();
-        var orderOutbox = outboxAction.insertOutbox(
+                .order(orderMessage).build(); // error OrderEntity.plan && OrderPlanEntity.order Stackoverflow ???
+        var orderOutbox = outboxAction.insertOutbox( // error disini stackoverflow??
                 "order.request",
                 orderId,
                 OutboxEventType.COMPLETE_ORDER, completeOrderMessage, SagaStatus.SUCCEEDED
-        );
+        );  // salah disini
         outboxAction.deleteOutbox(orderOutbox);
     }
 
@@ -87,9 +92,10 @@ public class OrderSagaService {
         String orderId = completeOrderMessage.getOrder().getId().toString();
         OrderStatus orderStatus = completeOrderMessage.getOrder().getOrderStatus();
         String userId = completeOrderMessage.getOrder().getUserId().toString();
-        OrderEntity order = completeOrderMessage.getOrder();
+        OrderMessage order = completeOrderMessage.getOrder();
 
-        orderSagaAction.updateOrderStatusAction(orderId, orderStatus);
+
+        orderSagaAction.updateOrderStatusAction(orderId, OrderStatus.COMPLETED);
     }
 
     @Transactional

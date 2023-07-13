@@ -3,18 +3,21 @@ spring:
     active: docker
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://postgres-subscription:5432/subscription?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://postgres-subscription:5432/postgres
     username: root
     password: root
   jpa:
     hibernate:
       ddl-auto: update
+#    properties:
+#      "[hibernate.default_schema]": subscription
   kafka:
     listener:
       missing-topics-fatal: false
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
+      bootstrap-servers: kafka:29092
       group-id: subscription-service-cg
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:

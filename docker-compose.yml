@@ -232,17 +232,22 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
 
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: wurstmeister/kafka:latest
     container_name: kafka
     restart: unless-stopped
     ports:
-      - 29092:29092
+      - 9092:9092
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_BROKER_ID: 1 # identifier
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # replikasi setiap partisi topik
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 # zookeper address
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: DOCKER_INTERNAL:PLAINTEXT,DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: DOCKER_INTERNAL://:29092,DOCKER_EXTERNAL://:9092 # yang bisa dikonek client internal , external dari docker network
+      KAFKA_ADVERTISED_LISTENERS: DOCKER_INTERNAL://kafka:29092,DOCKER_EXTERNAL://localhost:9092 # metadata yg dikasih ke client  ( yang bisa dikonek client internal , external dari docker network)
+      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER_INTERNAL
+      ALLOW_PLAINTEXT_LISTENER: "yes"
+      KAFKA_CREATE_TOPICS: t.saga.order.outbox.subscription.response:1:1,t.saga.order.outbox.order.request:1:1,t.saga.order.outbox.payment-validate.response:1:1,t.saga.order.outbox.payment-validate.request:1:1,t.saga.order.outbox.subscription.request:1:1
+    
     networks:
       - net
     depends_on:
@@ -255,7 +260,7 @@ services:
     ports:
       - 8083:8083
     environment:
-      BOOTSTRAP_SERVERS: kafka:9092
+      BOOTSTRAP_SERVERS: kafka:29092 # kafka-connect perlu konek ke 1 bootstrap server yg adad di docker network agar dapat konek ke kafka cluster
       GROUP_ID: 1
       CONFIG_STORAGE_TOPIC: ms_connect_configs
       OFFSET_STORAGE_TOPIC: ms_connect_offsets

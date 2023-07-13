@@ -3,13 +3,15 @@ spring:
     active: docker
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://postgres-order:5432/order?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    url: jdbc:postgresql://postgres-order:5432/postgres
     username: root
     password: root
   jpa:
     database: postgresql
     hibernate:
       ddl-auto: update
+#    properties:
+#      "[hibernate.default_schema]": orders
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
   application:
@@ -20,6 +22,7 @@ spring:
     producer:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     consumer:
+      bootstrap-servers: kafka:29092
       group-id: order-service-cg
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:

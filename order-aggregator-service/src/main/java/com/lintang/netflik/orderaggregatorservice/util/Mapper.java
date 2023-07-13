@@ -26,11 +26,11 @@ public class Mapper {
 
     public OrderEntity createOrderReqToOrderEntity(CreateOrderRequest createOrderRequest
                                              ,PlanDto planDto,
-                                             OrderPlanEntity orderPlanEntity      ) {
+                                             OrderPlanEntity orderPlanEntity   , String userId ) {
         OrderEntity createdOrder = new OrderEntity();
         createdOrder.setOrderStatus(com.lintang.netflik.orderaggregatorservice.common.OrderStatus.PENDING);
         createdOrder.setId(UUID.randomUUID());
-        createdOrder.setUserId(UUID.fromString(createOrderRequest.getUserId()));
+        createdOrder.setUserId(UUID.fromString(userId));
         createdOrder.setPrice(BigDecimal.valueOf(planDto.getPrice()));
         createdOrder.setPaymentId(UUID.randomUUID().toString());
         createdOrder.setFailureMessages("");

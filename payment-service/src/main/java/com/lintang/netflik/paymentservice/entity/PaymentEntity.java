@@ -19,13 +19,15 @@ public class PaymentEntity {
     private String status;
     private String grossAmount;
     private String transactionTime;
+    private String transactionId;
+    private String transactionStatus;
     private String paymentType;
-    private String settlementType;
     private String fraudStatus;
     private String bank;
     private String vaNumber;
     private String currency;
     private String orderId;
+
 
 
 }

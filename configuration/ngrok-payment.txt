@@ -1,0 +1,9 @@
+docker exec -it flix-microservices-ngrok-1 bash
+
+ngrok http 172.1.1.15:9900
+
+
+tulis redirect url https yang dikasih ngrok  di dashboard midtrans
+<URLNGROK>/api/v1/orders/notificationMidtrans
+save
+

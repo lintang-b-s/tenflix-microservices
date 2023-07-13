@@ -41,7 +41,7 @@ public class SagaOrderCompleteListener {
         var outboxMessage=  objectMapper.readValue(message, OutboxMessage.class);
         LOG.debug("step 4 saga: get message from order.request topic!!");
         if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.COMPLETE_ORDER)
-                && outboxMessage.getPayload().getSagaStatus() == SagaStatus.SUCCEEDED
+                && StringUtils.equalsAny(outboxMessage.getPayload().getSagaStatus(), SagaStatus.SUCCEEDED)
         ) {
 
             var completeOrderMessage = objectMapper.readValue(outboxMessage.getPayload().getPayload(),
@@ -52,7 +52,7 @@ public class SagaOrderCompleteListener {
         }
         if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(),
                 OutboxEventType.COMPENSATING_ORDER_SUBSCRIPTION_ERROR)
-         && outboxMessage.getPayload().getSagaStatus() == SagaStatus.COMPENSATING) {
+         && StringUtils.equalsAny(outboxMessage.getPayload().getSagaStatus() ,SagaStatus.COMPENSATING)) {
 
             var addSubscriptionErrorMessage = objectMapper.readValue(
                     outboxMessage.getPayload().getPayload(),

@@ -19,10 +19,14 @@ public class OrderSagaAction {
     private OrderPlanJpaRepository orderPlanJpaRepository;
 
     public OrderEntity updateOrderStatusAction(String orderId, OrderStatus orderStatus) {
-        OrderEntity updatedOrder = orderJpaRepository.updateOrderStatusById(UUID.fromString(orderId),
-                orderStatus.name());
 
-        return updatedOrder;
+//        OrderEntity updatedOrder = orderJpaRepository.updateOrderStatusById(UUID.fromString(orderId),
+//                orderStatus); // salah disini
+        OrderEntity orderDb = orderJpaRepository.findById(UUID.fromString(orderId)).get();
+        orderDb.setOrderStatus(orderStatus);
+        this.orderJpaRepository.save(orderDb);
+
+        return orderDb;
     }
 
 

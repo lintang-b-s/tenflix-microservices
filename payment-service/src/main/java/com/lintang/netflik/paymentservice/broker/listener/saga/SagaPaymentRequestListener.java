@@ -10,6 +10,7 @@ import com.lintang.netflik.paymentservice.broker.message.CompensatingOrderSubscr
 import com.lintang.netflik.paymentservice.broker.message.OutboxMessage;
 import com.lintang.netflik.paymentservice.command.service.PaymentSagaService;
 import com.lintang.netflik.paymentservice.entity.OutboxEventType;
+import com.lintang.netflik.paymentservice.entity.PaymentEntity;
 import com.lintang.netflik.paymentservice.entity.SagaStatus;
 import com.lintang.netflik.paymentservice.repository.OutboxRepository;
 import com.lintang.netflik.paymentservice.util.LocalDateTimeUtil;
@@ -50,16 +51,15 @@ public class SagaPaymentRequestListener {
         var outboxMessage = objectMapper.readValue(message, OutboxMessage.class);
         LOG.debug("step 1 Saga: get message from order service!");
         if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.VALIDATE_PAYMENT) &&
-                (outboxMessage.getPayload().getSagaStatus() == SagaStatus.STARTED)) {
+                (StringUtils.equalsAny(outboxMessage.getPayload().getSagaStatus(), SagaStatus.STARTED))) {
 
-            var mapMessageMidtrans = objectMapper.readValue(outboxMessage.getPayload().getPayload(),
-                    PaymentNotification.class);
-            Map<String, Any> mapNotificationMidtrans = mapMessageMidtrans.getNotificationResMap();
-            paymentSagaService.validatePayment(mapNotificationMidtrans);
+            PaymentEntity mapMessageMidtrans = objectMapper.readValue(outboxMessage.getPayload().getPayload(),
+                    PaymentEntity.class); // error disisni
+            paymentSagaService.validatePayment(mapMessageMidtrans);
             LOG.debug("send message to order service . Payment validated! ");
         }
         else if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.COMPENSATING_ORDER_SUBSCRIPTION_ERROR)
-         && (outboxMessage.getPayload().getSagaStatus() == SagaStatus.COMPENSATING)) {
+         && (StringUtils.equalsAny(outboxMessage.getPayload().getSagaStatus(), SagaStatus.COMPENSATING))) {
             var compensatingOrderSubscriptionMessage = objectMapper.readValue(
                     outboxMessage.getPayload().getPayload(), CompensatingOrderSubscriptionMessage.class
             );

@@ -12,13 +12,14 @@ import java.util.UUID;
 
 @Repository
 public interface OrderJpaRepository extends JpaRepository<OrderEntity, UUID> {
-    @Query("update OrderEntity o SET o.orderStatus = :orderStatus where o.id = :id ")
-    public OrderEntity updateOrderStatusById(UUID id, String orderStatus);
+//    @Query("update OrderEntity o SET o.orderStatus = :orderStatus where o.id = :id ")
+//    public OrderEntity updateOrderStatusById(UUID id, OrderStatus orderStatus); // salah disini
 
 
-    @Query("select o from OrderEntity o where o.userId=?1 and o.orderStatus=?2")
-    public Optional<List<OrderEntity>> findByUserId(UUID userId, OrderStatus orderStatus);
+
 
     public boolean existsByUserIdAndOrderStatus(UUID userId, OrderStatus orderStatus);
+
+    public List<OrderEntity> findByUserId(UUID userId);
 
 }

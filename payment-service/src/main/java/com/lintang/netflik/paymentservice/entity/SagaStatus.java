@@ -1,5 +1,9 @@
 package com.lintang.netflik.paymentservice.entity;
 
-public enum SagaStatus {
-    STARTED, PROCESSING, COMPENSATING, COMPENSATED
+public interface SagaStatus {
+    String STARTED = "STARTED";
+    String PROCESSING = "PROCESSING";
+    String COMPENSATING = "COMPENSATING";
+    String COMPENSATED= "COMPENSATED";
+    String SUCCEEDED = "SUCCEEDED";
 }

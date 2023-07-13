@@ -16,10 +16,13 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://keycloak:8080/realms/tenflix/protocol/openid-connect/auth?client_id=tenflix-client&response_type=code&scope=openid profile&redirect_uri=http://localhost:8181/api/query/v1/movies&state=asoasosaoasosoas",
+							"raw": "http://127.0.0.1:8080/realms/tenflix/protocol/openid-connect/auth?client_id=tenflix-client&response_type=code&scope=openid profile&redirect_uri=http://localhost:8080/callback&state=asoasosaoasosoas",
 							"protocol": "http",
 							"host": [
-								"keycloak"
+								"127",
+								"0",
+								"0",
+								"1"
 							],
 							"port": "8080",
 							"path": [
@@ -44,7 +47,7 @@
 								},
 								{
 									"key": "redirect_uri",
-									"value": "http://localhost:8181/api/query/v1/movies"
+									"value": "http://localhost:8080/callback"
 								},
 								{
 									"key": "state",
@@ -75,17 +78,17 @@
 								},
 								{
 									"key": "client_secret",
-									"value": "ZW9DhkCa6TYXwvohFFBXHrBCve0OAWM5",
+									"value": "y57aHOaRWrUO5PHdzk5jcUIm3RGWsKEg",
 									"type": "text"
 								},
 								{
 									"key": "code",
-									"value": "6f2ea6b7-8bf2-484f-8fa2-baf128928909.506520e4-f417-4e25-867d-1067627de5d2.e7409c95-243d-4168-91c1-d9dc85a71daa",
+									"value": "218f66ce-d5cf-4d55-abf6-f3490ef7a59e.82f70476-41ff-41f1-805f-321bd08bb23d.3f6103bf-5806-4d65-b16f-27e0520ffba0",
 									"type": "text"
 								},
 								{
 									"key": "redirect_uri",
-									"value": "http://localhost:8181/api/query/v1/movies",
+									"value": "http://localhost:8080/callback",
 									"type": "text"
 								},
 								{
@@ -211,7 +214,7 @@
 								},
 								{
 									"key": "client_secret",
-									"value": "ZW9DhkCa6TYXwvohFFBXHrBCve0OAWM5",
+									"value": "y57aHOaRWrUO5PHdzk5jcUIm3RGWsKEg",
 									"type": "text"
 								}
 							]
@@ -285,7 +288,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "http://keycloak:8080/admin/realms/tenflix/users/c8451efa-08eb-431f-ae12-6bd763c146eb",
+							"raw": "http://keycloak:8080/admin/realms/tenflix/users/33f319ab-4ba4-42b0-9443-34c8cf1fccad",
 							"protocol": "http",
 							"host": [
 								"keycloak"
@@ -296,7 +299,7 @@
 								"realms",
 								"tenflix",
 								"users",
-								"c8451efa-08eb-431f-ae12-6bd763c146eb"
+								"33f319ab-4ba4-42b0-9443-34c8cf1fccad"
 							]
 						}
 					},
@@ -856,7 +859,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8181/api/v1/movies",
+									"raw": "http://localhost:8181/api/v1/movie-service",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -865,7 +868,7 @@
 									"path": [
 										"api",
 										"v1",
-										"movies"
+										"movie-service"
 									]
 								}
 							},
@@ -931,7 +934,7 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8181/api/v1/movies",
+									"raw": "http://localhost:8181/api/v1/movie-service",
 									"protocol": "http",
 									"host": [
 										"localhost"
@@ -940,7 +943,7 @@
 									"path": [
 										"api",
 										"v1",
-										"movies"
+										"movie-service"
 									]
 								}
 							},
@@ -1153,16 +1156,83 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8090/api/v1/subscription",
+							"raw": "http://localhost:8000/api/v1/subscription",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8090",
+							"port": "8000",
 							"path": [
 								"api",
 								"v1",
 								"subscription"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/subscription/tes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"subscription",
+								"tes"
 							]
 						}
 					},
@@ -1225,7 +1295,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"userId\": \"c8451efa-08eb-431f-ae12-6bd763c146eb\",\n    \"planId\": 2\n}",
+							"raw": "{\n    \"planId\": 1\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1233,12 +1303,227 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8090/api/v1/orders",
+							"raw": "http://localhost:8000/api/v1/orders",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
-							"port": "8090",
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order Copy",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"c8451efa-08eb-431f-ae12-6bd763c146eb\",\n    \"planId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9900/api/v1/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9900",
+							"path": [
+								"api",
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get order detail",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/orders/4d966b69-213f-4c4c-a371-d3708d0b0e28",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								"4d966b69-213f-4c4c-a371-d3708d0b0e28"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get order history",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
 							"path": [
 								"api",
 								"v1",

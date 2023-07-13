@@ -61,8 +61,28 @@ message ProcessOrderResponse {
   ProcessResponse process_response =1;
 }
 
+message GetUserOrderDetailRequest {
+  string orderId = 1;
+  string userId = 2;
+}
+
+message GetUserOrderDetailResponse {
+  OrderDto orderDto = 1;
+}
+
+message GetUserOrderHistoryRequest {
+  string userId =1;
+}
+
+message GetUserOrderHistoryResponse {
+  OrderDto orderDto = 1;
+}
+
 service OrderService {
   rpc createOrder(CreateOrderGrpcRequest) returns (CreateOrderGrpcResponse);
   rpc processOrderSaga(ProcessOrderRequest) returns(google.protobuf.Empty);
+  rpc getUserOrderDetail(GetUserOrderDetailRequest) returns (GetUserOrderDetailResponse);
+  rpc getUserOrderHistory(GetUserOrderHistoryRequest) returns (stream GetUserOrderHistoryResponse);
+
 }
 

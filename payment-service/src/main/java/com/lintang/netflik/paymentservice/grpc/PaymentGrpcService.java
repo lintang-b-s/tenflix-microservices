@@ -1,11 +1,13 @@
-package com.lintang.netflik.paymentservice.query.service;
+package com.lintang.netflik.paymentservice.grpc;
 
 import com.lintang.netflik.paymentservice.*;
 import com.lintang.netflik.paymentservice.config.BadRequestException;
+import com.lintang.netflik.paymentservice.entity.PaymentEntity;
 import com.lintang.netflik.paymentservice.query.action.PaymentGrpcAction;
 import com.lintang.netflik.paymentservice.repository.PaymentJpaRepository;
 import com.lintang.netflik.models.CustomerDetails;
 import com.lintang.netflik.models.*;
+import com.lintang.netflik.paymentservice.util.PaymentMapper;
 import com.midtrans.Midtrans;
 import com.midtrans.httpclient.SnapApi;
 import com.midtrans.httpclient.error.MidtransError;
@@ -28,6 +30,9 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
     @Autowired
     private PaymentGrpcAction paymentGrpcAction;
 
+    @Autowired
+    private PaymentMapper paymentMapper;
+
     @Override
     public void getPaymentRedirectUrl(PaymentGetRedirectUrlGrpcRequest request,
             StreamObserver<PaymentGetRedirectUrlGrpcResponse> responseObersver) {
@@ -41,6 +46,7 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
             redirectUrl = paymentGrpcAction.getRedirectUrl(request);
         } catch (MidtransError e) {
             responseObersver.onError(Status.INVALID_ARGUMENT.withDescription("Midtrans Error?").asRuntimeException());
+
         }
 
         builder.setGetRedirectUrl(GetRedirectUrl.newBuilder().setRedirectUrl(redirectUrl)
@@ -50,4 +56,21 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
         responseObersver.onCompleted();
     }
 
+
+    @Override
+    public void getPaymentByOrderId(GetPaymentByOrderIdRequest request, StreamObserver<GetPaymentByOrderIdResponse> responseObserver)
+    {
+        String orderId = request.getOrderId();
+        Optional<PaymentEntity> paymentEntity = paymentGrpcAction.findByOrderId(orderId);
+        GetPaymentByOrderIdResponse.Builder builder= GetPaymentByOrderIdResponse.newBuilder();
+        if(!paymentEntity.isPresent()) {
+            responseObserver.onError(Status.NOT_FOUND.withDescription("payment with order id "+ orderId +  " not found !").asRuntimeException());
+            return;
+        }
+
+        builder.setPaymentDetail(paymentMapper.paymentEntityToPaymentDetail(paymentEntity.get())).build();
+        responseObserver.onNext(builder.build());
+        responseObserver.onCompleted();
+
+    }
 }

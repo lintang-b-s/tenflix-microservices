@@ -24,24 +24,12 @@ public class PaymentSagaAction {
 
 
 
-    public void savePayment(Map<String, Any> mapNotificationMidtrans) {
-        List<VirtualAccount> vaMid =(List<VirtualAccount>) SerializationUtils.deserialize(mapNotificationMidtrans.get("va_numbers").getValue().toByteArray());
+    public void savePayment(PaymentEntity paymentEntity) {
 
-        PaymentEntity payment = PaymentEntity.builder()
-                .id((String)  SerializationUtils.deserialize(mapNotificationMidtrans.get("transaction_id").getValue().toByteArray()))
-                .status((String)  SerializationUtils.deserialize(mapNotificationMidtrans.get("transaction_status").getValue().toByteArray()))
-                .grossAmount((String) SerializationUtils.deserialize(mapNotificationMidtrans.get("gross_amount").getValue().toByteArray()))
-                .transactionTime((String)  SerializationUtils.deserialize(mapNotificationMidtrans.get("transaction_time").getValue().toByteArray()))
-                .paymentType((String)  SerializationUtils.deserialize(mapNotificationMidtrans.get("payment_type").getValue().toByteArray()))
-                .settlementType((String)  SerializationUtils.deserialize(mapNotificationMidtrans.get("settlement_time").getValue().toByteArray()))
-                .fraudStatus((String)  SerializationUtils.deserialize(mapNotificationMidtrans.get("fraud_status").getValue().toByteArray()))
-                .orderId((String)  SerializationUtils.deserialize(mapNotificationMidtrans.get("order_id").getValue().toByteArray()))
-                .bank(vaMid.get(0).getBank())
-                .vaNumber(vaMid.get(0).getVaNumber()).currency((String)  SerializationUtils.deserialize(mapNotificationMidtrans.get("currency").getValue().toByteArray()))
-                .build();
-
-         this.paymentJpaRepository.save(payment);
+        PaymentEntity payment = paymentEntity;
+        this.paymentJpaRepository.save(payment);
     }
+
 
     public Optional<PaymentEntity> getPaymentById(String id) {
         Optional<PaymentEntity> payment = paymentJpaRepository.findById(id);

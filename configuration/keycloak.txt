@@ -11,7 +11,7 @@ cd opt/keycloak/bin
 
 
 
-
+yg bawah gak usah
 curl -s -X POST http://localhost:8001/plugins \
   -d name=oidc \
   -d config.client_id=kong \

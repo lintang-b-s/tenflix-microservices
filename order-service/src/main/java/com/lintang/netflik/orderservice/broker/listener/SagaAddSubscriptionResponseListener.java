@@ -41,14 +41,14 @@ public class SagaAddSubscriptionResponseListener {
         LOG.debug("step 3 saga :get message from subscription service !");
 
         if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.ADDED_SUBSCRIPTION)
-         && outboxMessage.getPayload().getSagaStatus() == SagaStatus.PROCESSING) {
+         && StringUtils.equalsAny(outboxMessage.getPayload().getSagaStatus(), SagaStatus.PROCESSING)) {
             var addedSubscriptionMessage = objectMapper.readValue(outboxMessage.getPayload().getPayload(), AddedSubscriptionMessage.class);
 
             sagaService.sendMessageToOrderRequestTopic(addedSubscriptionMessage);
             LOG.debug("sending message to order.requesst topic!");
         }
         else if(StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.SUBSCRIPTION_ERROR)
-         && outboxMessage.getPayload().getSagaStatus() == SagaStatus.COMPENSATING) {
+         && StringUtils.equalsAny(outboxMessage.getPayload().getSagaStatus(), SagaStatus.COMPENSATING)) {
             var addSubscriptionErrorMessage = objectMapper.readValue(outboxMessage.getPayload().getPayload(), AddSubscriptionErrorMessage.class);
 
             sagaService.compensatingOrderAndPayment(addSubscriptionErrorMessage);

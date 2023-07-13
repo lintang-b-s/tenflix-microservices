@@ -16,8 +16,10 @@ import com.lintang.netflik.orderaggregatorservice.entity.PlanEntity;
 import com.lintang.netflik.orderaggregatorservice.entity.UserEntity;
 import com.lintang.netflik.orderaggregatorservice.exception.BadRequestException;
 import com.lintang.netflik.orderaggregatorservice.exception.ResourceNotFoundException;
-import com.lintang.netflik.orderaggregatorservice.util.Mapper;
-import com.lintang.netflik.orderaggregatorservice.util.PlanMapper;
+import com.lintang.netflik.orderaggregatorservice.query.response.GetOrderDetailResponse;
+import com.lintang.netflik.orderaggregatorservice.query.response.GetOrdersResponse;
+import com.lintang.netflik.orderaggregatorservice.query.response.PaymentDto;
+import com.lintang.netflik.orderaggregatorservice.util.*;
 import com.midtrans.httpclient.error.MidtransError;
 import lombok.RequiredArgsConstructor;
 import net.devh.boot.grpc.client.inject.GrpcClient;
@@ -37,6 +39,7 @@ import org.springframework.web.client.RestTemplate;
 import java.math.BigDecimal;
 import java.security.Key;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -54,16 +57,31 @@ public class OrderGrpcService {
     private  OrderGrpcAction orderGrpcAction;
     @Autowired
     private PlanMapper planMapper;
+
+    @Autowired
+    private OrderMapper orderMapper;
+
+    @Autowired
+    private PaymentMapper paymentMapper;
+    @Autowired
+    private SubscriptionMapper subscriptionMapper;
+
+
     public CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest, String userId) throws MidtransError {
-        GetPlanGrpcResponse getPlanGrpcResponse =  orderGrpcAction.getPlanFromSubscriptionService(createOrderRequest);
+        GetPlanGrpcResponse getPlanGrpcResponse =  orderGrpcAction.getPlanFromSubscriptionService(createOrderRequest, userId);
         PlanDto planDto = getPlanGrpcResponse.getPlan();
         PlanEntity plan = planMapper.planDtoToPlanEntity(planDto);
+
 
 //        get user detail from keycloak
         KeycloakUserDto keycloakUserDto = orderGrpcAction.getUserDetail(userId);
 
+        //        throw badrequeesterror if user have active subscription
+        this.orderGrpcAction.getActiveSubscriptionFromSubscriptionService(userId);
+
+
 //        create order
-        OrderDtoResponse orderDto =orderGrpcAction.createOrderFromOrderService(createOrderRequest, planDto);
+        OrderDtoResponse orderDto =orderGrpcAction.createOrderFromOrderService(createOrderRequest, planDto, userId);
 
 //        get redirect url
         GetRedirectUrl getRedirectUrl = orderGrpcAction.getRedirectUrl(orderDto, keycloakUserDto, planDto);
@@ -72,10 +90,38 @@ public class OrderGrpcService {
                 .build();
     }
 
+
     public String processOrder(Map<String, Object> notificationRes) {
 
        orderGrpcAction.proccessOrder(notificationRes);
         return "Transaction Processed";
     }
 
+/*
+
+    get order detail, paymentdetail, subscription detail
+     from order-service , payment-service, subscription-service
+  */
+    public GetOrderDetailResponse getOrderDetail(String orderId, String userId ) {
+            OrderDto orderDto = this.orderGrpcAction.getUserOrderDetail(orderId, userId).getOrderDto();
+            PaymentDetail paymentDto = this.orderGrpcAction.getPaymentDetailFromPaymentService(orderId).getPaymentDetail();
+            SubscriptionDto subscriptionDto= this.orderGrpcAction.getSubcriptionDetailFromSubscriptionService(orderId,userId).getSubscriptionDto();
+
+
+            GetOrderDetailResponse response=
+                    GetOrderDetailResponse.builder().orderDto(orderMapper.orderDtoToOrderResponse(orderDto))
+                            .paymentDto(paymentMapper.paymentProtoToDto(paymentDto))
+                            .subscriptionDto(subscriptionMapper.subscriptionDtoProtoToDto(subscriptionDto)).build();
+            return response;
+
+    }
+
+
+    public GetOrdersResponse getOrderHistory(String userId ) {
+        List<OrderDtoResponse> orderDtos = this.orderGrpcAction.getUserOrderHistory(userId);
+
+        GetOrdersResponse response =
+                GetOrdersResponse.builder().orders(orderDtos).build();
+        return response;
+    }
 }

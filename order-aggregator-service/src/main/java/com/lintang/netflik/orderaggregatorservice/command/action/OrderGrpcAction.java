@@ -3,6 +3,7 @@ package com.lintang.netflik.orderaggregatorservice.command.action;
 
 import com.google.protobuf.Any;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.Empty;
 import com.lintang.netflik.models.*;
 import com.lintang.netflik.orderaggregatorservice.command.request.CreateOrderRequest;
 import com.lintang.netflik.orderaggregatorservice.command.response.CreateOrderResponse;
@@ -13,6 +14,8 @@ import com.lintang.netflik.orderaggregatorservice.entity.OrderEntity;
 import com.lintang.netflik.orderaggregatorservice.entity.OrderPlanEntity;
 import com.lintang.netflik.orderaggregatorservice.exception.BadRequestException;
 import com.lintang.netflik.orderaggregatorservice.exception.ResourceNotFoundException;
+import com.lintang.netflik.orderaggregatorservice.query.response.GetOrderDetailResponse;
+import com.lintang.netflik.orderaggregatorservice.query.response.GetOrdersResponse;
 import com.lintang.netflik.orderaggregatorservice.util.Mapper;
 import com.lintang.netflik.orderaggregatorservice.util.OrderMapper;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +32,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.SerializationUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -66,9 +68,9 @@ public class OrderGrpcAction {
    * Get plan from subscription service
    * */
 
-    public GetPlanGrpcResponse getPlanFromSubscriptionService(CreateOrderRequest createOrderRequest) {
+    public GetPlanGrpcResponse getPlanFromSubscriptionService(CreateOrderRequest createOrderRequest, String userId) {
         GetPlanGrpcRequest getPlanGrpcRequest = GetPlanGrpcRequest.newBuilder()
-                .setCreateOrder(CreateOrder.newBuilder().setPlanId(createOrderRequest.getPlanId()).setUserId(createOrderRequest.getUserId()).build())
+                .setCreateOrder(CreateOrder.newBuilder().setPlanId(createOrderRequest.getPlanId()).setUserId(userId).build()) //saalah disini
                 .build();
         GetPlanGrpcResponse getPlanGrpcResponse = null;
 
@@ -80,6 +82,25 @@ public class OrderGrpcAction {
         }
         return getPlanGrpcResponse;
     }
+
+/*
+
+    Get user active subscription (cek jika user masih ada subcription active maka throw badrequesterrorr)
+
+ */
+
+    public void getActiveSubscriptionFromSubscriptionService(String userId) {
+        GetActiveSubscriptionRequest getActiveSubscriptionRequest = GetActiveSubscriptionRequest.newBuilder()
+                .setGetActiveSubscriptionDto(GetActiveSubscriptionDto.newBuilder().setUserId(userId).build())
+                .build();
+        try{
+             this.subscriptionStub.getActiveSubscription(getActiveSubscriptionRequest);
+        } catch (RuntimeException e) {
+            throw new BadRequestException(e.getMessage());
+        }
+        return ;
+    }
+
 
         /*
         * Get user detail from keycloak server
@@ -112,12 +133,12 @@ public class OrderGrpcAction {
 
      }
 
-     public OrderDtoResponse createOrderFromOrderService(CreateOrderRequest createOrderRequest,PlanDto planDto ) {
+     public OrderDtoResponse createOrderFromOrderService(CreateOrderRequest createOrderRequest,PlanDto planDto , String userId) {
 
          OrderPlanEntity orderPlanEntity = mapper.planDtoToOrderPlanEntity(planDto);
 
 //    new order
-         OrderEntity createdOrder = mapper.createOrderReqToOrderEntity(createOrderRequest, planDto, orderPlanEntity);
+         OrderEntity createdOrder = mapper.createOrderReqToOrderEntity(createOrderRequest, planDto, orderPlanEntity , userId);
          OrderPlanDto orderPlanDto = mapper.orderPlanEntityToOrderPlanDto(orderPlanEntity);
 
          CreateOrderGrpcRequest createOrderGrpcRequest = mapper.createdOrderToCreateOrderGpcRequest(
@@ -173,6 +194,78 @@ public class OrderGrpcAction {
         return getRedirectUrl;
      }
 
+ /*
+     get order detail from order-service
+ */
+    public GetUserOrderDetailResponse getUserOrderDetail(String orderId, String userId ) {
+        GetUserOrderDetailRequest getUserOrderDetailRequest =
+                GetUserOrderDetailRequest.newBuilder()
+                        .setOrderId(orderId).setUserId(userId)
+                        .build();
+
+        GetUserOrderDetailResponse getOrderDetailResponse = null;
+        try{
+            getOrderDetailResponse= this.orderStub.getUserOrderDetail(getUserOrderDetailRequest);
+
+        }catch (RuntimeException e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        }
+
+        return getOrderDetailResponse;
+    }
+
+/*
+    Get Payment Detail by order Id from payment-service
+
+ */
+    public GetPaymentByOrderIdResponse getPaymentDetailFromPaymentService(String orderId ){
+        GetPaymentByOrderIdRequest getPaymentByOrderIdRequest=
+                GetPaymentByOrderIdRequest.newBuilder().setOrderId(orderId)
+                        .build();
+
+        GetPaymentByOrderIdResponse getPaymentByOrderIdResponse= null;
+        try{
+            getPaymentByOrderIdResponse = this.paymentStub.getPaymentByOrderId(getPaymentByOrderIdRequest);
+
+        } catch (RuntimeException e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        }
+        return getPaymentByOrderIdResponse;
+    }
+
+/*
+        Get subcription Detail by order Id from subscription-service
+
+    */
+
+    public GetUserSubscriptionByOrderIdResponse getSubcriptionDetailFromSubscriptionService(String orderId,String userId ) {
+        GetUserSubscriptionByOrderIdRequest request=
+                GetUserSubscriptionByOrderIdRequest.newBuilder().setOrderId(orderId).setUserId(userId).build();
+        GetUserSubscriptionByOrderIdResponse response= null;
+        try{
+            response = this.subscriptionStub.getUserSubscriptionByOrderId(request);
+        }
+        catch (RuntimeException e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        }
+
+        return response;
+    }
+
+
+    public List<OrderDtoResponse> getUserOrderHistory(String userId ) {
+        GetUserOrderHistoryRequest request=
+                GetUserOrderHistoryRequest.newBuilder().setUserId(userId).build();
+        Iterator<GetUserOrderHistoryResponse> response = null;
+        List<OrderDtoResponse> orderDtos = new ArrayList<OrderDtoResponse>();
+         this.orderStub.getUserOrderHistory(request)
+                 .forEachRemaining(stubResponse -> orderDtos.add(orderMapper.orderDtoToOrderResponse( stubResponse.getOrderDto())));
+
+         return orderDtos;
+
+    }
+
+//    selain stub
     private HttpHeaders createHttpHeaders(String accToken)
     {
         HttpHeaders headers = new HttpHeaders();

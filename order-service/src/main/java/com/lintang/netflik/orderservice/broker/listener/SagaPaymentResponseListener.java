@@ -39,15 +39,15 @@ public class SagaPaymentResponseListener {
         var outboxMessage = objectMapper.readValue(message, OutboxMessage.class);
         LOG.debug("Step 2 Saga: get message from payment-service");
         if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.VALIDATED_PAYMENT)
-         && outboxMessage.getPayload().getSagaStatus() == SagaStatus.PROCESSING) {
+         && StringUtils.equalsAny(outboxMessage.getPayload().getSagaStatus(), SagaStatus.PROCESSING)) {
             var paymentValidatedMessage = objectMapper.readValue(outboxMessage.getPayload().getPayload(),
-                    PaymentValidatedMessage.class);
+                    PaymentValidatedMessage.class); //error disini
             sagaService.updateOrderStatusToPaid(paymentValidatedMessage);
             LOG.debug("updating order id:" + paymentValidatedMessage.getPaymentId() + " status to PAID");
             LOG.debug("sending message to subscription-service");
         }
         else if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.CANCELLED_PAYMENT)
-                && outboxMessage.getPayload().getSagaStatus() == SagaStatus.PROCESSING){
+                && StringUtils.equalsAny(outboxMessage.getPayload().getSagaStatus(), SagaStatus.PROCESSING )){
             var paymentCanceledMessage = objectMapper.readValue(outboxMessage.getPayload().getPayload(),
                     PaymentCanceledMessage.class);
             sagaService.updateOrderStatusToCancelled(paymentCanceledMessage);

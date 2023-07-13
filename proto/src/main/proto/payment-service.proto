@@ -23,6 +23,21 @@ message TransactionDetails{
   ItemDetails itemDetails = 5;
 }
 
+message PaymentDetail{
+  string id =1;
+  string status = 2;
+  string grossAmount =3 ;
+  string transactionTime= 4;
+  string transactionId =5;
+  string transactionStatus =6;
+  string paymentType = 7;
+  string fraudStatus = 8;
+  string bank = 9;
+  string vaNumber = 10;
+  string currency = 11;
+  string orderId = 12;
+}
+
 
 message GetRedirectUrl{
   string token =1 ;
@@ -38,7 +53,18 @@ message PaymentGetRedirectUrlGrpcResponse{
   GetRedirectUrl getRedirectUrl=1;
 }
 
+message GetPaymentByOrderIdRequest{
+  string orderId = 1;
+}
+
+message GetPaymentByOrderIdResponse {
+  PaymentDetail paymentDetail = 1;
+}
+
 service PaymentService{
   rpc getPaymentRedirectUrl(PaymentGetRedirectUrlGrpcRequest) returns (PaymentGetRedirectUrlGrpcResponse);
+  rpc getPaymentByOrderId(GetPaymentByOrderIdRequest) returns (GetPaymentByOrderIdResponse);
+
+
 }
 

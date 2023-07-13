@@ -39,9 +39,9 @@ public class SagaAddSubscriptionRequestListener {
                                   @Payload String message) throws JsonMappingException, JsonProcessingException {
         var outboxMessage = objectMapper.readValue(message, OutboxMessage.class);
         LOG.debug("step 3 saga: get message from order service! ");
-        if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.VALIDATED_PAYMENT)
-         && outboxMessage.getPayload().getSagaStatus() == SagaStatus.PROCESSING) {
-            var  addSubscriptionMessage = objectMapper.readValue(message, AddSubscriptionMessage.class);
+        if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.ADD_SUBSCRIPTION)
+         && StringUtils.equalsAny(outboxMessage.getPayload().getSagaStatus() , SagaStatus.PROCESSING)) {
+            var  addSubscriptionMessage = objectMapper.readValue( outboxMessage.getPayload().getPayload(), AddSubscriptionMessage.class); //salah disni
 
             sagaService.addSubscriptionToUser(addSubscriptionMessage);
             LOG.debug("add subscription plan: " + addSubscriptionMessage.getPlanId() + "to user: " + addSubscriptionMessage.getUserId());

@@ -1,0 +1,10 @@
+
+
+bash ./bootstrap.sh
+docker-compose -f docker-compose-order-test.yml up -d
+bash ./kong-order.sh
+bash ./kafka-connect-debezium.sh
+
+kalau kafka-connect gak started, docker-compose down & up lagi
+setting ngrok
+
