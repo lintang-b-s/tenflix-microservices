@@ -1,0 +1,25 @@
+app:
+  name: 'go-clean-template'
+  version: '1.0.0'
+
+http:
+  port: '9900'
+
+logger:
+  log_level: 'debug'
+  rollbar_env: 'go-clean-template'
+
+postgres:
+  pool_max: 2
+  pg_url: postgres://user:pass@localhost:5439/postgres
+
+kc:
+  kc_clientId: tenflix-client
+  kc_clientSecret: y57aHOaRWrUO5PHdzk5jcUIm3RGWsKEg
+  kc_realm: tenflix
+  kc_hostname: keycloak-tenflix:8080
+
+
+rabbitmq:
+  rpc_server_exchange: 'rpc_server'
+  rpc_client_exchange: 'rpc_client'
