@@ -19,7 +19,7 @@ WORKDIR /app
 
 # goos = linux goarch amd64
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -gcflags "all=-N -l"  -tags migrate -o /bin/app ./cmd/app
+    go build -gcflags "all=-N -l"   -o /bin/app ./cmd/app
 
 # Step 3: Final
 #FROM scratch

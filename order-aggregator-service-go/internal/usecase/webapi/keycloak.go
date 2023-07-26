@@ -1,24 +1,38 @@
 package webapi
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"tenflix/lintang/order-aggregator-service/internal/entity"
+	"tenflix/lintang/order-aggregator-service/pkg/keycloak"
 )
 
 type KeycloakWebAPI struct {
 }
 
-func NewKeycloak() *KeycloakWebAPI {
+type KeycloakConfig struct {
+	*keycloak.ConfigKeycloak
+}
 
+var cfg KeycloakConfig
+
+func NewKeycloak(kc *keycloak.ConfigKeycloak) *KeycloakWebAPI {
+	cfg = KeycloakConfig{kc}
 	return &KeycloakWebAPI{}
 }
 
 type AccTokenResp struct {
-	access_token string
+	access_token       string
+	expires_in         int
+	refresh_expires_in int
+	refresh_token      string
+	token_type         string
+	session_state      string
+	scope              string
 }
 
 type UserDetail struct {
@@ -36,48 +50,55 @@ func (k *KeycloakWebAPI) GetUserDetail(ctx context.Context, userId string) (enti
 	body.Set("password", "lintang")
 	body.Set("client_id", "tenflix-client")
 	body.Set("client_secret", "y57aHOaRWrUO5PHdzk5jcUIm3RGWsKEg")
-	url := "http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/token"
+	url := "http://" + cfg.Hostname + "/realms/tenflix/protocol/openid-connect/token"
 
-	resp, err := http.PostForm(url, body)
+	//resp, err := http.PostForm(url, body)
+	var payload = bytes.NewBufferString(body.Encode())
+	request, err := http.NewRequest("POST", url, payload)
 	if err != nil {
 		return entity.KeycloakUserDto{}, fmt.Errorf("KeycloakWebAPI - GetUserDetail - http.PostForm: %w", err)
 	}
-
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	var client = &http.Client{}
+	resp, err := client.Do(request)
+	if err != nil {
+		return entity.KeycloakUserDto{}, fmt.Errorf("KeycloakWebAPI - GetUserDetail - http.PostForm: %w", err)
+	}
 	defer resp.Body.Close()
-	var dataAccToken AccTokenResp
 
-	err = json.NewDecoder(resp.Body).Decode(&dataAccToken)
+	var accTokenRes map[string]interface{}
+
+	err = json.NewDecoder(resp.Body).Decode(&accTokenRes)
 	if err != nil {
 		return entity.KeycloakUserDto{}, fmt.Errorf("KeycloakWebAPI - GetUserDetail -json.NewDecoder(resp.Body).Decode: %w", err)
 	}
-	accToken := dataAccToken.access_token
+	accToken := accTokenRes["access_token"].(string)
 
-	var client = &http.Client{}
-
-	urlUserDetail := "http://keycloak-tenflix:8080/admin/realms/tenflix/users/" + userId
+	urlUserDetail := "http://" + cfg.Hostname + "/admin/realms/tenflix/users/" + userId
 	requestUser, err := http.NewRequest("GET", urlUserDetail, nil)
 	if err != nil {
 		return entity.KeycloakUserDto{}, fmt.Errorf("KeycloakWebAPI - GetUserDetail - http.NewRequest: %w", err)
 	}
 	requestUser.Header.Add("Authorization", "Bearer "+accToken)
 	respUserDetail, err := client.Do(requestUser)
+
 	if err != nil {
 		return entity.KeycloakUserDto{}, fmt.Errorf("KeycloakWebAPI - GetUserDetail -  client.Do: %w", err)
 	}
 	defer respUserDetail.Body.Close()
 
-	var uDetail UserDetail
+	var uDetail map[string]interface{}
 	err = json.NewDecoder(respUserDetail.Body).Decode(&uDetail)
 	if err != nil {
 		return entity.KeycloakUserDto{}, fmt.Errorf("KeycloakWebAPI - GetUserDetail - json.NewDecoder(respUserDetail.Body).Decode: %w", err)
 	}
 
-	kUser :=  entity.KeycloakUserDto{
-		Id: uDetail.id,
-		Username: uDetail.username,
-		FirstName: uDetail.firstName,
-		LastName: uDetail.lastName,
-		Email: uDetail.email,
+	kUser := entity.KeycloakUserDto{
+		Id:        uDetail["id"].(string),
+		Username:  uDetail["username"].(string),
+		FirstName: uDetail["firstName"].(string),
+		LastName:  uDetail["lastName"].(string),
+		Email:     uDetail["email"].(string),
 	}
 
 	return kUser, nil

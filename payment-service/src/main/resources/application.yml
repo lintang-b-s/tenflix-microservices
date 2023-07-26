@@ -28,7 +28,18 @@ spring:
             trusted:
               packages: "*"
   application:
-    name: payment-service
+    name: paymentService
+  cloud:
+    consul:
+      host: 172.1.1.17
+      port: 8500
+      discovery:
+        serviceName: paymentService
+        instance-id: "${spring.application.name}-127\u2022.0\u2022.0\u2022.1-${grpc.server.port}"
+        register-health-check: false
+        port: 9003
+        tags: paymentService
+      enabled: true
 
 logging:
   level:
@@ -62,13 +73,13 @@ info:
 #
 
 # ---
-
+#
 # spring:
 #   profiles:
 #     active: local
 #   datasource:
 #     driver-class-name: org.postgresql.Driver
-#     url: jdbc:postgresql://localhost:5435/payment?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+#     url: jdbc:postgresql://localhost:5435/postgres?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
 #     username: root
 #     password: root
 #   jpa:
@@ -89,6 +100,17 @@ info:
 #           json:
 #             trusted:
 #               packages: "*"
+#   cloud:
+#     consul:
+#       host: localhost
+#       port: 8500
+#       discovery:
+#         serviceName: paymentService
+#         instance-id: "${spring.application.name}-127\u2022.0\u2022.0\u2022.1-${grpc.server.port}"
+#         register-health-check: false
+#         port: 9003
+#         tags: paymentService
+#       enabled: true
 #   application:
 #     name: payment-service
 #
@@ -97,6 +119,8 @@ info:
 #     org:
 #       apache:
 #         kafka: OFF
+#
+#
 #
 #
 # grpc:

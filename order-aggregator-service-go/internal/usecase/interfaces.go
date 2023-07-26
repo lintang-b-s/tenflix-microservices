@@ -3,6 +3,7 @@ package usecase
 
 import (
 	"context"
+	"tenflix/lintang/order-aggregator-service/config"
 	"tenflix/lintang/order-aggregator-service/pb"
 
 	"tenflix/lintang/order-aggregator-service/internal/entity"
@@ -46,7 +47,7 @@ type (
 	// OrderUseCase -.
 	Order interface {
 		CreateOrder(context.Context, entity.CreateOrderRequest, string) (entity.Order, string, string, error)
-		ProcessOrder(context.Context, map[string]interface{}) error
+		ProcessOrder(context.Context, map[string]interface{}, *config.Config) error
 		GetOrderDetail(context.Context, string, string) (entity.Subscription, entity.Order, entity.Payment, error)
 		GetOrderHistory(context.Context, string) ([]entity.Order, error)
 	}
@@ -54,7 +55,7 @@ type (
 	// OrderGrpcAPI
 	OrderGrpcAPI interface {
 		CreateOrder(context.Context, entity.CreateOrderRequest, pb.PlanDto, string) (entity.Order, error)
-		ProcessOrderGrpc(context.Context, map[string]interface{}) error
+		ProcessOrderGrpc(context.Context, map[string]interface{}, *config.Config) error
 		GetUserOrderDetail(context.Context, string, string) (entity.Order, error)
 		GetUserOrderHistory(context.Context, string) ([]entity.Order, error)
 	}

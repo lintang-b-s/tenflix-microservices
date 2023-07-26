@@ -10,6 +10,7 @@ mvn clean
 cd proto 
 mvn compile 
 cd .. 
+make proto-order-aggregator
 
 if ! mvn  package -DskipTests; then
     echo ""

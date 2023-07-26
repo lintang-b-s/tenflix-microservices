@@ -2,15 +2,18 @@ package grpcapi
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
-	"google.golang.org/protobuf/types/known/anypb"
+	"github.com/midtrans/midtrans-go"
+	"github.com/midtrans/midtrans-go/coreapi"
 	"io"
+	"tenflix/lintang/order-aggregator-service/config"
 	"tenflix/lintang/order-aggregator-service/internal/entity"
 	"tenflix/lintang/order-aggregator-service/pb"
 	"tenflix/lintang/order-aggregator-service/pkg/grpc"
 )
+
+var cMid coreapi.Client
 
 type OrderGrpcAPI struct {
 	c *grpc.ServiceClient
@@ -64,16 +67,39 @@ func (o *OrderGrpcAPI) CreateOrder(ctx context.Context, c entity.CreateOrderRequ
 	return order, nil
 }
 
-func (o *OrderGrpcAPI) ProcessOrderGrpc(ctx context.Context, notificationRes map[string]interface{}) error {
+func (o *OrderGrpcAPI) ProcessOrderGrpc(ctx context.Context, notificationRes map[string]interface{}, cfg *config.Config) error {
+
+	cMid.New(cfg.Mt.Server, midtrans.Sandbox)
+
+	//
 	orderClient := o.c.OrderClient
-	var notifProto = map[string]*anypb.Any{}
-	for key, val := range notificationRes {
-		byteSliceVal, _ := json.Marshal(val)
-		notifProto[key] = &anypb.Any{Value: byteSliceVal}
-	}
+	var notifProto = map[string]string{}
+	//for key, val := range notificationRes {
+	//
+	//	byteSliceVal := []byte(val.(string))
+	//
+	//	notifProto[key] = ceVal} // salah serialisasi ke any
+	//}
+
+	orderId, _ := notificationRes["order_id"].(string)
+	transaction, _ := cMid.CheckTransaction(orderId)
+
+	notifProto["order_id"] = orderId
+	notifProto["transaction_status"] = transaction.TransactionStatus
+	notifProto["fraud_status"] = transaction.FraudStatus
+	notifProto["transaction_id"] = transaction.TransactionID
+	//notifProto["va_numbers"] = ction.VaNumbers[0]
+
+	notifProto["gross_amount"] = transaction.GrossAmount
+	notifProto["transaction_time"] = transaction.TransactionTime
+	notifProto["payment_type"] = transaction.PaymentType
+	notifProto["currency"] = transaction.Currency
+
 	_, err := orderClient.ProcessOrderSaga(context.Background(), &pb.ProcessOrderRequest{
 		PaymentNotification: &pb.PaymentNotification{
 			NotificationRes: notifProto,
+			Bank:            transaction.VaNumbers[0].Bank,
+			VaNum:           transaction.VaNumbers[0].VANumber,
 		},
 	})
 	if err != nil {

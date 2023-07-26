@@ -22,7 +22,7 @@
         <module>subscription-service</module>
         <module>payment-service</module>
         <module>order-service</module>
-        <module>order-aggregator-service</module>
+<!--        <module>order-aggregator-service</module>-->
         <module>api-gateway</module>
         <module>movie-service</module>
         <module>proto</module>

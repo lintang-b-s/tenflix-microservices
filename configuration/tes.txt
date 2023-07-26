@@ -2,8 +2,11 @@
 
 bash ./bootstrap.sh
 docker-compose -f docker-compose-order-test.yml up -d
+cd configuration
 bash ./kong-order.sh
+bash ./consul-register.sh
 bash ./kafka-connect-debezium.sh
+
 
 kalau kafka-connect gak started, docker-compose down & up lagi
 setting ngrok

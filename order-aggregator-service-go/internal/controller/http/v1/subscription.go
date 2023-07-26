@@ -2,9 +2,11 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/tbaehler/gin-keycloak/pkg/ginkeycloak"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"net/http"
+	"tenflix/lintang/order-aggregator-service/config"
 	"tenflix/lintang/order-aggregator-service/internal/controller/http/middleware"
 	"tenflix/lintang/order-aggregator-service/internal/entity"
 	"tenflix/lintang/order-aggregator-service/internal/usecase"
@@ -16,14 +18,23 @@ type subscriptionRoutes struct {
 	l logger.Interface
 }
 
-func newSubscriptionRoutes(handler *gin.RouterGroup, s usecase.Subscription, l logger.Interface) {
+func newSubscriptionRoutes(handler *gin.RouterGroup, s usecase.Subscription, l logger.Interface, cfg *config.Config) {
 	r := &subscriptionRoutes{s, l}
+	// localhost:8080
+	// http://keycloak-tenflix:8080
+	var sbbEndpoint = ginkeycloak.KeycloakConfig{
+		Url:           "http://" + cfg.KC.Hostname,
+		Realm:         "tenflix",
+		FullCertsPath: nil,
+	}
 
 	h := handler.Group("/subscription")
+	h.Use(ginkeycloak.Auth(ginkeycloak.AuthCheck(), sbbEndpoint))
 	{
-		h.POST("/", middleware.IsAdmin, r.createPlan)
-		h.GET("/check", middleware.IsUser, r.checkUserSubscription)
+		h.POST("/", middleware.IsUser, r.createPlan)
+		//h.GET("/check", middleware.IsUser, r.checkUserSubscription) belum di implement di grpcserver
 	}
+
 }
 
 type createPlanRequest struct {
@@ -75,7 +86,7 @@ func (r *subscriptionRoutes) createPlan(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, createPlanResponse{plan})
+	c.JSON(http.StatusCreated, createPlanResponse{plan})
 }
 
 type checkSubscriptionResponse struct {

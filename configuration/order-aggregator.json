@@ -1,0 +1,14 @@
+{
+  "id": "order-aggregator-01",
+  "name": "order-aggregator",
+  "tags": ["v1.0", "development"],
+  "address": "172.1.1.19",
+  "port": 9900,
+  "check": {
+    "name": "http api on port 9900",
+    "http": "http://172.1.1.19:9900/healthz",
+    "method": "GET",
+    "interval": "15s"
+  }
+
+}

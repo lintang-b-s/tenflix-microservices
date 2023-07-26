@@ -1,12 +1,18 @@
 spring:
-  profiles: local
-  cloud:
-    consul:
-      host: localhost
-      port: 8500
-      discovery:
-        instanceId: ${spring.application.name}:${random.value}
-      enabled: true
+  profiles:
+    active: local
+#  cloud:
+#    consul:
+#      host: localhost
+#      port: 8500
+#      discovery:
+#        serviceName: subscriptionservice
+#        instance-id: "${spring.application.name}-127\u2022.0\u2022.0\u2022.1-${grpc.server.port}"
+#        port: 9000
+#        management-tags:
+#          - subscriptionservice
+#
+#      enabled: true
 eureka:
   client:
     enabled: false

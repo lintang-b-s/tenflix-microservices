@@ -2,6 +2,7 @@ package com.lintang.netflik.subscriptionservice.grpc;
 
 
 import com.google.protobuf.Empty;
+import com.google.protobuf.Timestamp;
 import com.lintang.netflik.models.*;
 import com.lintang.netflik.subscriptionservice.command.action.SubscriptionAction;
 import com.lintang.netflik.subscriptionservice.entity.PlanEntity;
@@ -13,6 +14,9 @@ import io.grpc.stub.StreamObserver;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -120,7 +124,9 @@ public class SubscriptionGrpcService extends SubscriptionServiceGrpc.Subscriptio
         Optional<SubscriptionEntity> subscriptionEntity = subscriptionGrpcAction.getSubcriptionByOrderId(request.getOrderId());
 
         if (!subscriptionEntity.isPresent()) {
+//
             responseObserver.onError(Status.NOT_FOUND.withDescription("subscription with ordeerId " + request.getOrderId() + " not found").asRuntimeException());
+            return;
         }
         GetUserSubscriptionByOrderIdResponse response=
                 GetUserSubscriptionByOrderIdResponse.newBuilder().setSubscriptionDto(subscriptionMapper.

@@ -8,6 +8,9 @@ package com.lintang.netflik.models;
 
 option java_multiple_files = true;
 
+option go_package =  "tenflix/lintang/order-aggregator-service/pb";
+
+
 message PlanDto{
   uint64 plan_id = 1;
   string name = 2;

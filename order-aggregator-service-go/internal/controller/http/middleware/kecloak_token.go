@@ -1,10 +1,10 @@
 package middleware
 
 import (
-	"errors"
-	"github.com/Nerzal/gocloak"
-	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
+	"github.com/tbaehler/gin-keycloak/pkg/ginkeycloak"
+	"golang.org/x/exp/slices"
+	"golang.org/x/oauth2"
 	"net/http"
 	"tenflix/lintang/order-aggregator-service/pkg/keycloak"
 
@@ -22,79 +22,76 @@ func New(kc *keycloak.ConfigKeycloak) {
 	cfg = KeycloakConfig{kc}
 }
 
-var client gocloak.GoCloak
-
 type UnsignedResponse struct {
-	Message interface{} `json:"message"`
+	Message string `json:"message"`
 }
 
-func Initialize() {
-	client = gocloak.NewClient(cfg.Hostname)
+func ExtractBearerToken(token string) string {
+	return strings.Replace(token, "Bearer ", "", 1)
 }
 
-func KecloakTokenCheck(c *gin.Context) {
+func IsUser(c *gin.Context) {
 
-	jwtToken, err := extractBearerToken(c.GetHeader("Authorization"))
+	jwtToken := ExtractBearerToken(c.GetHeader("Authorization"))
+	var keycloakConfig = ginkeycloak.KeycloakConfig{
+		Url:           "http://" + cfg.Hostname,
+		Realm:         cfg.Realm,
+		FullCertsPath: nil,
+	}
+	token := &oauth2.Token{
+		AccessToken: jwtToken,
+	}
+	tokenContainer, err := ginkeycloak.GetTokenContainer(token, keycloakConfig)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, UnsignedResponse{
-			Message: err.Error(),
+		c.AbortWithStatusJSON(http.StatusUnauthorized, UnsignedResponse{
+			Message: "you are not authorized",
+		})
+		return
+	}
+	claim := tokenContainer.KeyCloakToken
+
+	principalId := tokenContainer.KeyCloakToken.Sub
+	roles := claim.RealmAccess.Roles
+	if !slices.Contains(roles, "default-roles-tenflix") {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, UnsignedResponse{
+			Message: "you are not authorized",
 		})
 		return
 	}
 
-	rptResult, err := client.RetrospectToken(jwtToken, cfg.ClientId, cfg.ClientSecret, cfg.Realm)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, UnsignedResponse{
-			Message: err.Error(),
-		})
-		return
-	}
-	isTokenValid := rptResult.Active
-	if !isTokenValid {
-		c.AbortWithStatusJSON(http.StatusBadRequest, UnsignedResponse{
-			Message: err.Error(),
-		})
-		return
-	}
-
-	claims, _ := extractClaims(jwtToken)
-	principalId := claims["sub"].(string)
 	c.Set("principalId", principalId)
 	c.Next()
 }
 
-func extractBearerToken(header string) (string, error) {
-	if header == "" {
-		return "", errors.New("bad header value given")
+func IsAdmin(c *gin.Context) {
+
+	jwtToken := ExtractBearerToken(c.GetHeader("Authorization"))
+	var keycloakConfig = ginkeycloak.KeycloakConfig{
+		Url:           "http://" + cfg.Hostname,
+		Realm:         cfg.Realm,
+		FullCertsPath: nil,
 	}
-
-	jwtToken := strings.Split(header, " ")
-	if len(jwtToken) != 2 {
-		return "", errors.New("incorrectly formatted authorization header")
+	token := &oauth2.Token{
+		AccessToken: jwtToken,
 	}
-
-	return jwtToken[1], nil
-}
-
-type JWTMaker struct {
-	secretKey string
-}
-
-func extractClaims(tokenStr string) (jwt.MapClaims, bool) {
-	hmacSecretString := "y57aHOaRWrUO5PHdzk5jcUIm3RGWsKEg" // Value
-	hmacSecret := []byte(hmacSecretString)
-	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
-		// check token signing method etc
-		return hmacSecret, nil
-	})
-
+	tokenContainer, err := ginkeycloak.GetTokenContainer(token, keycloakConfig)
 	if err != nil {
-		return nil, false
+		c.AbortWithStatusJSON(http.StatusUnauthorized, UnsignedResponse{
+			Message: "you are not authorized",
+		})
+		return
+	}
+	claim := tokenContainer.KeyCloakToken
+
+	principalId := tokenContainer.KeyCloakToken.Sub
+	roles := claim.RealmAccess.Roles
+	if !slices.Contains(roles, "admin") {
+		c.AbortWithStatusJSON(http.StatusUnauthorized, UnsignedResponse{
+			Message: "you are not authorized",
+		})
+		return
 	}
 
-	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return claims, true
-	} else {
-		return nil, false
-	}
+	c.Set("principalId", principalId)
+	c.Next()
 }

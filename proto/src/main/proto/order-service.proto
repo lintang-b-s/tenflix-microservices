@@ -7,6 +7,8 @@ import "google/protobuf/any.proto";
 
 option java_multiple_files = true;
 
+option go_package =  "tenflix/lintang/order-aggregator-service/pb";
+
 
 enum OrderStatus{
   PENDING = 0;
@@ -34,7 +36,9 @@ message OrderDto{
 }
 
 message PaymentNotification{
-  map<string, google.protobuf.Any> notification_res=1;
+  map<string, string> notification_res=1;
+  string bank =2;
+  string vaNum = 3;
 
 }
 

@@ -80,7 +80,7 @@ public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
     @Override
     public void processOrderSaga(ProcessOrderRequest request, StreamObserver<Empty> responseObserver) {
 
-        String orderId = (String) SerializationUtils.deserialize(request.getPaymentNotification().getNotificationResMap().get("order_id").getValue().toByteArray());
+        String orderId = request.getPaymentNotification().getNotificationResMap().get("order_id").toString();
         Optional<OrderEntity> orderEntityOptional = orderAction.findOrderById(orderId);
         if (!orderEntityOptional.isPresent()){
             responseObserver.onError(Status.NOT_FOUND.withDescription("Order with id "+orderId
@@ -88,7 +88,8 @@ public class OrderGrpcService extends OrderServiceGrpc.OrderServiceImplBase {
         }
 
 //        Map<String, Any> map
-        PaymentEntity mapNotificationMidtrans = processOrderAction.convertMaptoHashMap(request.getPaymentNotification().getNotificationResMap()); // salah disini
+        PaymentEntity mapNotificationMidtrans = processOrderAction.convertMaptoHashMap(request.getPaymentNotification().getNotificationResMap(), request.getPaymentNotification().getBank(),
+                request.getPaymentNotification().getVaNum());
 
         try {
             var paymentOutbox = orderOutboxAction.insertOutbox(

@@ -57,6 +57,7 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
     }
 
 
+    // for get order detail  (if payment in db nil, create nil entity)
     @Override
     public void getPaymentByOrderId(GetPaymentByOrderIdRequest request, StreamObserver<GetPaymentByOrderIdResponse> responseObserver)
     {
@@ -64,6 +65,7 @@ public class PaymentGrpcService extends PaymentServiceGrpc.PaymentServiceImplBas
         Optional<PaymentEntity> paymentEntity = paymentGrpcAction.findByOrderId(orderId);
         GetPaymentByOrderIdResponse.Builder builder= GetPaymentByOrderIdResponse.newBuilder();
         if(!paymentEntity.isPresent()) {
+
             responseObserver.onError(Status.NOT_FOUND.withDescription("payment with order id "+ orderId +  " not found !").asRuntimeException());
             return;
         }

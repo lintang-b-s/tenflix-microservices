@@ -76,7 +76,7 @@ public class OrderGrpcService {
 //        get user detail from keycloak
         KeycloakUserDto keycloakUserDto = orderGrpcAction.getUserDetail(userId);
 
-        //        throw badrequeesterror if user have active subscription
+        //  throw badrequeesterror if user have active subscription
         this.orderGrpcAction.getActiveSubscriptionFromSubscriptionService(userId);
 
 

@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
@@ -12,9 +11,9 @@ type (
 		App  `yaml:"app"`
 		HTTP `yaml:"http"`
 		Log  `yaml:"logger"`
-		PG   `yaml:"postgres"`
+		Mt   `yaml:"mt"`
 		KC   `yaml:"kc"`
-		//RMQ  `yaml:"rabbitmq"`
+		Con  `yaml:"consul"`
 	}
 
 	// App -.
@@ -34,16 +33,24 @@ type (
 	}
 
 	// PG -.
-	PG struct {
-		PoolMax int    `env-required:"true" yaml:"pool_max" env:"PG_POOL_MAX"`
-		URL     string `env-required:"true" yaml:"pg_url"               env:"PG_URL"`
-	}
+	//PG struct {
+	//	PoolMax int    `env-required:"true" yaml:"pool_max" env:"PG_POOL_MAX"`
+	//	URL     string `env-required:"true" yaml:"pg_url"               env:"PG_URL"`
+	//}
 
 	KC struct {
 		ClientId     string `env-required:"true" yaml:"kc_clientId"`
 		ClientSecret string `env-required:"true" yaml:"kc_clientSecret"`
 		Realm        string `env-required:"true" yaml:"kc_realm"`
 		Hostname     string `env-required:"true" yaml:"kc_hostname"`
+	}
+
+	Con struct {
+		ConsulHost string `env-required:"true" yaml:"consul_host" `
+	}
+
+	Mt struct {
+		Server string `env-required:"true"    env:"MIDTRANS_SERVERKEY"`
 	}
 
 	//// RMQ -.

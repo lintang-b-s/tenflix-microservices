@@ -3,6 +3,7 @@ package app
 
 import (
 	"fmt"
+	"github.com/tbaehler/gin-keycloak/pkg/ginkeycloak"
 	"os"
 	"os/signal"
 	"syscall"
@@ -26,33 +27,20 @@ import (
 func Run(cfg *config.Config) {
 	l := logger.New(cfg.Log.Level)
 
-	//// Repository
-	//pg, err := postgres.New(cfg.PG.URL, postgres.MaxPoolSize(cfg.PG.PoolMax))
-	//
-	//if err != nil {
-	//	l.Fatal(fmt.Errorf("app - Run - postgres.New: %w", err))
-	//}
-	//defer pg.Close()
-
 	kc := keycloak.NewKeycloak(cfg.KC.ClientId, cfg.KC.ClientSecret, cfg.KC.Realm, cfg.KC.Hostname)
 
-	// Use case
-	//translationUseCase := usecase.New(
-	//	repo.New(pg),
-	//	webapi.New(),
-	//)
-
 	// grpc client
+
 	subscGrpc := &grpc.ServiceClient{
-		SubscriptionClient: grpc.InitSubscriptionServiceClient(),
+		SubscriptionClient: grpc.InitSubscriptionServiceClient(cfg.Con.ConsulHost),
 	}
 
 	orderGrpc := &grpc.ServiceClient{
-		OrderClient: grpc.InitOrderServiceClient(),
+		OrderClient: grpc.InitOrderServiceClient(cfg.Con.ConsulHost),
 	}
 
 	paymentGrpc := &grpc.ServiceClient{
-		PaymentClient: grpc.InitPaymentServiceClient(),
+		PaymentClient: grpc.InitPaymentServiceClient(cfg.Con.ConsulHost),
 	}
 
 	subscriptionUseCase := usecase.NewSubscriptionUseCase(
@@ -62,7 +50,7 @@ func Run(cfg *config.Config) {
 	orderUseCase := usecase.NewOrderUseCase(
 		grpcapi.NewOrderGrpc(orderGrpc),
 		grpcapi.New(subscGrpc),
-		webapi.NewKeycloak(),
+		webapi.NewKeycloak(kc),
 		grpcapi.NewPaymentGrpc(paymentGrpc),
 	)
 
@@ -71,11 +59,12 @@ func Run(cfg *config.Config) {
 
 	//keycloak
 	middleware.New(kc)
-	middleware.Initialize()
 
 	// HTTP Server
 	handler := gin.New()
-	v1.NewRouter(handler, l, subscriptionUseCase, orderUseCase)
+	handler.Use(ginkeycloak.RequestLogger([]string{"uid"}, "data"))
+
+	v1.NewRouter(handler, l, subscriptionUseCase, orderUseCase, cfg)
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 
 	// Waiting signal

@@ -54,6 +54,7 @@ func (p *PaymentGrpcAPI) GetPaymentDetailFromPaymentService(ctx context.Context,
 			OrderId: orderId,
 		})
 	if err != nil {
+
 		return entity.Payment{}, fmt.Errorf("PaymentGrpcAPI - GetPaymentDetailFromPaymentService - paymentClient.GetPaymentByOrderId")
 	}
 	payemnt := entity.Payment{

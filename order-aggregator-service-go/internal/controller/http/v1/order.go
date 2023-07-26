@@ -2,9 +2,12 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/tbaehler/gin-keycloak/pkg/ginkeycloak"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
 	"net/http"
+	"tenflix/lintang/order-aggregator-service/config"
 	"tenflix/lintang/order-aggregator-service/internal/controller/http/middleware"
 	"tenflix/lintang/order-aggregator-service/internal/entity"
 	"tenflix/lintang/order-aggregator-service/internal/usecase"
@@ -16,15 +19,24 @@ type orderRoutes struct {
 	l logger.Interface
 }
 
-func newOrderRoutes(handler *gin.RouterGroup, o usecase.Order, l logger.Interface) {
-	r := &orderRoutes{o, l}
+var configF *config.Config
 
-	h := handler.Group("/order")
+func newOrderRoutes(handler *gin.RouterGroup, o usecase.Order, l logger.Interface, cfg *config.Config) {
+	r := &orderRoutes{o, l}
+	configF = cfg
+
+	var sbbEndpoint = ginkeycloak.KeycloakConfig{
+		Url:           "http://" + cfg.KC.Hostname,
+		Realm:         "tenflix",
+		FullCertsPath: nil,
+	}
+	h := handler.Group("/orders")
+	//h.Use(ginkeycloak.Auth(ginkeycloak.AuthCheck(), sbbEndpoint))
 	{
-		h.POST("/", middleware.IsUser, r.createOrder)
+		h.POST("/", ginkeycloak.Auth(ginkeycloak.AuthCheck(), sbbEndpoint), middleware.IsUser, r.createOrder)
 		h.POST("/notificationMidtrans", r.processOrder)
-		h.GET("/:id", middleware.IsUser, r.getOrderDetail)
-		h.GET("/", r.getOrderHistory)
+		h.GET("/:id", ginkeycloak.Auth(ginkeycloak.AuthCheck(), sbbEndpoint), middleware.IsUser, r.getOrderDetail) //
+		h.GET("/", ginkeycloak.Auth(ginkeycloak.AuthCheck(), sbbEndpoint), middleware.IsUser, r.getOrderHistory)
 
 	}
 
@@ -86,7 +98,8 @@ func (r *orderRoutes) createOrder(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, createOrderResponse{Order: order, OrderStatus: orderStatus, RedirectUrl: redirectUrl})
+	resp := createOrderResponse{Order: order, OrderStatus: orderStatus, RedirectUrl: redirectUrl}
+	c.JSON(http.StatusCreated, resp)
 }
 
 type processOrderResponse struct {
@@ -118,6 +131,7 @@ func (r *orderRoutes) processOrder(c *gin.Context) {
 	err := r.o.ProcessOrder(
 		c.Request.Context(),
 		request,
+		configF,
 	)
 	if err != nil {
 		r.l.Error(err, "http - v1 - processOrder")

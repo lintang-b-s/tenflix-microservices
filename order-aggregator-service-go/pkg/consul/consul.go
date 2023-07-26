@@ -10,6 +10,8 @@ import (
 )
 
 func ServiceRegistryWithConsul() {
+	//cfg, _ := config2.NewConfig()
+
 	config := consulapi.DefaultConfig()
 	consul, err := consulapi.NewClient(config)
 	if err != nil {

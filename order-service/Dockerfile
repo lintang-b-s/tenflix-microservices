@@ -1,4 +1,5 @@
-FROM openjdk:17
+#FROM openjdk:17
+FROM amazoncorretto:17-alpine3.15
 ADD target/*.jar myapplication
 ADD src/main/resources/application.yml  application.yml
 ADD  src/main/resources/bootstrap.yml bootstrap.yml

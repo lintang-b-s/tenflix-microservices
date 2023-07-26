@@ -4,6 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hashicorp/consul/api"
+	config2 "tenflix/lintang/order-aggregator-service/config"
+
+	//"github.com/hashicorp/consul/api"
 	"google.golang.org/grpc/resolver"
 	"regexp"
 	"sync"
@@ -45,10 +48,10 @@ func NewBuilder() resolver.Builder {
 }
 
 func (cb *consulBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
-
+	cfg, _ := config2.NewConfig()
 	fmt.Printf("calling consul build\n")
 	fmt.Printf("target: %v\n", target)
-	host := "127.0.0.1" // kalo di docker ganti ke 172.1.1.17
+	host := cfg.Con.ConsulHost // kalo di docker ganti ke 172.1.1.17, local: 127.0.0.1
 	port := ":8500"
 	name := target.Endpoint()
 
@@ -92,7 +95,12 @@ func (cr *consulResolver) watcher() {
 		fmt.Printf("adding service addrs\n")
 		fmt.Printf("newAddrs: %v\n", newAddrs)
 		cr.cc.NewAddress(newAddrs)
+		//cr.cc.UpdateState(resolver.State{
+		//	Addresses: newAddrs,
+		//})
+
 		cr.cc.NewServiceConfig(cr.name)
+
 	}
 
 }
@@ -113,10 +121,6 @@ func parseTarget(target string) (host, port, name string, err error) {
 	if target == "" {
 		return "", "", "", errMissingAddr
 	}
-
-	//if !regexConsul.MatchString(target) {
-	//	return "", "", "", errAddrMisMatch
-	//} //error disni
 
 	groups := regexConsul.FindStringSubmatch(target)
 	host = groups[1]

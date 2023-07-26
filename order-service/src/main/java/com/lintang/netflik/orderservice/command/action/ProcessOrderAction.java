@@ -17,8 +17,8 @@ public class ProcessOrderAction {
   @Autowired
   private PaymentMapper paymentMapper;
 
-  public PaymentEntity convertMaptoHashMap(Map<String, Any> midtransMap) {
-    PaymentEntity payment = paymentMapper.convertMidtransToPayment(midtransMap);
+  public PaymentEntity convertMaptoHashMap(Map<String, String> midtransMap,String  bank ,String vaNum ) {
+    PaymentEntity payment = paymentMapper.convertMidtransToPayment(midtransMap, bank , vaNum);
 
     return payment;
   }

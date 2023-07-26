@@ -3,9 +3,7 @@ package grpcapi
 import (
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"tenflix/lintang/order-aggregator-service/internal/helper"
-
 	//"github.com/satori/go.uuid"
 	"tenflix/lintang/order-aggregator-service/internal/entity"
 	"tenflix/lintang/order-aggregator-service/pb"
@@ -79,12 +77,12 @@ func (s *SubscriptionGrpcAPI) GetUserCurrentSubscription(ctx context.Context, us
 		return entity.Subscription{}, fmt.Errorf("SubscriptionGrpcAPI - GetUserCurrentSubscription - subscriptionClient.GetUserCurrentSubscription: %w", err)
 	}
 
-	uId, err := uuid.Parse(res.SubscriptionDto.UserId)
+	//uId, err := uuid.Parse(res.SubscriptionDto.UserId)
 
 	endDate := res.SubscriptionDto.EndSubscriptionDate.AsTime()
 	subscription := entity.Subscription{
 		Id:                  res.SubscriptionDto.Id,
-		UserId:              uId,
+		UserId:              res.SubscriptionDto.UserId,
 		EndSubscriptionDate: endDate,
 		Status:              res.SubscriptionDto.Status,
 		Plan:                helper.PlanDtoProtoToPlan(res.SubscriptionDto.Plan),
@@ -120,15 +118,16 @@ func (s *SubscriptionGrpcAPI) GetSubscriptionDetail(ctx context.Context, orderId
 			UserId:  userId,
 		})
 	if err != nil {
+
 		return entity.Subscription{}, fmt.Errorf("SubscriptionGrpcAPI - GetSubscriptionDetail - subscriptionClient.GetUserSubscriptionByOrderId: %w", err)
 	}
 
-	uId, _ := uuid.Parse(res.SubscriptionDto.UserId)
+	//uId, _ := uuid.Parse(res.SubscriptionDto.UserId)
 
 	endDate := res.SubscriptionDto.EndSubscriptionDate.AsTime()
 	subscription := entity.Subscription{
 		Id:                  res.SubscriptionDto.Id,
-		UserId:              uId,
+		UserId:              res.SubscriptionDto.UserId,
 		EndSubscriptionDate: endDate,
 		Status:              res.SubscriptionDto.Status,
 		Plan:                helper.PlanDtoProtoToPlan(res.SubscriptionDto.Plan),
