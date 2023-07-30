@@ -1,50 +1,41 @@
 package com.lintang.netflik.notificationservice.dto;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Set;
 
 
 @NoArgsConstructor
-//@AllArgsConstructor
+@AllArgsConstructor
 public class MovieEvent {
+
     private int id;
-
-
     private String name;
-
     private String type;
-
     private String synopsis;
-
-
     private String mpaRating;
-
-    private LocalDate rYear;
-
-
-    private Integer idmbRating;
-
-
-    @Valid
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDateTime rYear;
+    private int idmbRating;
     private Set<Actor> actors ;
 
-
-    @Valid
     private Set<Creator> creators;
-
-
-    @Valid
     private Set<Video> videos ;
 
 
     private String image ;
 
-    private String outboxType;
+    private Set<Tag> tags;
+    private Set<Category> categories;
+
     private ZonedDateTime createdAt;
 
     public MovieEvent setCreatedAt(ZonedDateTime createdAt) {
@@ -56,16 +47,9 @@ public class MovieEvent {
         return createdAt;
     }
 
-    public String getOutboxType() {
-        return outboxType;
-    }
 
-    public MovieEvent setOutboxType(String outboxType) {
-        this.outboxType = outboxType;
-        return this;
-    }
 
-    public LocalDate getrYear() {
+    public LocalDateTime getrYear() {
         return rYear;
     }
 
@@ -114,7 +98,7 @@ public class MovieEvent {
         return this;
     }
 
-    public MovieEvent setrYear(LocalDate rYear) {
+    public MovieEvent setrYear(LocalDateTime rYear) {
         this.rYear = rYear;
         return this;
     }
@@ -161,6 +145,29 @@ public class MovieEvent {
 
     public MovieEvent setImage(String image) {
         this.image = image;
+        return this;
+    }
+
+    public MovieEvent setIdmbRating(int idmbRating) {
+        this.idmbRating = idmbRating;
+        return this;
+    }
+
+    public Set<Tag> getTags() {
+        return tags;
+    }
+
+    public MovieEvent setTags(Set<Tag> tags) {
+        this.tags = tags;
+        return this;
+    }
+
+    public Set<Category> getCategories() {
+        return categories;
+    }
+
+    public MovieEvent setCategories(Set<Category> categories) {
+        this.categories = categories;
         return this;
     }
 }

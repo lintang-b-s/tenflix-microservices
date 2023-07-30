@@ -10,6 +10,7 @@ public class VideoEntity {
     private int id;
 
     private String url;
+    private String publicId;
 
     private int length;
 
@@ -85,6 +86,14 @@ public class VideoEntity {
         this.movie = null;
     }
 
+    public String getPublicId() {
+        return publicId;
+    }
+
+    public VideoEntity setPublicId(String publicId) {
+        this.publicId = publicId;
+        return this;
+    }
 
     @Override
     public String toString() {

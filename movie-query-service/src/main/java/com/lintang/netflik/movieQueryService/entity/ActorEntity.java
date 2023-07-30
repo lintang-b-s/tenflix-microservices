@@ -1,6 +1,8 @@
 package com.lintang.netflik.movieQueryService.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -10,6 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 //@AllArgsConstructor
 public class ActorEntity {
@@ -25,9 +29,9 @@ public class ActorEntity {
         this.name = name;
     }
 
-    @JsonIgnore
-    @DBRef
-    private Set<MovieEntity> movies = new HashSet<>();
+//    @JsonIgnore
+//    @DBRef
+//    private Set<MovieEntity> movies = new HashSet<>();
 
 
 
@@ -49,30 +53,29 @@ public class ActorEntity {
         return this;
     }
 
-    public Set<MovieEntity> getMovies() {
-        return movies;
-    }
+//    public Set<MovieEntity> getMovies() {
+//        return movies;
+//    }
+//
+//    public ActorEntity setMovies(Set<MovieEntity> movies) {
+//        this.movies = movies;
+//        return this;
+//    }
 
-    public ActorEntity setMovies(Set<MovieEntity> movies) {
-        this.movies = movies;
-        return this;
-    }
-
-    public void addMovie(MovieEntity movie) {
-        this.movies.add(movie);
-    }
-
-    public void removeMovie(MovieEntity movie) {
-        this.movies.remove(movie);
-    }
-
+//    public void addMovie(MovieEntity movie) {
+//        this.movies.add(movie);
+//    }
+//
+//    public void removeMovie(MovieEntity movie) {
+//        this.movies.remove(movie);
+//    }
+//
 
     @Override
     public String toString() {
         return "ActorEntity{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", movies=" + movies +
                 '}';
     }
 }

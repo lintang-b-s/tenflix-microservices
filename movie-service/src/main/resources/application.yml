@@ -28,6 +28,22 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/certs
+  kafka:
+    listener:
+      missing-topics-fatal: false
+    producer:
+      bootstrap-servers: kafka:29092
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: movie-service-cg
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+
 
 server:
   port: 8200
@@ -46,9 +62,7 @@ rabbitmq:
       name: email
     movie:
       add: add_movie
-    movie:
       update: update_movie
-    movie:
       delete: delete_movie
   binding:
     email:
@@ -73,7 +87,7 @@ management:
       exposure:
         include: health,info
   info:
-    env: 
+    env:
       enabled: true
   server:
     port: 8200
@@ -159,7 +173,7 @@ info:
 #       exposure:
 #         include: health,info
 #   info:
-#     env: 
+#     env:
 #       enabled: true
 #   server:
 #     port: 8200

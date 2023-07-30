@@ -21,7 +21,7 @@ public class EmailConsumerService {
 
 
   public void emailNotifNewMovie(MovieEvent message) {
-    String messageContentBody = "film" +  message.getName() + "telah tersedia di netflik. " + message.getSynopsis();
+    String messageContentBody = "film" +  message.getName() + "telah tersedia di tenfix. " + message.getSynopsis();
 
     emailService.send("uyayiu123@gmail.com", message.getName(),
       buildEmail(message.getName(), messageContentBody,
@@ -607,5 +607,5 @@ public class EmailConsumerService {
                      "</html>";
 
    }
-  
+
 }

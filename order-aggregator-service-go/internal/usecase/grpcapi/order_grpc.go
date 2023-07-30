@@ -71,15 +71,9 @@ func (o *OrderGrpcAPI) ProcessOrderGrpc(ctx context.Context, notificationRes map
 
 	cMid.New(cfg.Mt.Server, midtrans.Sandbox)
 
-	//
+
 	orderClient := o.c.OrderClient
 	var notifProto = map[string]string{}
-	//for key, val := range notificationRes {
-	//
-	//	byteSliceVal := []byte(val.(string))
-	//
-	//	notifProto[key] = ceVal} // salah serialisasi ke any
-	//}
 
 	orderId, _ := notificationRes["order_id"].(string)
 	transaction, _ := cMid.CheckTransaction(orderId)
@@ -88,7 +82,6 @@ func (o *OrderGrpcAPI) ProcessOrderGrpc(ctx context.Context, notificationRes map
 	notifProto["transaction_status"] = transaction.TransactionStatus
 	notifProto["fraud_status"] = transaction.FraudStatus
 	notifProto["transaction_id"] = transaction.TransactionID
-	//notifProto["va_numbers"] = ction.VaNumbers[0]
 
 	notifProto["gross_amount"] = transaction.GrossAmount
 	notifProto["transaction_time"] = transaction.TransactionTime
@@ -173,5 +166,6 @@ func (o *OrderGrpcAPI) GetUserOrderHistory(ctx context.Context, userId string) (
 		_ = append(orders, order)
 
 	}
+	return orders, nil
 
 }

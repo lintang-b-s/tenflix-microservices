@@ -10,17 +10,17 @@ networks:
 
 services:
 
-  postgres: #cuma buat tes golang order-aggregator
-    container_name: postgres
-    image: postgres
-    environment:
-      POSTGRES_USER: 'user'
-      POSTGRES_PASSWORD: 'pass'
-      POSTGRES_DB: 'postgres'
+
+  media-service:
+    container_name: media-service
+    build: ./media-service
     ports:
-      - 5439:5432
+      - 9400:9400
+    environment:
+      - CLOUDINARY_URL=${CLOUDINARY_URL}
     networks:
       - net
+
 
   ngrok:
     image: ngrok/ngrok:latest

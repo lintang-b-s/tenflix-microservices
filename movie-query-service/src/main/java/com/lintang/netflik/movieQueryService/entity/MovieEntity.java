@@ -1,6 +1,7 @@
 package com.lintang.netflik.movieQueryService.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.lintang.netflik.movieQueryService.broker.message.Video;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -39,11 +40,18 @@ public class MovieEntity {
     @JsonIgnore
     private Set<CreatorEntity> creators= new HashSet<>() ;
 
+    @JsonIgnore
+    private Set<TagEntity> tags = new HashSet<>();
+
 
     @DocumentReference
     @JsonIgnore
     private Set<VideoEntity> videos = new HashSet<>();
 
+
+
+    @JsonIgnore
+    private Set<CategoryEntity> categories = new HashSet<>();
 
     public int getId() {
         return id;
@@ -110,17 +118,17 @@ public class MovieEntity {
 
 
 
-    public MovieEntity addActor(ActorEntity actor) {
-        this.actors.add(actor);
-        actor.getMovies().add(this);
-        return this;
-    }
-
-    public MovieEntity addCreator(CreatorEntity creator) {
-        this.creators.add(creator);
-        creator.getMovies().add(this);
-        return this;
-    }
+//    public MovieEntity addActor(ActorEntity actor) {
+//        this.actors.add(actor);
+//        actor.getMovies().add(this);
+//        return this;
+//    }
+//
+//    public MovieEntity addCreator(CreatorEntity creator) {
+//        this.creators.add(creator);
+//        creator.getMovies().add(this);
+//        return this;
+//    }
 
     public Set<ActorEntity> getActors() {
         return actors;
@@ -150,6 +158,17 @@ public class MovieEntity {
         return this;
     }
 
+    public MovieEntity addVideos(VideoEntity videos) {
+        this.videos.add(videos);
+        return this;
+    }
+
+    public MovieEntity deleteVideo(VideoEntity video) {
+        this.videos.remove(video);
+        return this;
+    }
+
+
     public String getImage() {
         return image;
     }
@@ -158,6 +177,33 @@ public class MovieEntity {
         this.image = image;
         return this;
     }
+
+    public MovieEntity setrYear(Date rYear) {
+        this.rYear = rYear;
+        return this;
+    }
+
+    public Set<TagEntity> getTags() {
+        return tags;
+    }
+
+    public MovieEntity setTags(Set<TagEntity> tags) {
+        this.tags = tags;
+        return this;
+    }
+
+
+
+
+    public Set<CategoryEntity> getCategories() {
+        return categories;
+    }
+
+    public MovieEntity setCategories(Set<CategoryEntity> categories) {
+        this.categories = categories;
+        return this;
+    }
+
 
     @Override
     public String toString() {
@@ -172,9 +218,10 @@ public class MovieEntity {
                 ", image='" + image + '\'' +
                 ", actors=" + actors +
                 ", creators=" + creators +
+                ", tags=" + tags +
                 ", videos=" + videos +
+
+                ", categories=" + categories +
                 '}';
     }
-
-
 }

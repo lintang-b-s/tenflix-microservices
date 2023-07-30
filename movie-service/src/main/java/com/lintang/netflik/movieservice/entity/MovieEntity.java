@@ -29,7 +29,7 @@ public class MovieEntity {
     private String image;
 
 
-    @ManyToMany( fetch = FetchType.LAZY)
+    @ManyToMany( fetch = FetchType.EAGER)
     @JoinTable(
             name="movie_actor",
             joinColumns = @JoinColumn(name = "movie_id", referencedColumnName = "id"),
@@ -39,7 +39,7 @@ public class MovieEntity {
     private Set<ActorEntity> actors= new HashSet<>();
 
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="movie_creator",
             joinColumns = @JoinColumn(name = "movie_id", referencedColumnName = "id"),
@@ -52,6 +52,25 @@ public class MovieEntity {
     @OneToMany(mappedBy = "movie",  fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<VideoEntity> videos = new HashSet<>();
+
+
+    @ManyToMany( fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "movie_tag",
+        joinColumns = @JoinColumn(name = "movie_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "tag_id", referencedColumnName = "id"))
+    private Set<TagEntity> tags = new HashSet<>();
+
+
+
+
+    @ManyToMany( fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "movie_category",
+            joinColumns = @JoinColumn(name = "movie_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
+    private Set<CategoryEntity> categories = new HashSet<>();
+
 
 
     public int getId() {
@@ -172,6 +191,35 @@ public class MovieEntity {
         this.videos.clear();
     }
 
+    public void deleteVideo(VideoEntity v){
+        this.videos.remove(v);
+    }
+
+    public void addMovie(VideoEntity v) {
+        this.videos.add(v);
+    }
+
+    public Set<TagEntity> getTags() {
+        return tags;
+    }
+
+    public MovieEntity setTags(Set<TagEntity> tags) {
+        this.tags = tags;
+        return this;
+    }
+
+    public Set<CategoryEntity> getCategories() {
+        return categories;
+    }
+
+    public MovieEntity setCategories(Set<CategoryEntity> categories) {
+        this.categories = categories;
+        return this;
+    }
+
+
+
+
     @Override
     public String toString() {
         return "MovieEntity{" +
@@ -186,8 +234,8 @@ public class MovieEntity {
                 ", actors=" + actors +
                 ", creators=" + creators +
                 ", videos=" + videos +
+                ", tags=" + tags +
+                ", categories=" + categories +
                 '}';
     }
-
-
 }

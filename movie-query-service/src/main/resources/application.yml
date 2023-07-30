@@ -18,7 +18,22 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/certs
-  
+  kafka:
+    listener:
+      missing-topics-fatal: false
+    producer:
+      bootstrap-servers: kafka:29092
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:
+      group-id: movie-query-service-cg
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+
 server:
   port: 8100
 
@@ -59,7 +74,7 @@ management:
       exposure:
         include: health,info
   info:
-    env: 
+    env:
       enabled: true
   server:
     port: 8100
@@ -68,7 +83,7 @@ info:
     name: movie query
     description: query movie
 
-   
+
 # ---
 # spring:
 #   profiles:
@@ -90,7 +105,7 @@ info:
 #       resourceserver:
 #         jwt:
 #           jwk-set-uri: http://localhost:8080/realms/tenflix/protocol/openid-connect/certs
-  
+
 # server:
 #   port: 8100
 
@@ -131,7 +146,7 @@ info:
 #       exposure:
 #         include: health,info
 #   info:
-#     env: 
+#     env:
 #       enabled: true
 #   server:
 #     port: 8100
@@ -140,4 +155,3 @@ info:
 #     name: movie query
 #     description: query movie
 
-   

@@ -6,6 +6,7 @@ import com.lintang.netflik.orderservice.broker.message.*;
 import com.lintang.netflik.orderservice.command.action.OrderOutboxAction;
 import com.lintang.netflik.orderservice.command.action.OrderSagaAction;
 import com.lintang.netflik.orderservice.entity.*;
+import com.lintang.netflik.orderservice.exception.InternalServerEx;
 import com.lintang.netflik.orderservice.util.OrderMessageMapper;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -34,11 +35,11 @@ public class OrderSagaService {
     */
 
     @Transactional
-    public void updateOrderStatusToPaid(PaymentValidatedMessage paymentValidatedMessage) throws JsonProcessingException {
+    public void updateOrderStatusToPaid(PaymentValidatedMessage paymentValidatedMessage)  {
         String orderId = paymentValidatedMessage.getOrderId();
 
             OrderEntity order = orderSagaAction.updateOrderStatusAction(orderId, paymentValidatedMessage.getOrderStatus());
-//            OrderPlanEntity orderPlanEntity  =orderSagaAction.getPlan(order.getId().toString());
+
             AddSubscriptionMessage subscriptionMessage = AddSubscriptionMessage.builder()
                     .orderId(order.getId().toString())
                     .userId(order.getUserId().toString())
@@ -48,17 +49,22 @@ public class OrderSagaService {
                     .paymentId(order.getPaymentId())
                     .planId(order.getPlan().getPlanId())
                     .build();
-            var orderOutbox = outboxAction.insertOutbox(
+        OutboxEntity orderOutbox = null;
+        try {
+            orderOutbox = outboxAction.insertOutbox(
                     "subscription.request",
                     orderId,
                     OutboxEventType.ADD_SUBSCRIPTION, subscriptionMessage, SagaStatus.PROCESSING
             );
-            outboxAction.deleteOutbox(orderOutbox);
+        } catch (JsonProcessingException e) {
+            throw new InternalServerEx("error json processing : " + e.getMessage());
+        }
+        outboxAction.deleteOutbox(orderOutbox);
             LOG.debug("Step 2 saga: get messaagee from order service . Update order status in order db");
     }
 
     @Transactional
-    public void updateOrderStatusToCancelled(PaymentCanceledMessage paymentCanceledMessage) throws JsonProcessingException {
+    public void updateOrderStatusToCancelled(PaymentCanceledMessage paymentCanceledMessage)  {
         String orderId = paymentCanceledMessage.getOrderId();
         OrderEntity order = orderSagaAction.updateOrderStatusAction(orderId, paymentCanceledMessage.getOrderStatus());
         // end ProcessOrderSaga
@@ -71,18 +77,23 @@ public class OrderSagaService {
     }
 
     @Transactional
-    public void sendMessageToOrderRequestTopic(AddedSubscriptionMessage addedSubscriptionMessage) throws JsonProcessingException{
+    public void sendMessageToOrderRequestTopic(AddedSubscriptionMessage addedSubscriptionMessage) {
         String orderId = addedSubscriptionMessage.getOrderId();
         OrderStatus orderStatus = OrderStatus.COMPLETED;
         OrderEntity order = orderSagaAction.findById(orderId);
         OrderMessage orderMessage = orderMessageMapper.orderEntityToOrderMessage(order);
         CompleteOrderMessage completeOrderMessage = CompleteOrderMessage.builder()
                 .order(orderMessage).build(); // error OrderEntity.plan && OrderPlanEntity.order Stackoverflow ???
-        var orderOutbox = outboxAction.insertOutbox( // error disini stackoverflow??
-                "order.request",
-                orderId,
-                OutboxEventType.COMPLETE_ORDER, completeOrderMessage, SagaStatus.SUCCEEDED
-        );  // salah disini
+        OutboxEntity orderOutbox = null;  // salah disini
+        try {
+            orderOutbox = outboxAction.insertOutbox( // error disini stackoverflow??
+                    "order.request",
+                    orderId,
+                    OutboxEventType.COMPLETE_ORDER, completeOrderMessage, SagaStatus.SUCCEEDED
+            );
+        } catch (JsonProcessingException e) {
+            throw new InternalServerEx("error json processing : " + e.getMessage());
+        }
         outboxAction.deleteOutbox(orderOutbox);
     }
 
@@ -99,7 +110,7 @@ public class OrderSagaService {
     }
 
     @Transactional
-    public void compensatingOrderAndPayment(AddSubscriptionErrorMessage addSubscriptionErrorMessage) throws JsonProcessingException {
+    public void compensatingOrderAndPayment(AddSubscriptionErrorMessage addSubscriptionErrorMessage) {
         OrderEntity order = orderSagaAction.findById(addSubscriptionErrorMessage.getOrderId());
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -108,19 +119,31 @@ public class OrderSagaService {
                 CompensatingOrderSubscriptionMessage.builder()
                         .order(orderMessage).build();
 
-        var compensatingPaymentOutbox = outboxAction.insertOutbox(
-                "payment-validate.request",
-                order.getId().toString(),
-                OutboxEventType.COMPENSATING_ORDER_SUBSCRIPTION_ERROR,
-                compensatingMessage, SagaStatus.COMPENSATING
-        );
+        OutboxEntity compensatingPaymentOutbox = null;
+        try {
+            compensatingPaymentOutbox = outboxAction.insertOutbox(
+                    "payment-validate.request",
+                    order.getId().toString(),
+                    OutboxEventType.COMPENSATING_ORDER_SUBSCRIPTION_ERROR,
+                    compensatingMessage, SagaStatus.COMPENSATING
+            );
+        } catch (JsonProcessingException e) {
+            throw new InternalServerEx("error json processing : " + e.getMessage());
+
+        }
         outboxAction.deleteOutbox(compensatingPaymentOutbox);
-        var compensatingOrderOutbox = outboxAction.insertOutbox(
-                "order.request",
-                order.getId().toString(),
-                OutboxEventType.COMPENSATING_ORDER_SUBSCRIPTION_ERROR,
-                compensatingMessage, SagaStatus.COMPENSATING
-        );
+        OutboxEntity compensatingOrderOutbox = null;
+        try {
+            compensatingOrderOutbox = outboxAction.insertOutbox(
+                    "order.request",
+                    order.getId().toString(),
+                    OutboxEventType.COMPENSATING_ORDER_SUBSCRIPTION_ERROR,
+                    compensatingMessage, SagaStatus.COMPENSATING
+            );
+        } catch (JsonProcessingException e) {
+            throw new InternalServerEx("error json processing : " + e.getMessage());
+
+        }
         outboxAction.deleteOutbox(compensatingOrderOutbox);
 
     }

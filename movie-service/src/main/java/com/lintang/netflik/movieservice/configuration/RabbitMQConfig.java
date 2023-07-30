@@ -98,11 +98,7 @@ public class RabbitMQConfig {
                 .with(deleteMovieRoutingKey);
     }
 
-    // message converter
-//    @Bean
-//    public MessageConverter converter(){
-//        return new Jackson2JsonMessageConverter();
-//    }
+
 
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {

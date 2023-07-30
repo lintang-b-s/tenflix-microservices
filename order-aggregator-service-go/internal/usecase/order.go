@@ -24,11 +24,6 @@ func NewOrderUseCase(o OrderGrpcAPI, s SubscriptionGrpcAPI, k KeycloakWebAPI, p 
 	}
 }
 
-//type conc struct {
-//	Waitg *sync.WaitGroup
-//	Tes   string
-//}
-
 func (uc *OrderUseCase) CreateOrder(ctx context.Context, c entity.CreateOrderRequest, userId string) (entity.Order, string, string, error) {
 
 	planDto, err := uc.subscriptionGrpcAPI.GetPlan(ctx, c, userId)

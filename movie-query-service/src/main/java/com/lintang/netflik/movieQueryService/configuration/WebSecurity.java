@@ -3,7 +3,6 @@ package com.lintang.netflik.movieQueryService.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -40,10 +39,11 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 //        return http.build();
 
          http
-                 .cors().disable() .authorizeRequests().antMatchers(HttpMethod.POST, "/api/v1/**")
-                .hasAnyAuthority("ROLE_admin", "ROLE_user")
-                .antMatchers(HttpMethod.PUT, "/api/v1/**").hasAnyRole("admin", "user")
-                .antMatchers("/actuator/**").permitAll()
+                 .cors().disable().csrf().disable().authorizeRequests()
+                .antMatchers( "/api/v1/movie-service/movies").hasAnyRole("admin", "user", "default-roles-tenflix")
+                 .antMatchers( "/api/v1/movie-service/videos").hasAnyRole("admin", "user", "default-roles-tenflix")
+
+                 .antMatchers("/actuator/**").permitAll()
                 .anyRequest().authenticated()
                 .and().oauth2ResourceServer().jwt()
                 .jwtAuthenticationConverter(jwtAuthenticationConverter);
