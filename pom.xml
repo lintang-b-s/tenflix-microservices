@@ -9,6 +9,7 @@
         <version>2.6.13</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+
     <groupId>com.lintang.netflik</groupId>
     <artifactId>netflik</artifactId>
     <version>0.0.1-SNAPSHOT</version>
@@ -16,15 +17,12 @@
     <name>netflik</name>
     <description>Demo project for Spring Boot</description>
     <modules>
-        <module>discovery-server</module>
-        <module>movie-query-service</module>
+<!--        <module>movie-query-service</module>-->
         <module>notificationservice</module>
         <module>subscription-service</module>
         <module>payment-service</module>
         <module>order-service</module>
-<!--        <module>order-aggregator-service</module>-->
-        <module>api-gateway</module>
-        <module>movie-service</module>
+<!--        <module>movie-service</module>-->
         <module>proto</module>
     </modules>
     <properties>

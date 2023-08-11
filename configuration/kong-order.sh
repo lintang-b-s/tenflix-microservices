@@ -1,12 +1,10 @@
 #   for docker-compose-order-test
 
-
-
 curl -i -X POST \
  --url 'http://localhost:8001/services' \
 --header 'Content-Type: application/json' \
 --data '{
-	"host" : "172.1.1.15",
+	"host" : "172.1.1.19",
 	"port" : 9900,
 	"name" : "order-aggregator-service-subscription",
 	"retries" : 5,
@@ -25,7 +23,7 @@ curl -i -X POST \
  --url 'http://localhost:8001/services' \
 --header 'Content-Type: application/json' \
 --data '{
-	"host" : "172.1.1.15",
+	"host" : "172.1.1.19",
 	"port" : 9900,
 	"name" : "order-aggregator-service-orders",
 	"retries" : 5,

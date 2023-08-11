@@ -10,7 +10,6 @@ networks:
 
 services:
 
-
   media-service:
     container_name: media-service
     build: ./media-service

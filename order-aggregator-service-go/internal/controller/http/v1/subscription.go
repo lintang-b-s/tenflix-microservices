@@ -102,7 +102,7 @@ type checkSubscriptionResponse struct {
 // @Success     200 {object} checkSubscriptionResponse
 // @Failure     400 {object} response
 // @Failure     500 {object} response
-// @Router      /subscription/check [get]
+// @Router      /subscription/check [get]i
 // Author: https://github.com/lintang-b-s
 func (r *subscriptionRoutes) checkUserSubscription(c *gin.Context) {
 	principalId := c.MustGet("principalId").(string)

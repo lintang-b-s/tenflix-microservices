@@ -1,0 +1,10 @@
+{
+  "host" : "172.1.1.19",
+  "port" : 9900,
+  "name" : "order-aggregator-service-subscription",
+  "retries" : 5,
+  "path" : "/api/v1/subscription",
+  "connect_timeout" : 60000,
+  "write_timeout" : 60000,
+  "read_timeout" : 60000
+}

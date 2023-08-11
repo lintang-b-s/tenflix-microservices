@@ -71,7 +71,6 @@ func (o *OrderGrpcAPI) ProcessOrderGrpc(ctx context.Context, notificationRes map
 
 	cMid.New(cfg.Mt.Server, midtrans.Sandbox)
 
-
 	orderClient := o.c.OrderClient
 	var notifProto = map[string]string{}
 
@@ -163,7 +162,7 @@ func (o *OrderGrpcAPI) GetUserOrderHistory(ctx context.Context, userId string) (
 				Subtotal: int64(res.OrderDto.Price),
 			},
 		}
-		_ = append(orders, order)
+		orders = append(orders, order)
 
 	}
 	return orders, nil
