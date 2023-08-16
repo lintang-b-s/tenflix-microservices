@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"tenflix/lintang/order-aggregator-service/internal/entity"
+	"github.com/evrone/go-clean-template/internal/entity"
 )
 
 // TranslationUseCase -.

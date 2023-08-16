@@ -4,7 +4,7 @@ package usecase
 import (
 	"context"
 
-	"tenflix/lintang/order-aggregator-service/internal/entity"
+	"github.com/evrone/go-clean-template/internal/entity"
 )
 
 //go:generate mockgen -source=interfaces.go -destination=./mocks_test.go -package=usecase_test
@@ -25,5 +25,19 @@ type (
 	// TranslationWebAPI -.
 	TranslationWebAPI interface {
 		Translate(entity.Translation) (entity.Translation, error)
+	}
+
+	Movie interface {
+		Index(context.Context, entity.Movie) error
+		Search(context.Context, entity.Search) ([]entity.Movie, error)
+		AutoComplete(context.Context, entity.AutoComplete) ([]entity.Movie, error)
+		GetByGenre(context.Context, entity.GetByGenre) ([]entity.Movie, error)
+	}
+
+	MovieElasticSearchRepo interface {
+		Index(context.Context, entity.Movie) error
+		Search(context.Context, entity.Search) ([]entity.Movie, error)
+		AutoComplete(context.Context, entity.AutoComplete) ([]entity.Movie, error)
+		GetByGenre(context.Context, entity.GetByGenre) ([]entity.Movie, error)
 	}
 )

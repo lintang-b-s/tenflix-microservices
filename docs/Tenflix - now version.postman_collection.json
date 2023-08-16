@@ -1,0 +1,712 @@
+{
+	"info": {
+		"_postman_id": "27d9240a-f5da-4359-8ff9-e004450e9e51",
+		"name": "Tenflix - now version",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23925296",
+		"_collection_link": "https://orange-comet-51695.postman.co/workspace/netflik~35c0e208-27dd-4c2a-a67f-44e4ee221c8b/collection/23925296-27d9240a-f5da-4359-8ff9-e004450e9e51?action=share&source=collection_link&creator=23925296"
+	},
+	"item": [
+		{
+			"name": "user&auth Copy",
+			"item": [
+				{
+					"name": "auth code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8080/realms/tenflix/protocol/openid-connect/auth?client_id=tenflix-client&response_type=code&scope=openid profile&redirect_uri=http://localhost:8080/callback&state=asoasosaoasosoas",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8080",
+							"path": [
+								"realms",
+								"tenflix",
+								"protocol",
+								"openid-connect",
+								"auth"
+							],
+							"query": [
+								{
+									"key": "client_id",
+									"value": "tenflix-client"
+								},
+								{
+									"key": "response_type",
+									"value": "code"
+								},
+								{
+									"key": "scope",
+									"value": "openid profile"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8080/callback"
+								},
+								{
+									"key": "state",
+									"value": "asoasosaoasosoas"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "access token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "authorization_code",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "tenflix-client",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "y57aHOaRWrUO5PHdzk5jcUIm3RGWsKEg",
+									"type": "text"
+								},
+								{
+									"key": "code",
+									"value": "13ba9459-2e90-40bd-bd52-c29a861f2b3a.e09e7464-a62b-4941-be9c-a2fbd6dac4ec.3f6103bf-5806-4d65-b16f-27e0520ffba0",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8080/callback",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "profile",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://localhost:8080/realms/tenflix/protocol/openid-connect/token",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"realms",
+								"tenflix",
+								"protocol",
+								"openid-connect",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "subscription Copy",
+			"item": [
+				{
+					"name": "create plan- via api gateway",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"30 days subscription\",\n    \"price\": 70,\n    \"description\": \"30 days subscription\",\n    \"activePeriod\": 30,\n    \"discountPrice\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/subscription",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"subscription"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create plan- via order -aggregator-service",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"30 days subscription\",\n    \"price\": 70,\n    \"description\": \"30 days subscription\",\n    \"activePeriod\": 30,\n    \"discountPrice\": 30\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/subscription",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"subscription"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "order-service Copy",
+			"item": [
+				{
+					"name": "create order-via api gateway",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create order-via order-aggregator-service",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"planId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:9900/api/v1/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9900",
+							"path": [
+								"api",
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get order detail - via api gateway",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/v1/orders/cc1ce815-3e3e-4856-8396-0ac87bbbe390",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								"cc1ce815-3e3e-4856-8396-0ac87bbbe390"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get order detail - via order-aggregator-service",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:9900/api/v1/orders/3701dbab-3b93-44aa-9f7e-b6f26ef6b007",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "9900",
+							"path": [
+								"api",
+								"v1",
+								"orders",
+								"3701dbab-3b93-44aa-9f7e-b6f26ef6b007"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get order history - via api gateway",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get order history - via order-aggregator-service",
+					"request": {
+						"auth": {
+							"type": "oauth2",
+							"oauth2": [
+								{
+									"key": "accessTokenUrl",
+									"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+									"type": "string"
+								},
+								{
+									"key": "clientSecret",
+									"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+									"type": "string"
+								},
+								{
+									"key": "scope",
+									"value": "openid offline_access",
+									"type": "string"
+								},
+								{
+									"key": "clientId",
+									"value": "spring-cloud-client",
+									"type": "string"
+								},
+								{
+									"key": "grant_type",
+									"value": "client_credentials",
+									"type": "string"
+								},
+								{
+									"key": "authUrl",
+									"value": "http://localhost:5005/auth/login",
+									"type": "string"
+								},
+								{
+									"key": "tokenName",
+									"value": "token",
+									"type": "string"
+								},
+								{
+									"key": "addTokenTo",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/v1/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"v1",
+								"orders"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

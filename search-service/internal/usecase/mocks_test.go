@@ -8,7 +8,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	entity "tenflix/lintang/order-aggregator-service/internal/entity"
+	entity "github.com/evrone/go-clean-template/internal/entity"
 	gomock "github.com/golang/mock/gomock"
 )
 

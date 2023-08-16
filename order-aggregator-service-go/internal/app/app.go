@@ -9,7 +9,6 @@ import (
 	"syscall"
 	"tenflix/lintang/order-aggregator-service/internal/controller/http/middleware"
 	"tenflix/lintang/order-aggregator-service/internal/usecase/webapi"
-	"tenflix/lintang/order-aggregator-service/pkg/consul"
 	"tenflix/lintang/order-aggregator-service/pkg/keycloak"
 
 	"github.com/gin-gonic/gin"
@@ -55,7 +54,7 @@ func Run(cfg *config.Config) {
 	)
 
 	// consul registration
-	consul.ServiceRegistryWithConsul()
+	//consul.ServiceRegistryWithConsul()
 
 	//keycloak
 	middleware.New(kc)

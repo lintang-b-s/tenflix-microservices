@@ -1,0 +1,33 @@
+{ "peta":
+      { 
+        "mappings": {
+          "properties": {
+            "releaseYear": { "type": "integer"},
+            "title": { 
+              "type": "text",
+              "fields": {
+                "raw": {"type":  "search_as_you_type"}
+              }
+            },
+            "director":  { 
+              "type": "text",
+              "fields": {
+                "raw": {"type":  "keyword"}
+              }
+            },
+            "cast":   { 
+              "type": "text",
+              "fields": {
+                "raw": {"type":  "keyword"}
+              }
+            },
+            "genre": { "type": "keyword"},
+            "synopsis": {"type": "text"},
+            "rating": {"type":  "double"},
+            "image": {"type":  "keyword"},
+            "url": {"type": "keyword"}
+          }
+        }  
+      }
+
+}

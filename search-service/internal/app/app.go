@@ -9,46 +9,32 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"tenflix/lintang/order-aggregator-service/config"
-	amqprpc "tenflix/lintang/order-aggregator-service/internal/controller/amqp_rpc"
-	v1 "tenflix/lintang/order-aggregator-service/internal/controller/http/v1"
-	"tenflix/lintang/order-aggregator-service/internal/usecase"
-	"tenflix/lintang/order-aggregator-service/internal/usecase/repo"
-	"tenflix/lintang/order-aggregator-service/internal/usecase/webapi"
-	"tenflix/lintang/order-aggregator-service/pkg/httpserver"
-	"tenflix/lintang/order-aggregator-service/pkg/logger"
-	"tenflix/lintang/order-aggregator-service/pkg/postgres"
-	"tenflix/lintang/order-aggregator-service/pkg/rabbitmq/rmq_rpc/server"
+	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/evrone/go-clean-template/config"
+	v1 "github.com/evrone/go-clean-template/internal/controller/http/v1"
+	"github.com/evrone/go-clean-template/internal/usecase"
+	"github.com/evrone/go-clean-template/internal/usecase/repo"
+	"github.com/evrone/go-clean-template/pkg/httpserver"
+	"github.com/evrone/go-clean-template/pkg/logger"
 )
 
 // Run creates objects via constructors.
 func Run(cfg *config.Config) {
 	l := logger.New(cfg.Log.Level)
-
-	// Repository
-	pg, err := postgres.New(cfg.PG.URL, postgres.MaxPoolSize(cfg.PG.PoolMax))
-	if err != nil {
-		l.Fatal(fmt.Errorf("app - Run - postgres.New: %w", err))
+	cfgEs := elasticsearch.Config{
+		Addresses: []string{"http://elasticsearch:9200"},
 	}
-	defer pg.Close()
 
-	// Use case
-	translationUseCase := usecase.New(
-		repo.New(pg),
-		webapi.New(),
+	// elasticsearch client
+	esClient, err := elasticsearch.NewClient(cfgEs)
+
+	movieUseCase := usecase.NewMovie(
+		repo.NewMovieEsRepo(esClient),
 	)
-
-	// RabbitMQ RPC Server
-	rmqRouter := amqprpc.NewRouter(translationUseCase)
-
-	rmqServer, err := server.New(cfg.RMQ.URL, cfg.RMQ.ServerExchange, rmqRouter, l)
-	if err != nil {
-		l.Fatal(fmt.Errorf("app - Run - rmqServer - server.New: %w", err))
-	}
 
 	// HTTP Server
 	handler := gin.New()
-	v1.NewRouter(handler, l, translationUseCase)
+	v1.NewRouter(handler, l, movieUseCase)
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 
 	// Waiting signal
@@ -60,8 +46,6 @@ func Run(cfg *config.Config) {
 		l.Info("app - Run - signal: " + s.String())
 	case err = <-httpServer.Notify():
 		l.Error(fmt.Errorf("app - Run - httpServer.Notify: %w", err))
-	case err = <-rmqServer.Notify():
-		l.Error(fmt.Errorf("app - Run - rmqServer.Notify: %w", err))
 	}
 
 	// Shutdown
@@ -70,8 +54,4 @@ func Run(cfg *config.Config) {
 		l.Error(fmt.Errorf("app - Run - httpServer.Shutdown: %w", err))
 	}
 
-	err = rmqServer.Shutdown()
-	if err != nil {
-		l.Error(fmt.Errorf("app - Run - rmqServer.Shutdown: %w", err))
-	}
 }

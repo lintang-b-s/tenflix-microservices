@@ -52,7 +52,7 @@ func (cb *consulBuilder) Build(target resolver.Target, cc resolver.ClientConn, o
 	fmt.Printf("calling consul build\n")
 	fmt.Printf("target: %v\n", target)
 	host := cfg.Con.ConsulHost // kalo di docker ganti ke 172.1.1.17, local: 127.0.0.1
-	port := ":8500"
+	port := ":" + defaultPort
 	name := target.Endpoint()
 
 	cr := &consulResolver{

@@ -30,7 +30,7 @@ func ServiceRegistryWithConsul() {
 		Check: &consulapi.AgentServiceCheck{
 			HTTP:     fmt.Sprintf("http://%s:%v/healthz", address, port),
 			Interval: "10s",
-			Timeout:  "30s",
+			Timeout:  "59s",
 		},
 	}
 

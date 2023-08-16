@@ -1,6 +1,6 @@
 linters-settings:
   gci:
-    local-prefixes: tenflix/lintang/order-aggregator-service
+    local-prefixes: github.com/evrone/go-clean-template
   dupl:
     threshold: 100
   errorlint:

@@ -1,0 +1,7 @@
+
+docker exec -it kafka sh
+cd opt/bitnami/kafka/bin
+./kafka-console-consumer.sh --topic dbserver1.inventory.orders  --from-beginning --bootstrap-server localhost:9092
+./kafka-console-producer.sh --topic dbserver1.inventory.orders  --bootstrap-server localhost:9092
+./kafka-topics.sh --bootstrap-server localhost:9092 --list
+

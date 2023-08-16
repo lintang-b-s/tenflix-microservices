@@ -10,9 +10,9 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 
 	// Swagger docs.
-	_ "tenflix/lintang/order-aggregator-service/docs"
-	"tenflix/lintang/order-aggregator-service/internal/usecase"
-	"tenflix/lintang/order-aggregator-service/pkg/logger"
+	_ "github.com/evrone/go-clean-template/docs"
+	"github.com/evrone/go-clean-template/internal/usecase"
+	"github.com/evrone/go-clean-template/pkg/logger"
 )
 
 // NewRouter -.
@@ -22,7 +22,7 @@ import (
 // @version     1.0
 // @host        localhost:8080
 // @BasePath    /v1
-func NewRouter(handler *gin.Engine, l logger.Interface, t usecase.Translation) {
+func NewRouter(handler *gin.Engine, l logger.Interface, m usecase.Movie) {
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
@@ -40,6 +40,6 @@ func NewRouter(handler *gin.Engine, l logger.Interface, t usecase.Translation) {
 	// Routers
 	h := handler.Group("/v1")
 	{
-		newTranslationRoutes(h, t, l)
+		newMovieRoutes(h, m, l)
 	}
 }

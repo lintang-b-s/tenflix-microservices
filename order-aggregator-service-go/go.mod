@@ -20,11 +20,14 @@ require (
 	github.com/swaggo/files v0.0.0-20210815190702-a29dd2bc99b2
 	github.com/swaggo/gin-swagger v1.3.3
 	github.com/swaggo/swag v1.7.6
+
 )
 
 require (
+	github.com/golang/glog v1.1.0
 	github.com/hashicorp/consul/api v1.22.0
 	github.com/midtrans/midtrans-go v1.3.6
+	github.com/szuecs/gin-glog v1.1.1
 	github.com/tbaehler/gin-keycloak v1.4.0
 	golang.org/x/exp v0.0.0-20230321023759-10a507213a29
 	golang.org/x/oauth2 v0.6.0
@@ -44,7 +47,6 @@ require (
 	github.com/go-openapi/spec v0.20.8 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
-	github.com/golang/glog v1.1.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/gookit/color v1.5.2 // indirect

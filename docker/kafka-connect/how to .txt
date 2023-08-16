@@ -1,0 +1,13 @@
+
+
+1. download postgres-connector-jar java 8 in https://jdbc.postgresql.org/download/
+copy and paste jar file to "jars" directory
+
+
+2. download elasticseaerch-sink-connector version 14.0.6 in https://www.confluent.io/hub/confluentinc/kafka-connect-elasticsearch
+copy and paste zip file into this directory (kafka-connect)
+
+
+3. download jdbc connector version 10.7.1 in https://www.confluent.io/hub/confluentinc/kafka-connect-jdbc
+copy and paste zip file into this directory (kafka-connect)
+

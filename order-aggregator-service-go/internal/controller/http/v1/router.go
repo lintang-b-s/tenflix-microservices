@@ -3,11 +3,14 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/golang/glog"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
+	ginglog "github.com/szuecs/gin-glog"
 	"net/http"
 	"tenflix/lintang/order-aggregator-service/config"
+	"time"
 
 	// Swagger docs.
 	_ "tenflix/lintang/order-aggregator-service/docs"
@@ -26,11 +29,12 @@ func NewRouter(handler *gin.Engine, l logger.Interface, s usecase.Subscription, 
 	// Options
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
+	handler.Use(ginglog.Logger(50 * time.Second))
 
 	// Swagger
 	swaggerHandler := ginSwagger.DisablingWrapHandler(swaggerFiles.Handler, "DISABLE_SWAGGER_HTTP_HANDLER")
 	handler.GET("/swagger/*any", swaggerHandler)
-
+	glog.Info("info")
 	// K8s probe
 	handler.GET("/healthz", func(c *gin.Context) { c.Status(http.StatusOK) })
 

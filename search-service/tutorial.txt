@@ -1,0 +1,90 @@
+
+
+pagination size 10 , from document ke 5000:
+curl -XGET '127.0.0.1:9200/movieswiki/_search?size=10&from=5000&pretty=true'
+
+
+
+autocomplete search:
+curl -s --request GET 'http://localhost:9200/movies/_search?pretty' --data-raw '{
+   "size": 5,
+   "query": {
+       "multi_match": {
+           "query": "The dark",
+           "type": "bool_prefix",
+           "fields": [
+               "title",
+               "title._2gram",
+               "title._3gram"
+           ]
+       }
+   }
+}'
+
+
+buat 2 type mapping (bisa jadi fulltext search, keyword, sorting, aggregation): https://www.elastic.co/guide/en/elasticsearch/reference/current/multi-fields.html
+
+
+full text search & sorting
+GET my-index-000001/_search
+{
+  "query": {
+    "match": {
+      "city": "york"
+    }
+  },
+  "sort": {
+    "city.raw": "asc"
+  },
+  "aggs": {
+    "Cities": {
+      "terms": {
+        "field": "city.raw"
+      }
+    }
+  }
+}
+
+
+
+search & filter:
+//{“multi_match”: {“query”: “star”, “fields”: [“title”, “synopsis” ] } }
+	// multi_match , query ke beberapa field (full text search)
+
+	/*
+		{
+			"query":{
+				"bool": {
+					"should": [{“multi_match”: {
+									“query”: “star”,
+									“fields”: [“title”, “synopsis” , "director", "cast"],
+									"fuzziness" : "AUTO"
+									} },
+
+					],
+					"filter": ["terms": {"releaseYear": [args.ReleaseYear]},
+							"terms" : { "director.raw": [args.Director] },
+							"terms": { "cast.raw": [args.Cast]},
+							"terms" : { "genre": [args.Genre] },
+							"range" : { "rating" : { "gte": args.MinRating } }
+						],
+				}
+			},
+			"from": args.From,
+			"size": args.Size,
+
+		}
+
+	*/
+
+
+
+text vs keyword: https://codecurated.com/blog/elasticsearch-text-vs-keyword/?ref=hackernoon.com
+typo & mispelling: https://hackernoon.com/how-to-use-fuzzy-query-matches-in-elasticsearch-dh1h3167
+
+
+
+
+
+
+jq -c -r ".[]" movies-tenflix.json | while read line; do echo '{"index":{}}'; echo $line; done > bulk-tenflix.json

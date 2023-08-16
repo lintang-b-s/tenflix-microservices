@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"tenflix/lintang/order-aggregator-service/config"
-	"tenflix/lintang/order-aggregator-service/internal/app"
+	"github.com/evrone/go-clean-template/config"
+	"github.com/evrone/go-clean-template/internal/app"
 )
 
 func main() {

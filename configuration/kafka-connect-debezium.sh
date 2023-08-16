@@ -2,10 +2,12 @@ curl --location 'localhost:8083/connectors' \
 --header 'Content-Type: application/json' \
 --data @./debezium-order.json &&
 
+echo &&
 curl --location 'http://localhost:8083/connectors' \
 --header 'Content-Type: application/json' \
 --data @./debezium-payment.json &&
 
+echo &&
 curl --location 'http://localhost:8083/connectors' \
 --header 'Content-Type: application/json' \
 --data @./debezium-subscription.json

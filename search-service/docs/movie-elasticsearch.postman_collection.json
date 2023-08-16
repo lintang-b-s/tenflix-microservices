@@ -1,0 +1,285 @@
+{
+	"info": {
+		"_postman_id": "5b9f8dec-31da-4515-8300-e601a269efce",
+		"name": "movie-elasticsearch",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23925296",
+		"_collection_link": "https://orange-comet-51695.postman.co/workspace/netflik~35c0e208-27dd-4c2a-a67f-44e4ee221c8b/collection/23925296-5b9f8dec-31da-4515-8300-e601a269efce?action=share&creator=23925296&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "New Request Copy",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"query\": {\n        \"multi_match\": {\n            \"query\": \"Oppenheim\",\n            \"fields\": [\"title^3\", \"synopsis\"],\n            \"fuzziness\": \"AUTO\"\n            \n        }\n    },\n    \"sort\": [\n          \"_score\" \n    ]\n\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:9200/movieswiki/_search?pretty",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "9200",
+					"path": [
+						"movieswiki",
+						"_search"
+					],
+					"query": [
+						{
+							"key": "pretty",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search by title and filter",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"q\": \"Oppenheime\",\n    \"genre\": [\"history\"],\n    \"mrtg\":  4,\n    \"dir\": \"Christopher Nolan\",\n    \"cast\": [\"Cillian Murphy\"],\n    \"rly\": [2023],\n    \"from\": 0,\n    \"size\": 20\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/v1/movies/search",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"movies",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "search by ttitle",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"q\": \"Oppenheimer\",\n    \"from\": 0,\n    \"size\": 20\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/v1/movies/search",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"movies",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all movieswiki",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:9200/movieswiki/_search?pretty=true",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "9200",
+					"path": [
+						"movieswiki",
+						"_search"
+					],
+					"query": [
+						{
+							"key": "pretty",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"query\": {\n        \"match\": {\n            \"title\": \"Oppenheimer\"\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:9200/movieswiki/_search?pretty",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "9200",
+					"path": [
+						"movieswiki",
+						"_search"
+					],
+					"query": [
+						{
+							"key": "pretty",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "autocomplete",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"word\": \"Oppenheim\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/v1/movies/autocomplete",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"movies",
+						"autocomplete"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get by genre",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"genre\": \"History\",\n    \"rly\": [2023,2022],\n    \"from\": 0,\n    \"size\": 20\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:8080/v1/movies/genre",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"movies",
+						"genre"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get movieswiki mapping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9200/movieswiki/_mapping?pretty",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9200",
+					"path": [
+						"movieswiki",
+						"_mapping"
+					],
+					"query": [
+						{
+							"key": "pretty",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
