@@ -1,0 +1,150 @@
+spring:
+  profiles:
+    active: docker
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://postgres-order:5432/postgres
+    username: root
+    password: root
+  jpa:
+    database: postgresql
+    hibernate:
+      ddl-auto: update
+#    properties:
+#      "[hibernate.default_schema]": orders
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  application:
+    name: orderService
+  kafka:
+    listener:
+      missing-topics-fatal: false
+    producer:
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      bootstrap-servers: kafka:29092
+      group-id: order-service-cg
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring:
+          json:
+            trusted:
+              packages: "*"
+
+  cloud:
+    consul:
+      host: 172.1.1.17
+      port: 8500
+      discovery:
+        serviceName: orderService
+        instance-id: "${spring.application.name}-127\u2022.0\u2022.0\u2022.1-${grpc.server.port}"
+        register-health-check: false
+        port: 9002
+        tags: orderService
+      enabled: true
+grpc:
+  server:
+    port: 9002
+
+# logging:
+#   level:
+#     org:
+#       apache:
+#         kafka: OFF
+
+
+server:
+  port: 9600
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  info:
+    env:
+      enabled: true
+  server:
+    port: 9600
+info:
+  app:
+    name: order-aggregator-service
+    description: aggregate multiple response from other service
+
+
+# ---
+#
+# spring:
+#   profiles:
+#     active: local
+#   datasource:
+#     driver-class-name: org.postgresql.Driver
+#     url: jdbc:postgresql://localhost:5434/postgres?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+#     username: root
+#     password: root
+#   jpa:
+#     database: postgresql
+#     hibernate:
+#       ddl-auto: update
+#     database-platform: org.hibernate.dialect.PostgreSQLDialect
+#     show-sql: true
+#   application:
+#     name: order-service
+#   kafka:
+#     listener:
+#       missing-topics-fatal: false
+#     producer:
+#       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#     consumer:
+#       group-id: order-service-cg
+#       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+#       properties:
+#         spring:
+#           json:
+#             trusted:
+#               packages: "*"
+#   cloud:
+#     consul:
+#       host: localhost
+#       port: 8500
+#       discovery:
+#         serviceName: orderService
+#         instance-id: "${spring.application.name}-127\u2022.0\u2022.0\u2022.1-${grpc.server.port}"
+#         register-health-check: false
+#         port: 9002
+#         tags: orderService
+#       enabled: true
+#
+# grpc:
+#   server:
+#     port: 9002
+#
+# logging:
+#   level:
+#     org:
+#       apache:
+#         kafka: OFF
+#
+#
+#
+# server:
+#   port: 9600
+# management:
+#   endpoint:
+#     health:
+#       show-details: always
+#   endpoints:
+#     web:
+#       exposure:
+#         include: health,info
+#   info:
+#     env:
+#       enabled: true
+#   server:
+#     port: 9600
+# info:
+#   app:
+#     name: order-aggregator-service
+#     description: aggregate multiple response from other service

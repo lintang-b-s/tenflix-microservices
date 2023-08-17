@@ -31,7 +31,7 @@ microservices orders and payments (it's actually a movie streaming microservices
      bash ./consul-register.sh
     if kafka-connect is not running or kong, execute the above command again
     bash ./kong-order.sh
-    check all service registered in localhost:8500
+    check all service registered in localhost:8500, wait until order-service, subscription-service, paymentservice registered in consul
     wait until kafka-connect load all plugin
     bash ./kafka-connect-debezium.sh
 ```
@@ -39,7 +39,7 @@ microservices orders and payments (it's actually a movie streaming microservices
 
 ### setting payment midtrans
 ```
-    docker exec -it flix-microservices-ngrok-1 bash
+    docker exec -it tenflix-microservices-ngrok-1 bash
     
     ngrok http 172.1.1.19:9900
     
@@ -71,6 +71,7 @@ microservices orders and payments (it's actually a movie streaming microservices
 ```
 
 note:  you must provide an access token to each protected endpoint
+note: if order-aggregator-service container not running , start container again and run bash ./kong-order.sh
 
 ### 2. register
 ![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1692204057/1_idxpen.png )
