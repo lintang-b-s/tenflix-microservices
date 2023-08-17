@@ -4,7 +4,7 @@ microservices orders and payments (it's actually a movie streaming microservices
 
 
 # Architecture
-![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1692215543/tenflix_5_bkafsa.png)
+![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1692240124/tenflix_6_qi5mma.png)
 
 
 
@@ -19,7 +19,7 @@ microservices orders and payments (it's actually a movie streaming microservices
 ### prequisite
 1. install protobuf compiler
 2. install apache maven
-
+3. install docker & docker compose
 
 ### start application
 ```
