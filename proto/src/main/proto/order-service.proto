@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package com.lintang.netflik.models;
 import "google/protobuf/empty.proto";
-import "google/protobuf/any.proto";
 
 
 option java_multiple_files = true;

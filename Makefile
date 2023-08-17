@@ -12,12 +12,14 @@ PATH:=$(LOCAL_BIN):$(PATH)
 help: ## Display this help screen
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-proto-order-aggregator: ## generate golang code in order-aggregator-service-go
-	rm -f pb/*.go
+proto-order-aggregator:
+	rm -f order-aggregator-service-go/pb/*.go
+	mkdir order-aggregator-service-go/pb
 	protoc --proto_path=proto/src/main/proto --go_out=order-aggregator-service-go/pb --go_opt=paths=source_relative \
 	--go-grpc_out=order-aggregator-service-go/pb --go-grpc_opt=paths=source_relative \
 	proto/src/main/proto/*.proto
-.PHONY: proto
+#.PHONY: proto
+.PHONY: proto-order-aggregator
 
 
 #protoc --proto_path=proto --go_out=pb --go_opt=paths=source_relative \
