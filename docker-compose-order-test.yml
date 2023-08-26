@@ -294,8 +294,6 @@ services:
     image: mysql:latest
     ports:
       - 3305:3306
-    volumes:
-      - ./mysql_keycloak_data:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: keycloak
