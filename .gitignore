@@ -78,3 +78,5 @@ kafka/
 kafka/
 data/
 .env
+
+mysql_keycloak_data/
