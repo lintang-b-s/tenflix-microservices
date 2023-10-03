@@ -2,6 +2,8 @@
 microservices orders and payments (it's actually a movie streaming microservices, but it's not finished yet), built using microservices architecture, Saga distributed transactions pattern, kafka, grpc, concurrency, api gateway, service discovery, etc.
 
 
+This project provides an example of the Saga distributed transactions pattern.
+
 
 # Architecture
 ![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1692240124/tenflix_6_qi5mma.png)
