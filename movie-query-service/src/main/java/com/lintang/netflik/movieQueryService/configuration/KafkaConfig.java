@@ -4,6 +4,7 @@ package com.lintang.netflik.movieQueryService.configuration;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +21,12 @@ public class KafkaConfig {
     @Autowired
     private KafkaProperties kafkaProperties;
 
+    @Value("${spring.kafka.consumer.bootstrap-servers}")
+    private String bootstrapServer;
+
     private ConsumerFactory<Object, Object> consumerFactoryWithStringDeserializer() {
         var properties = kafkaProperties.buildConsumerProperties();
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
 
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 

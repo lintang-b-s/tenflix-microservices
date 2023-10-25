@@ -1,0 +1,32 @@
+
+# membuat topic
+docker exec -it zookeeper kafka-topics --create --topic foo --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092
+docker exec -it zookeeper kafka-topics --create --topic t.upload.request --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka:29092
+
+
+# list topics
+docker exec -it zookeeper kafka-topics --bootstrap-server kafka:29092 --list
+
+
+# kafka producer
+docker exec -it zookeeper kafka-console-producer --bootstrap-server kafka:29092 --topic   t.upload.request
+
+# kafka consumer
+kafka-console-consumer.sh --consumer.config playground.config --bootstrap-server cluster.playground.cdkt.io:9092 --topic second_topic
+docker exec -it zookeeper  kafka-console-consumer --bootstrap-server  kafka:29092 --topic t.upload.request
+
+# json message utk topic t.upload.request
+{
+    "id": 1,
+    "file": "00110000 00110010 10100111 10110010 10001101 10101001 11011010 00100100
+           01011000 00001100",
+    "publicId": 1
+}
+
+# ref: https://www.conduktor.io/kafka/how-to-send-large-messages-in-apache-kafka/
+
+
+JALANAKAN YANG INI SAJA 
+# ubah max message size kafka broker
+docker exec -it zookeeper kafka-configs --bootstrap-server kafka:29092 --alter --entity-type topics --entity-name t.upload.request --add-config max.message.bytes=104858800
+

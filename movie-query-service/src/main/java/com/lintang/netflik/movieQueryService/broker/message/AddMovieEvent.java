@@ -1,9 +1,7 @@
 package com.lintang.netflik.movieQueryService.broker.message;
 
 
-import com.lintang.netflik.movieservice.api.response.Actor;
-import com.lintang.netflik.movieservice.api.response.Creator;
-import com.lintang.netflik.movieservice.api.response.Video;
+
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 

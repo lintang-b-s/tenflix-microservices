@@ -22,10 +22,11 @@ spring:
     listener:
       missing-topics-fatal: false
     producer:
-      bootstrap-servers: kafka:29092
+      # bootstrap-servers: kafka:29092
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
     consumer:
+      bootstrap-servers: kafka:29092
       group-id: movie-query-service-cg
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
@@ -37,33 +38,31 @@ spring:
 server:
   port: 8100
 
-rabbitmq:
-  exchange:
-    name: movie_exchange
-  queue:
-    email:
-      name: email
-    movie:
-      add: add_movie
-    movie:
-      update: update_movie
-    movie:
-      delete: delete_movie
-  binding:
-    email:
-      routing:
-        key: email_routing_key
-    movieAdd:
-      routing:
-        key: addMovie_routing_key
-    movieUpdate:
-      routing:
-        key: updateMovie_routing_key
-    movieDelete:
-      routing:
-        key: deleteMovie_routing_key
-
-
+# rabbitmq:
+#   exchange:
+#     name: movie_exchange
+#   queue:
+#     email:
+#       name: email
+#     movie:
+#       add: add_movie
+#     movie:
+#       update: update_movie
+#     movie:
+#       delete: delete_movie
+#   binding:
+#     email:
+#       routing:
+#         key: email_routing_key
+#     movieAdd:
+#       routing:
+#         key: addMovie_routing_key
+#     movieUpdate:
+#       routing:
+#         key: updateMovie_routing_key
+#     movieDelete:
+#       routing:
+#         key: deleteMovie_routing_key
 
 management:
   endpoint:
@@ -82,8 +81,6 @@ info:
   app:
     name: movie query
     description: query movie
-
-
 # ---
 # spring:
 #   profiles:
@@ -134,8 +131,6 @@ info:
 #     movieDelete:
 #       routing:
 #         key: deleteMovie_routing_key
-
-
 
 # management:
 #   endpoint:

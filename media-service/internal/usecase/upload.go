@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/segmentio/kafka-go"
 	"tenflix/lintang/order-aggregator-service/internal/entity"
-	kafkaClient "tenflix/lintang/order-aggregator-service/pkg/kafka"
+	kafkaClient "tenflix/lintang/order-aggregator-service/pkg/kafkaa"
 	"time"
 )
 

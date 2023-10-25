@@ -2,9 +2,9 @@ spring:
   profiles:
     active: docker
   datasource:
-    url: jdbc:postgresql://postgres-movie:5432/netflik?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
-    username: netflik
-    password: netflik
+    url: jdbc:postgresql://postgres-movie:5432/postgres?binaryTransfer=true&reWriteBatchedInserts=true&stringtype=unspecified
+    username: root
+    password: root
     driver-class-name: org.postgresql.Driver
   jpa:
     database: postgresql
@@ -36,6 +36,7 @@ spring:
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
     consumer:
+      bootstrap-servers: kafka:29092
       group-id: movie-service-cg
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
@@ -43,7 +44,6 @@ spring:
           json:
             trusted:
               packages: "*"
-
 
 server:
   port: 8200
@@ -78,6 +78,32 @@ rabbitmq:
       routing:
         key: deleteMovie_routing_key
 
+
+# salah
+# rabbitmq:
+#   exchange:
+#     name: movie_exchange
+#   queue:
+#     email:
+#       name: email
+#     movie:
+#       add: add_movie
+#       update: update_movie
+#       delete: delete_movie
+#   binding:
+#     email:
+#       routing:
+#         key: email_routing_key
+#     movieAdd:
+#       routing:
+#         key: addMovie_routing_key
+#     movieUpdate:
+#       routing:
+#         key: updateMovie_routing_key
+#     movieDelete:
+#       routing:
+#         key: deleteMovie_routing_key
+
 management:
   endpoint:
     health:
@@ -95,8 +121,6 @@ info:
   app:
     name: movie-service
     description: movie command service
-
-
 # ---
 # spring:
 #   profiles:

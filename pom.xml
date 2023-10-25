@@ -17,12 +17,12 @@
     <name>netflik</name>
     <description>Demo project for Spring Boot</description>
     <modules>
-<!--        <module>movie-query-service</module>-->
+        <module>movie-query-service</module>
         <module>notificationservice</module>
         <module>subscription-service</module>
         <module>payment-service</module>
         <module>order-service</module>
-<!--        <module>movie-service</module>-->
+        <module>movie-service</module>
         <module>proto</module>
     </modules>
     <properties>

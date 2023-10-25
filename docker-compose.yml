@@ -10,7 +10,7 @@ networks:
 
 services:
 
-  
+
   kong-database:
     container_name: kong-database
     image: postgres:11-alpine
@@ -247,7 +247,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER_INTERNAL
       ALLOW_PLAINTEXT_LISTENER: "yes"
       KAFKA_CREATE_TOPICS: t.saga.order.outbox.subscription.response:1:1,t.saga.order.outbox.order.request:1:1,t.saga.order.outbox.payment-validate.response:1:1,t.saga.order.outbox.payment-validate.request:1:1,t.saga.order.outbox.subscription.request:1:1
-    
+
     networks:
       - net
     depends_on:
@@ -416,7 +416,6 @@ services:
       - consul-tenflix
       - kong
       - keycloak-tenflix
-
     platform: linux/arm64/v8
 
   movie-query-service:

@@ -36,6 +36,8 @@ This project provides an example of the Saga distributed transactions pattern.
     check all service registered in localhost:8500, wait until order-service, subscription-service, paymentservice registered in consul
     wait until kafka-connect load all plugin
     bash ./kafka-connect-debezium.sh
+    docker exec -it zookeeper kafka-configs --bootstrap-server kafka:29092 --alter --entity-type topics --entity-name t.upload.request --add-config max.message.bytes=104858800
+
 ```
 
 

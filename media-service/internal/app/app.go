@@ -8,14 +8,14 @@ import (
 	"os/signal"
 	"syscall"
 	"tenflix/lintang/order-aggregator-service/internal/usecase"
-	readerKafka "tenflix/lintang/order-aggregator-service/internal/usecase/kafka"
+	readerKafka "tenflix/lintang/order-aggregator-service/internal/usecase/kafkaa"
 	"tenflix/lintang/order-aggregator-service/internal/usecase/webapi"
 
 	"github.com/gin-gonic/gin"
 
 	"tenflix/lintang/order-aggregator-service/config"
 	"tenflix/lintang/order-aggregator-service/pkg/httpserver"
-	kafkaClient "tenflix/lintang/order-aggregator-service/pkg/kafka"
+	kafkaClient "tenflix/lintang/order-aggregator-service/pkg/kafkaa"
 	"tenflix/lintang/order-aggregator-service/pkg/logger"
 )
 
@@ -25,7 +25,7 @@ func Run(cfg *config.Config) {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
 
-	// kafka producer
+	// kafkaa producer
 	kafkaProducer := kafkaClient.NewProducer(l, cfg.Kafka.Brokers)
 	defer kafkaProducer.Close()
 
@@ -36,12 +36,10 @@ func Run(cfg *config.Config) {
 
 	// HTTP Server
 	handler := gin.New()
-	//v1.NewRouter(handler, l, translationUseCase)
-	//v1.NewRouter(handler, l)
 
 	httpServer := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
 
-	// kafka consumer
+	// kafkaa consumer
 	readerMessageProcessor := readerKafka.NewReaderMessageProcessor(cfg, uploadUseCase, l)
 	cg := kafkaClient.NewConsumerGroup(cfg.Kafka.Brokers, cfg.Kafka.GroupId, l)
 	go cg.ConsumeTopic(ctx, []string{cfg.Kafka.UploadTopicsName}, readerKafka.PoolSize, readerMessageProcessor.ProcessMessages)

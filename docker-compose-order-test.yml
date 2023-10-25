@@ -502,7 +502,7 @@ services:
       - "9001:9000"
     environment:
       KAFKA_BROKERCONNECT: "kafka:29092"
-      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+#      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
       CMD_ARGS: "--message.format=AVRO --schemaregistry.connect=http://schema-registry:8081"
     depends_on:
       - kafka
@@ -527,6 +527,22 @@ services:
     depends_on:
       - kafka
 
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.2.6
+    container_name: schema-registry
+    restart: unless-stopped
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    healthcheck:
+      test: "curl -f http://localhost:8081 || exit 1"
+    networks:
+      - net
   # kafka_manager:
   #   image: hlebalbau/kafka-manager:stable
   #   ports:
@@ -540,6 +556,7 @@ services:
   #     - zookeeper
   #     - kafka
   #     - kafka-connect
+
 
 
 volumes:

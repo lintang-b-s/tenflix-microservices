@@ -50,7 +50,7 @@ type (
 		UploadTopicsName string   `env-required:"true" yaml:"upload_topics_name"`
 		Brokers          []string `env-required:"true" yaml:"brokers"`
 		GroupId          string   `env-required:"true" yaml:"groupId"`
-		InitTopics       bool     `env-required:"true" yaml:"InitTopics"`
+		// InitTopics       bool     `env-required:"true" yaml:"InitTopics"`
 	}
 
 	Cloudinary struct {
@@ -63,6 +63,7 @@ func NewConfig() (*Config, error) {
 	cfg := &Config{}
 
 	err := cleanenv.ReadConfig("./config/config.yml", cfg)
+	err = cleanenv.ReadConfig("./.env", cfg)
 	if err != nil {
 		return nil, fmt.Errorf("config error: %w", err)
 	}

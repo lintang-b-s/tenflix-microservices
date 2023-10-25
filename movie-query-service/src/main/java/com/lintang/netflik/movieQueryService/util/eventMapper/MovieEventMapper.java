@@ -1,11 +1,14 @@
 package com.lintang.netflik.movieQueryService.util.eventMapper;
 
 
+import com.lintang.netflik.movieQueryService.broker.message.Actor;
+import com.lintang.netflik.movieQueryService.broker.message.Creator;
+import com.lintang.netflik.movieQueryService.broker.message.Video;
 import com.lintang.netflik.movieQueryService.entity.ActorEntity;
 import com.lintang.netflik.movieQueryService.entity.CreatorEntity;
 import com.lintang.netflik.movieQueryService.entity.MovieEntity;
 import com.lintang.netflik.movieQueryService.entity.VideoEntity;
-import com.lintang.netflik.movieQueryService.event.AddMovieEvent;
+import com.lintang.netflik.movieQueryService.broker.message.AddMovieEvent;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

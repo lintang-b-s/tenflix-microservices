@@ -1,5 +1,8 @@
 package com.lintang.netflik.movieQueryService.dto;
 
+import com.lintang.netflik.movieQueryService.broker.message.Actor;
+import com.lintang.netflik.movieQueryService.broker.message.Creator;
+import com.lintang.netflik.movieQueryService.broker.message.Video;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 

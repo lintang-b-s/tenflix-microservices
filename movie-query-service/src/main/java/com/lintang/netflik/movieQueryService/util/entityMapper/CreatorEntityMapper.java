@@ -1,5 +1,6 @@
 package com.lintang.netflik.movieQueryService.util.entityMapper;
 
+import com.lintang.netflik.movieQueryService.broker.message.Creator;
 import com.lintang.netflik.movieQueryService.dto.AddCreatorReq;
 import com.lintang.netflik.movieQueryService.entity.CreatorEntity;
 import org.springframework.stereotype.Component;
