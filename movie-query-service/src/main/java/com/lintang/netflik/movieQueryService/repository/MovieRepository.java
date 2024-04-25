@@ -17,5 +17,4 @@ public interface MovieRepository extends MongoRepository<MovieEntity, Integer> {
 
 
 
-
 }

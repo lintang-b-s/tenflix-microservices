@@ -9,11 +9,10 @@ networks:
       - subnet: 172.1.1.0/24
 
 services:
-
-
-
   ngrok:
     image: ngrok/ngrok:latest
+    mem_limit: "200mb"
+    cpus: 0.2
     volumes:
      - ./ngrok.yml:/etc/ngrok.yml
     ports:
@@ -27,6 +26,8 @@ services:
   payment-service:
     container_name: payment-service
     build: ./payment-service
+    mem_limit: "400mb"
+    cpus: 0.5
     ports:
       - 8800:8800
       - 5006:5006 # debug port
@@ -41,7 +42,6 @@ services:
       - SPRING_CLOUD_CONSUL_SERVICENAME=paymentService
       - SPRING_CLOUD_CONSUL_ENABLED=true
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 # remote debugging
-
       # - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 # remote debugging
     networks:
       net:
@@ -54,6 +54,8 @@ services:
   order-service:
     container_name: order-service
     build: ./order-service
+    mem_limit: "500mb"
+    cpus: 0.5
     ports:
       - 9600:9600
       - 5007:5007
@@ -83,6 +85,8 @@ services:
 #      - "seccomp:unconfined"
 #    cap_add:
 #      - SYS_PTRACE
+    mem_limit: "300mb"
+    cpus: 0.2
     ports:
       - "9900:9900"
 #      - "40000:40000"
@@ -99,6 +103,347 @@ services:
       net:
         ipv4_address: 172.1.1.19
 
+  subscription-service:
+    container_name: subscription-service
+    build: ./subscription-service
+    mem_limit: "500mb"
+    cpus: 0.5
+    ports:
+      - 9100:9100
+      - 5008:5008
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_CONSUL_HOST=172.1.1.17
+      - SPRING_CLOUD_CONSUL_PORT=8500
+      - SPRING_CLOUD_CONSUL_INSTANCEID=subscription-service:999
+      - SPRING_CLOUD_CONSUL_SERVICENAME=subscriptionService
+      - SPRING_CLOUD_CONSUL_ENABLED=true
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008 #remote debugging
+
+    networks:
+      net:
+        ipv4_address: 172.1.1.12
+    depends_on:
+      - postgres-subscription
+    platform: linux/arm64/v8
+
+  kong-database:
+    container_name: kong-database
+    image: postgres:11-alpine
+    restart: unless-stopped
+    mem_limit: "300mb"
+    cpus: 0.5
+    environment:
+      POSTGRES_USER: kong
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "kong"]
+      interval: 30s
+      timeout: 3s
+      retries: 5
+    networks:
+      net:
+        ipv4_address: 172.1.1.16
+    depends_on:
+      - consul-tenflix
+
+  kong-migration:
+    container_name: kong-migration
+    image: kong:3.0.1-alpine
+    command: "kong migrations bootstrap"
+    restart: on-failure
+    mem_limit: "400mb"
+    cpus: 0.3
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: kong-database
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: password
+    networks:
+      - net
+    links:
+      - kong-database
+    depends_on:
+      - kong-database
+
+  kong:
+    container_name: kong
+    image: kong:3.0.1-alpine
+    restart: unless-stopped
+    mem_limit: "600mb"
+    cpus: 0.5
+    environment:
+      KONG_DATABASE: postgres
+      KONG_PG_HOST: 172.1.1.16
+      KONG_PG_USER: kong
+      KONG_PG_PASSWORD: password
+      KONG_ADMIN_LISTEN: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+      KONG_DB_UPDATE_FREQUENCY: 1m
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_DNS_RESOLVER: 172.1.1.17:8600
+    networks:
+      net:
+        ipv4_address: 172.1.1.40
+    depends_on:
+      - kong-migration
+      - consul-tenflix
+    ports:
+      - "8001:8001"
+      - "8444:8444"
+      - "8000:8000"
+      - "8443:8443"
+
+  #consul service discovery
+  consul-tenflix:
+    image: consul:1.15.4
+    container_name: consul-tenflix
+    restart: always
+    mem_limit: "300mb"
+    cpus: 0.5
+    ports:
+      - 8300:8300
+      - 8301:8301
+      - 8301:8301/udp
+      - 8302:8302
+      - 8400:8400
+      - 8500:8500
+      - 8600:8600
+      - 8600:8600/udp
+    networks:
+      net:
+        ipv4_address: 172.1.1.17 #
+
+
+
+  postgres-subscription:
+    container_name: postgres-subscription
+    image: debezium/postgres:15-alpine
+    mem_limit: "500mb"
+    cpus: 0.5
+    ports:
+      - 5430:5432
+    networks:
+      - net
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    volumes:
+      - postgres-subscription:/var/lib/postgresql/data
+      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
+#      - "./postgres/docker-entrypoint-initdb.d/init.sql:/docker-entrypoint-initdb.d/init.sql"
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
+  postgres-order:
+    container_name: postgres-order
+    image: debezium/postgres:15-alpine
+    mem_limit: "300mb"
+    cpus: 0.5
+    ports:
+      - 5434:5432
+    networks:
+      - net
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    volumes:
+      - postgres-order:/var/lib/postgresql/data
+      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
+#      - "./postgres/docker-entrypoint-initdb.d/init.sql:/docker-entrypoint-initdb.d/init.sql"
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
+  postgres-payment:
+    container_name: postgres-payment
+    image: debezium/postgres:15-alpine
+    mem_limit: "300mb"
+    cpus: 0.5
+    ports:
+      - 5435:5432
+    networks:
+      - net
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    volumes:
+      - postgres-payment:/var/lib/postgresql/data
+      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
+#      - "./postgres/docker-entrypoint-initdb.d/init.sql:/docker-entrypoint-initdb.d/init.sql"
+    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
+  keycloak-mysql:
+    container_name: keycloak-mysql
+    image: mysql:latest
+    mem_limit: "700mb"
+    cpus: 0.5
+    ports:
+      - 3305:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: keycloak
+      MYSQL_USER: keycloak
+      MYSQL_PASSWORD: password
+    networks:
+      - net
+    platform: linux/arm64/v8
+
+  keycloak-tenflix:
+    container_name: keycloak-tenflix
+    image: quay.io/keycloak/keycloak:21.1.2
+    command: [ "start-dev", "--import-realm" ]
+    mem_limit: "700mb"
+    cpus: 0.5
+    environment:
+      DB_VENDOR: MYSQL
+      DB_ADDR: mysql
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KEYCLOAK_IMPORT: /opt/keycloak/data/import/all-realm.json:ro
+      JAVA_OPTS_APPEND: -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
+      # JAVA_OPTS_APPEND: "-Dkeycloak.profile.feature.upload_scripts=enabled"
+    networks:
+      - net
+    ports:
+      - 8080:8080
+    volumes:
+      - ./realms/tenflix-realm.json:/opt/keycloak/data/import/tenflix-realm.json:ro
+      - ./realms/master-realm.json:/opt/keycloak/bin/master-realm.json
+    depends_on:
+      - keycloak-mysql
+
+
+  pg-admin:
+    image: dpage/pgadmin4
+    mem_limit: "300mb"
+    cpus: 0.5
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@email.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+      - PGADMIN_LISTEN_PORT=5050
+    ports:
+      - 5050:5050
+    networks:
+      - net
+    depends_on:
+      - postgres-order
+      - postgres-subscription
+      - postgres-payment
+
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.2.6
+    container_name: zookeeper
+    restart: unless-stopped
+    mem_limit: "700mb"
+    cpus: 0.6
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    healthcheck:
+      test: "echo stat | nc localhost $$ZOOKEEPER_CLIENT_PORT"
+    networks:
+      - net
+
+#
+  kafka:
+    image: confluentinc/cp-kafka:7.2.6
+    container_name: kafka
+    restart: unless-stopped
+    mem_limit: "1024mb"
+    cpus: 0.7
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_CFG_LISTENERS: PLAINTEXT://:29092,PLAINTEXT_HOST://:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "9092" ]
+    networks:
+      - net
+
+#
+
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: kafdrop
+    restart: "no"
+    mem_limit: "300mb"
+    cpus: 0.3
+    ports:
+      - "9001:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:29092"
+#      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+      CMD_ARGS: "--message.format=AVRO --schemaregistry.connect=http://schema-registry:8081"
+    depends_on:
+      - kafka
+    networks:
+      - net
+
+
+
+# versi debezium
+  kafka-connect:
+    image: debezium/connect:latest
+    container_name: kafka-connect
+    mem_limit: "800mb"
+    cpus: 0.6
+    ports:
+      - 8083:8083
+    environment:
+      BOOTSTRAP_SERVERS: kafka:29092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: connect_configs
+      OFFSET_STORAGE_TOPIC: connect_offsets
+    networks:
+      - net
+    depends_on:
+      - kafka
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.2.6
+    container_name: schema-registry
+    restart: unless-stopped
+    mem_limit: "400mb"
+    cpus: 0.5
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    healthcheck:
+      test: "curl -f http://localhost:8081 || exit 1"
+    networks:
+      - net
+
+
+
+volumes:
+  postgres-order: {}
+  postgres-payment: {}
+  postgres-subscription: {}
+  kafka-rest-proxy:
 
     # versi java
 #  order-aggregator-service:
@@ -125,253 +470,7 @@ services:
 #        ipv4_address: 172.1.1.15
 #    platform: linux/arm64/v8
 
-  subscription-service:
-    container_name: subscription-service
-    build: ./subscription-service
-    ports:
-      - 9100:9100
-      - 5008:5008
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CLOUD_CONSUL_HOST=172.1.1.17
-      - SPRING_CLOUD_CONSUL_PORT=8500
-      - SPRING_CLOUD_CONSUL_INSTANCEID=subscription-service:999
-      - SPRING_CLOUD_CONSUL_SERVICENAME=subscriptionService
-      - SPRING_CLOUD_CONSUL_ENABLED=true
-      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008 #remote debugging
 
-    networks:
-      net:
-        ipv4_address: 172.1.1.12
-    depends_on:
-      - postgres-subscription
-    platform: linux/arm64/v8
-
-  kong-database:
-    container_name: kong-database
-    image: postgres:11-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: kong
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "kong"]
-      interval: 30s
-      timeout: 3s
-      retries: 5
-    networks:
-      net:
-        ipv4_address: 172.1.1.16
-    depends_on:
-      - consul-tenflix
-
-  kong-migration:
-    container_name: kong-migration
-    image: kong:latest
-    command: "kong migrations bootstrap"
-    restart: on-failure
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: password
-    networks:
-      - net
-    links:
-      - kong-database
-    depends_on:
-      - kong-database
-
-  kong:
-    container_name: kong
-    image: kong:latest
-    restart: unless-stopped
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: 172.1.1.16
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: password
-      KONG_ADMIN_LISTEN: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
-      KONG_DB_UPDATE_FREQUENCY: 1m
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_DNS_RESOLVER: 172.1.1.17:8600
-    networks:
-      net:
-        ipv4_address: 172.1.1.40
-    depends_on:
-      - kong-migration
-      - consul-tenflix
-    ports:
-      - "8001:8001"
-      - "8444:8444"
-      - "8000:8000"
-      - "8443:8443"
-
-
-
-
-
-
-
-  #consul service discovery
-  consul-tenflix:
-    image: consul:1.15.4
-    container_name: consul-tenflix
-    restart: always
-    ports:
-      - 8300:8300
-      - 8301:8301
-      - 8301:8301/udp
-      - 8302:8302
-      - 8400:8400
-      - 8500:8500
-      - 8600:8600
-      - 8600:8600/udp
-    networks:
-      net:
-        ipv4_address: 172.1.1.17 #
-
-
-
-  postgres-subscription:
-    container_name: postgres-subscription
-    image: debezium/postgres:15-alpine
-    ports:
-      - 5430:5432
-    networks:
-      - net
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-    volumes:
-      - postgres-subscription:/var/lib/postgresql/data
-      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
-#      - "./postgres/docker-entrypoint-initdb.d/init.sql:/docker-entrypoint-initdb.d/init.sql"
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
-
-  postgres-order:
-    container_name: postgres-order
-    image: debezium/postgres:15-alpine
-    ports:
-      - 5434:5432
-    networks:
-      - net
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-    volumes:
-      - postgres-order:/var/lib/postgresql/data
-      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
-#      - "./postgres/docker-entrypoint-initdb.d/init.sql:/docker-entrypoint-initdb.d/init.sql"
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
-
-  postgres-payment:
-    container_name: postgres-payment
-    image: debezium/postgres:15-alpine
-    ports:
-      - 5435:5432
-    networks:
-      - net
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-    volumes:
-      - postgres-payment:/var/lib/postgresql/data
-      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
-#      - "./postgres/docker-entrypoint-initdb.d/init.sql:/docker-entrypoint-initdb.d/init.sql"
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
-
-  keycloak-mysql:
-    container_name: keycloak-mysql
-    image: mysql:latest
-    ports:
-      - 3305:3306
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: keycloak
-      MYSQL_USER: keycloak
-      MYSQL_PASSWORD: password
-    networks:
-      - net
-    platform: linux/arm64/v8
-
-  keycloak-tenflix:
-    container_name: keycloak-tenflix
-    image: quay.io/keycloak/keycloak:21.1.2
-    command: [ "start-dev", "--import-realm" ]
-    environment:
-      DB_VENDOR: MYSQL
-      DB_ADDR: mysql
-      DB_DATABASE: keycloak
-      DB_USER: keycloak
-      DB_PASSWORD: password
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME_STRICT_HTTPS: false
-      KEYCLOAK_IMPORT: /opt/keycloak/data/import/all-realm.json:ro
-      JAVA_OPTS_APPEND: -Dkeycloak.migration.strategy=OVERWRITE_EXISTING
-      # JAVA_OPTS_APPEND: "-Dkeycloak.profile.feature.upload_scripts=enabled"
-    networks:
-      - net
-    ports:
-      - 8080:8080
-    volumes:
-      - ./realms/tenflix-realm.json:/opt/keycloak/data/import/tenflix-realm.json:ro
-      - ./realms/master-realm.json:/opt/keycloak/bin/master-realm.json
-    depends_on:
-      - keycloak-mysql
-
-
-  pg-admin:
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@email.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
-      - PGADMIN_LISTEN_PORT=5050
-    ports:
-      - 5050:5050
-    networks:
-      - net
-    depends_on:
-      - postgres-order
-      - postgres-subscription
-      - postgres-payment
-
-
-#  zookeeper:
-#    image: docker.io/bitnami/zookeeper:3.7
-#    container_name: zookeeper
-#    networks:
-#      - net
-#    ports:
-#      - "2181:2181"
-#    volumes:
-#      - "./data/zookeeper_data:/bitnami"
-#    environment:
-#      ALLOW_ANONYMOUS_LOGIN: yes
-#      ZOOKEEPER_CLIENT_PORT: 2181
-#      ZOOKEEPER_TICK_TIME: 2000
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.2.6
-    container_name: zookeeper
-    restart: unless-stopped
-    ports:
-      - "2181:2181"
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-    healthcheck:
-      test: "echo stat | nc localhost $$ZOOKEEPER_CLIENT_PORT"
-    networks:
-      - net
 
 # versi lama
 #  kafka:
@@ -398,28 +497,7 @@ services:
 #      ALLOW_PLAINTEXT_LISTENER: "yes"
 #    depends_on:
 #      - zookeeper
-#
-  kafka:
-    image: confluentinc/cp-kafka:7.2.6
-    container_name: kafka
-    restart: unless-stopped
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-      - "29092:29092"
-    environment:
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_CFG_LISTENERS: PLAINTEXT://:29092,PLAINTEXT_HOST://:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-    healthcheck:
-      test: [ "CMD", "nc", "-z", "localhost", "9092" ]
-    networks:
-      - net
 
-#  kafka-rest-proxy:
 #    image: confluentinc/cp-kafka-rest:7.2.6
 #    container_name: kafka-rest-proxy
 #    restart: unless-stopped
@@ -494,55 +572,6 @@ services:
 #      - net
 
 
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    container_name: kafdrop
-    restart: "no"
-    ports:
-      - "9001:9000"
-    environment:
-      KAFKA_BROKERCONNECT: "kafka:29092"
-#      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
-      CMD_ARGS: "--message.format=AVRO --schemaregistry.connect=http://schema-registry:8081"
-    depends_on:
-      - kafka
-    networks:
-      - net
-
-
-
-# versi debezium
-  kafka-connect:
-    image: debezium/connect:latest
-    container_name: kafka-connect
-    ports:
-      - 8083:8083
-    environment:
-      BOOTSTRAP_SERVERS: kafka:29092
-      GROUP_ID: 1
-      CONFIG_STORAGE_TOPIC: connect_configs
-      OFFSET_STORAGE_TOPIC: connect_offsets
-    networks:
-      - net
-    depends_on:
-      - kafka
-
-  schema-registry:
-    image: confluentinc/cp-schema-registry:7.2.6
-    container_name: schema-registry
-    restart: unless-stopped
-    depends_on:
-      - kafka
-    ports:
-      - "8081:8081"
-    environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
-    healthcheck:
-      test: "curl -f http://localhost:8081 || exit 1"
-    networks:
-      - net
   # kafka_manager:
   #   image: hlebalbau/kafka-manager:stable
   #   ports:
@@ -557,9 +586,16 @@ services:
   #     - kafka
   #     - kafka-connect
 
-
-
-volumes:
-  postgres-order: {}
-  postgres-payment: {}
-  postgres-subscription: {}
+#  zookeeper:
+#    image: docker.io/bitnami/zookeeper:3.7
+#    container_name: zookeeper
+#    networks:
+#      - net
+#    ports:
+#      - "2181:2181"
+#    volumes:
+#      - "./data/zookeeper_data:/bitnami"
+#    environment:
+#      ALLOW_ANONYMOUS_LOGIN: yes
+#      ZOOKEEPER_CLIENT_PORT: 2181
+#      ZOOKEEPER_TICK_TIME: 2000

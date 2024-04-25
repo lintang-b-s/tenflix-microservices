@@ -9,11 +9,10 @@ networks:
       - subnet: 172.1.1.0/24
 
 services:
-
-
-
   ngrok:
     image: ngrok/ngrok:latest
+    mem_limit: "200mb"
+    cpus: 0.2
     volumes:
      - ./ngrok.yml:/etc/ngrok.yml
     ports:
@@ -27,6 +26,8 @@ services:
   payment-service:
     container_name: payment-service
     build: ./payment-service
+    mem_limit: "400mb"
+    cpus: 0.5
     ports:
       - 8800:8800
       - 5006:5006 # debug port
@@ -41,7 +42,6 @@ services:
       - SPRING_CLOUD_CONSUL_SERVICENAME=paymentService
       - SPRING_CLOUD_CONSUL_ENABLED=true
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 # remote debugging
-
       # - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 # remote debugging
     networks:
       net:
@@ -54,6 +54,8 @@ services:
   order-service:
     container_name: order-service
     build: ./order-service
+    mem_limit: "500mb"
+    cpus: 0.5
     ports:
       - 9600:9600
       - 5007:5007
@@ -83,6 +85,8 @@ services:
 #      - "seccomp:unconfined"
 #    cap_add:
 #      - SYS_PTRACE
+    mem_limit: "300mb"
+    cpus: 0.2
     ports:
       - "9900:9900"
 #      - "40000:40000"
@@ -100,34 +104,11 @@ services:
         ipv4_address: 172.1.1.19
 
 
-    # versi java
-#  order-aggregator-service:
-#    container_name: order-aggregator-service
-#    build: ./order-aggregator-service
-#    ports:
-#      - 9900:9900
-#      - 5009:5009
-#    depends_on:
-#      - keycloak-tenflix
-#      - payment-service
-#      - order-service
-#      - subscription-service
-#      - consul-tenflix
-#    environment:
-#      - SPRING_PROFILES_ACTIVE=docker
-#      - SPRING_CLOUD_CONSUL_HOST=172.1.1.17
-#      - SPRING_CLOUD_CONSUL_PORT=8500
-#      - SPRING_CLOUD_CONSUL_INSTANCEID=order-aggregator-service:999
-#      - SPRING_CLOUD_CONSUL_ENABLED=true
-#      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5009 # remote debugging
-#    networks:
-#      net:
-#        ipv4_address: 172.1.1.15
-#    platform: linux/arm64/v8
-
   subscription-service:
     container_name: subscription-service
     build: ./subscription-service
+    mem_limit: "500mb"
+    cpus: 0.5
     ports:
       - 9100:9100
       - 5008:5008
@@ -139,7 +120,6 @@ services:
       - SPRING_CLOUD_CONSUL_SERVICENAME=subscriptionService
       - SPRING_CLOUD_CONSUL_ENABLED=true
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008 #remote debugging
-
     networks:
       net:
         ipv4_address: 172.1.1.12
@@ -151,6 +131,8 @@ services:
     container_name: kong-database
     image: postgres:11-alpine
     restart: unless-stopped
+    mem_limit: "300mb"
+    cpus: 0.5
     environment:
       POSTGRES_USER: kong
       POSTGRES_PASSWORD: password
@@ -169,9 +151,11 @@ services:
 
   kong-migration:
     container_name: kong-migration
-    image: kong:latest
+    image: kong:3.0.1-alpine
     command: "kong migrations bootstrap"
     restart: on-failure
+    mem_limit: "400mb"
+    cpus: 0.3
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: kong-database
@@ -186,8 +170,10 @@ services:
 
   kong:
     container_name: kong
-    image: kong:latest
+    image: kong:3.0.1-alpine
     restart: unless-stopped
+    mem_limit: "600mb"
+    cpus: 0.5
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: 172.1.1.16
@@ -212,17 +198,13 @@ services:
       - "8000:8000"
       - "8443:8443"
 
-
-
-
-
-
-
   #consul service discovery
   consul-tenflix:
     image: consul:1.15.4
     container_name: consul-tenflix
     restart: always
+    mem_limit: "300mb"
+    cpus: 0.5
     ports:
       - 8300:8300
       - 8301:8301
@@ -236,11 +218,11 @@ services:
       net:
         ipv4_address: 172.1.1.17 #
 
-
-
   postgres-subscription:
     container_name: postgres-subscription
     image: debezium/postgres:15-alpine
+    mem_limit: "500mb"
+    cpus: 0.5
     ports:
       - 5430:5432
     networks:
@@ -258,6 +240,8 @@ services:
   postgres-order:
     container_name: postgres-order
     image: debezium/postgres:15-alpine
+    mem_limit: "300mb"
+    cpus: 0.5
     ports:
       - 5434:5432
     networks:
@@ -275,6 +259,8 @@ services:
   postgres-payment:
     container_name: postgres-payment
     image: debezium/postgres:15-alpine
+    mem_limit: "300mb"
+    cpus: 0.5
     ports:
       - 5435:5432
     networks:
@@ -292,6 +278,8 @@ services:
   keycloak-mysql:
     container_name: keycloak-mysql
     image: mysql:latest
+    mem_limit: "700mb"
+    cpus: 0.5
     ports:
       - 3305:3306
     environment:
@@ -307,6 +295,8 @@ services:
     container_name: keycloak-tenflix
     image: quay.io/keycloak/keycloak:21.1.2
     command: [ "start-dev", "--import-realm" ]
+    mem_limit: "700mb"
+    cpus: 0.5
     environment:
       DB_VENDOR: MYSQL
       DB_ADDR: mysql
@@ -339,6 +329,8 @@ services:
       - PGADMIN_LISTEN_PORT=5050
     ports:
       - 5050:5050
+    mem_limit: "300mb"
+    cpus: 0.5
     networks:
       - net
     depends_on:
@@ -347,24 +339,13 @@ services:
       - postgres-payment
 
 
-#  zookeeper:
-#    image: docker.io/bitnami/zookeeper:3.7
-#    container_name: zookeeper
-#    networks:
-#      - net
-#    ports:
-#      - "2181:2181"
-#    volumes:
-#      - "./data/zookeeper_data:/bitnami"
-#    environment:
-#      ALLOW_ANONYMOUS_LOGIN: yes
-#      ZOOKEEPER_CLIENT_PORT: 2181
-#      ZOOKEEPER_TICK_TIME: 2000
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.2.6
     container_name: zookeeper
     restart: unless-stopped
+    mem_limit: "700mb"
+    cpus: 0.6
     ports:
       - "2181:2181"
     environment:
@@ -374,36 +355,12 @@ services:
     networks:
       - net
 
-# versi lama
-#  kafka:
-#    image: docker.io/bitnami/kafka:3
-##    image: debezium/kafka:latest
-#    container_name: kafka
-#    restart: unless-stopped
-#    networks:
-#      - net
-#    ports:
-#      - "9092:9092"
-#    environment:
-#      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-#      KAFKA_CFG_LISTENERS: PLAINTEXT://:29092,PLAINTEXT_HOST://:9092
-#      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
-##      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: DOCKER_INTERNAL
-#      KAFKA_CFG_ZOOKEEPER_CONNECT: "zookeeper:2181"
-#      KAFKA_CFG_BROKER_ID: 1
-#      KAFKA_CFG_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-#      KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-#      KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR: 1
-#      KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR:
-#      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
-#      ALLOW_PLAINTEXT_LISTENER: "yes"
-#    depends_on:
-#      - zookeeper
-#
   kafka:
     image: confluentinc/cp-kafka:7.2.6
     container_name: kafka
     restart: unless-stopped
+    mem_limit: "1024mb"
+    cpus: 0.7
     depends_on:
       - zookeeper
     ports:
@@ -420,6 +377,188 @@ services:
       test: [ "CMD", "nc", "-z", "localhost", "9092" ]
     networks:
       - net
+
+# versi debezium
+  kafka-connect:
+    image: debezium/connect:latest
+    container_name: kafka-connect
+    mem_limit: "800mb"
+    cpus: 0.6
+    ports:
+      - 8083:8083
+    environment:
+      BOOTSTRAP_SERVERS: kafka:29092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: connect_configs
+      OFFSET_STORAGE_TOPIC: connect_offsets
+    networks:
+      - net
+    depends_on:
+      - kafka
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.2.6
+    container_name: schema-registry
+    mem_limit: "300mb"
+    cpus: 0.5
+    restart: unless-stopped
+    depends_on:
+      - kafka
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+    healthcheck:
+      test: "curl -f http://localhost:8081 || exit 1"
+    networks:
+      - net
+
+#  Movies
+  movie-service:
+    container_name: movie-service
+    build: ./movie-service
+    mem_limit: "300mb"
+    cpus: 0.4
+    environment:
+      - CLOUDINARY_URL=${CLOUDINARY_URL}
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5009 # remote debugging
+    networks:
+      # - net
+     net:
+       ipv4_address: 172.1.1.32
+    ports:
+      - 8200:8200
+      - 5009:5009
+    depends_on:
+      - postgres-movie
+      - consul-tenflix
+      - kong
+      - keycloak-tenflix
+      - kafka
+
+  movie-query-service:
+    container_name: movie-query-service
+    build: ./movie-query-service
+    mem_limit: "300mb"
+    cpus: 0.4
+    ports:
+      - 8100:8100
+    depends_on:
+      - mongo-movie-query
+      - kong
+      - consul-tenflix
+      - keycloak-tenflix
+      - kafka
+    networks:
+      # - net
+      net:
+       ipv4_address: 172.1.1.33
+
+  media-service:
+    container_name: media-service
+    mem_limit: "300mb"
+    cpus: 0.2
+    build: 
+      context: ./media-service
+      dockerfile: Dockerfile
+    environment:
+      - CLOUDINARY_URL=${CLOUDINARY_URL}
+    ports:
+      - 8082:8082
+      - 4002:4002
+    networks:
+      # - net
+      net:
+          ipv4_address: 172.1.1.34
+    # depends_on:
+    #   - kafka
+    #   - movie-service
+    #   - consul-tenflix
+    #   - kong
+  
+
+  postgres-movie:
+    container_name: postgres-movie
+    image: debezium/postgres:15-alpine
+    mem_limit: "300mb"
+    cpus: 0.5
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+    ports:
+      - 5431:5432
+    volumes:
+      - postgres-movie:/var/lib/postgresql/data
+    networks:
+      - net
+
+  mongo-movie-query:
+    container_name: mongo-movie-query
+    image: mongo:4.4.14-rc0-focal
+    mem_limit: "300mb"
+    cpus: 0.5
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    expose:
+      - "27017"
+    networks:
+      # - net
+      net:
+          ipv4_address: 172.1.1.35
+
+
+volumes:
+  postgres-order: {}
+  postgres-payment: {}
+  postgres-subscription: {}
+  postgres-movie: {}
+
+
+
+    # versi java
+#  order-aggregator-service:
+#    container_name: order-aggregator-service
+#    build: ./order-aggregator-service
+#    ports:
+#      - 9900:9900
+#      - 5009:5009
+#    depends_on:
+#      - keycloak-tenflix
+#      - payment-service
+#      - order-service
+#      - subscription-service
+#      - consul-tenflix
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - SPRING_CLOUD_CONSUL_HOST=172.1.1.17
+#      - SPRING_CLOUD_CONSUL_PORT=8500
+#      - SPRING_CLOUD_CONSUL_INSTANCEID=order-aggregator-service:999
+#      - SPRING_CLOUD_CONSUL_ENABLED=true
+#      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5009 # remote debugging
+#    networks:
+#      net:
+#        ipv4_address: 172.1.1.15
+#    platform: linux/arm64/v8
+
+  # kafka_manager:
+  #   image: hlebalbau/kafka-manager:stable
+  #   ports:
+  #     - "9500:9000"
+  #   environment:
+  #     ZK_HOSTS: "localhost:2181"
+  #     APPLICATION_SECRET: "random-secret"
+  #   networks:
+  #     - net
+  #   depends_on:
+  #     - zookeeper
+  #     - kafka
+  #     - kafka-connect
+
 
 #  kafka-rest-proxy:
 #    image: confluentinc/cp-kafka-rest:7.2.6
@@ -496,159 +635,62 @@ services:
 #      - net
 
 
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    container_name: kafdrop
-    restart: "no"
-    ports:
-      - "9001:9000"
-    environment:
-      KAFKA_BROKERCONNECT: "kafka:29092"
-#      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
-      CMD_ARGS: "--message.format=AVRO --schemaregistry.connect=http://schema-registry:8081"
-    depends_on:
-      - kafka
-    networks:
-      - net
+#   kafdrop:
+#     image: obsidiandynamics/kafdrop
+#     container_name: kafdrop
+#     restart: "no"
+#     mem_limit: "300mb"
+#     cpus: 0.5
+#     ports:
+#       - "9001:9000"
+#     environment:
+#       KAFKA_BROKERCONNECT: "kafka:29092"
+# #      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+#       CMD_ARGS: "--message.format=AVRO --schemaregistry.connect=http://schema-registry:8081"
+#     depends_on:
+#       - kafka
+#     networks:
+#       - net
 
 
 
-# versi debezium
-  kafka-connect:
-    image: debezium/connect:latest
-    container_name: kafka-connect
-    ports:
-      - 8083:8083
-    environment:
-      BOOTSTRAP_SERVERS: kafka:29092
-      GROUP_ID: 1
-      CONFIG_STORAGE_TOPIC: connect_configs
-      OFFSET_STORAGE_TOPIC: connect_offsets
-    networks:
-      - net
-    depends_on:
-      - kafka
+# versi lama
+#  kafka:
+#    image: docker.io/bitnami/kafka:3
+##    image: debezium/kafka:latest
+#    container_name: kafka
+#    restart: unless-stopped
+#    networks:
+#      - net
+#    ports:
+#      - "9092:9092"
+#    environment:
+#      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+#      KAFKA_CFG_LISTENERS: PLAINTEXT://:29092,PLAINTEXT_HOST://:9092
+#      KAFKA_CFG_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+##      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: DOCKER_INTERNAL
+#      KAFKA_CFG_ZOOKEEPER_CONNECT: "zookeeper:2181"
+#      KAFKA_CFG_BROKER_ID: 1
+#      KAFKA_CFG_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+#      KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+#      KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR: 1
+#      KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR:
+#      KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE: "true"
+#      ALLOW_PLAINTEXT_LISTENER: "yes"
+#    depends_on:
+#      - zookeeper
+#
 
-  schema-registry:
-    image: confluentinc/cp-schema-registry:7.2.6
-    container_name: schema-registry
-    restart: unless-stopped
-    depends_on:
-      - kafka
-    ports:
-      - "8081:8081"
-    environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:29092
-      SCHEMA_REGISTRY_HOST_NAME: schema-registry
-      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
-    healthcheck:
-      test: "curl -f http://localhost:8081 || exit 1"
-    networks:
-      - net
-  # kafka_manager:
-  #   image: hlebalbau/kafka-manager:stable
-  #   ports:
-  #     - "9500:9000"
-  #   environment:
-  #     ZK_HOSTS: "localhost:2181"
-  #     APPLICATION_SECRET: "random-secret"
-  #   networks:
-  #     - net
-  #   depends_on:
-  #     - zookeeper
-  #     - kafka
-  #     - kafka-connect
-
-
-#  Movies
-  movie-service:
-    container_name: movie-service
-    build: ./movie-service
-    environment:
-      - CLOUDINARY_URL=${CLOUDINARY_URL}
-      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5009 # remote debugging
-    networks:
-      # - net
-     net:
-       ipv4_address: 172.1.1.32
-    ports:
-      - 8200:8200
-      - 5009:5009
-    depends_on:
-      - postgres-movie
-      - consul-tenflix
-      - kong
-      - keycloak-tenflix
-      - kafka
-
-  movie-query-service:
-    container_name: movie-query-service
-    build: ./movie-query-service
-    ports:
-      - 8100:8100
-    depends_on:
-      - mongo-movie-query
-      - kong
-      - consul-tenflix
-      - keycloak-tenflix
-      - kafka
-    networks:
-      # - net
-      net:
-       ipv4_address: 172.1.1.33
-
-  media-service:
-    container_name: media-service
-    build: 
-      context: ./media-service
-      dockerfile: Dockerfile
-    
-    environment:
-      - CLOUDINARY_URL=${CLOUDINARY_URL}
-    ports:
-      - 8082:8082
-      - 4002:4002
-    networks:
-      # - net
-      net:
-          ipv4_address: 172.1.1.34
-    depends_on:
-      - kafka
-      - movie-service
-      - consul-tenflix
-      - kong
-
-  postgres-movie:
-    container_name: postgres-movie
-    image: debezium/postgres:15-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: postgres
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-    ports:
-      - 5431:5432
-    volumes:
-      - postgres-movie:/var/lib/postgresql/data
-    networks:
-      - net
-
-  mongo-movie-query:
-    container_name: mongo-movie-query
-    image: mongo:4.4.14-rc0-focal
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    expose:
-      - "27017"
-    networks:
-      # - net
-      net:
-          ipv4_address: 172.1.1.35
-
-
-volumes:
-  postgres-order: {}
-  postgres-payment: {}
-  postgres-subscription: {}
-  postgres-movie: {}
+#  zookeeper:
+#    image: docker.io/bitnami/zookeeper:3.7
+#    container_name: zookeeper
+#    networks:
+#      - net
+#    ports:
+#      - "2181:2181"
+#    volumes:
+#      - "./data/zookeeper_data:/bitnami"
+#    environment:
+#      ALLOW_ANONYMOUS_LOGIN: yes
+#      ZOOKEEPER_CLIENT_PORT: 2181
+#      ZOOKEEPER_TICK_TIME: 2000
