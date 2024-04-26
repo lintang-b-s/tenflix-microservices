@@ -34,10 +34,11 @@ func (uc *UploadUseCase) UploadVideo(ctx context.Context, u entity.UploadVideoMe
 		return fmt.Errorf("UploadUseCase - uploadVideo - o.json.Marshal: %w", err)
 	}
 
-	return uc.kafkaProducer.PublishMessage(ctx, kafka.Message{
+	err =  uc.kafkaProducer.PublishMessage(ctx, kafka.Message{
 		Topic: "t.upload.response",
 		Value: dtoBytes,
 		Time:  time.Now().UTC(),
-	})
-
+	}) 
+	fmt.Println("send uploaded video url to movie-service!!!!")
+	return err 
 }

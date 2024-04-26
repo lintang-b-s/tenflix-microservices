@@ -49,15 +49,9 @@ public class KafkaConfig {
 
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        
 
         return new DefaultKafkaProducerFactory<>(properties);
-    }
-
-    private ConsumerFactory<Object, Object> consumerFactoryWithJsonDeserializer(){
-        var properties = kafkaProperties.buildConsumerProperties();
-        
-        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        return new DefaultKafkaConsumerFactory<>(properties);
     }
 
     @Bean
@@ -65,14 +59,26 @@ public class KafkaConfig {
         return new KafkaTemplate<>(producerFactoryWithJsonDeserializer());
     }
 
+    private ConsumerFactory<Object, Object> consumerFactoryWithStringDeserializer() {
+        var properties = kafkaProperties.buildConsumerProperties();
+        properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
+
+        properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+
+        return new DefaultKafkaConsumerFactory<>(properties);
+    }
 
     @Bean(value = "stringDeserializerContainerFactory")
     public ConcurrentKafkaListenerContainerFactory<Object, Object> kafkaListenerContainerFactory() {
         var factory = new ConcurrentKafkaListenerContainerFactory<Object, Object>();
-        factory.setConsumerFactory(consumerFactoryWithJsonDeserializer());
+        factory.setConsumerFactory(consumerFactoryWithStringDeserializer());
         factory.getContainerProperties().setAckMode(AckMode.RECORD);
         factory.setCommonErrorHandler(new DefaultErrorHandler(new FixedBackOff(3000, 4)));
         return factory;
     }
 
+   
+
+
+    
 }

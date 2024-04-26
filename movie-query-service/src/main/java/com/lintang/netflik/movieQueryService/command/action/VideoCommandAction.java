@@ -4,6 +4,7 @@ package com.lintang.netflik.movieQueryService.command.action;
 import com.lintang.netflik.models.GetActiveSubscriptionDto;
 import com.lintang.netflik.models.GetUserCurrentSubscriptionRequest;
 import com.lintang.netflik.models.SubscriptionServiceGrpc;
+import com.lintang.netflik.movieQueryService.broker.listener.CqrsVideoRequestListener;
 import com.lintang.netflik.movieQueryService.broker.message.AddVideoMessage;
 import com.lintang.netflik.movieQueryService.broker.message.DeleteVideoMessage;
 import com.lintang.netflik.movieQueryService.entity.MovieEntity;
@@ -26,6 +27,8 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators.Add;
 import org.springframework.stereotype.Component;
@@ -36,9 +39,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public class VideoCommandAction {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CqrsVideoRequestListener.class);
+
 
     private MovieRepository movierepository;
     private ActorEntityMapper actorEntityMapper;
@@ -146,14 +153,34 @@ public class VideoCommandAction {
     }
 
     public void updateVideoUrl(AddVideoMessage videoMessage) {
+        LOG.info("video Url terbaru: " + videoMessage.getUrl());
+        LOG.info("videoId  terbaru: " + videoMessage.getId());
+
         Optional<VideoEntity> video = videoRepository.findById(Integer.valueOf(videoMessage.getId()));
+
         if (!video.isPresent()){
             throw new ResourceNotFoundException("video with id: "+ videoMessage.getId() + " not found!");
         }
 
         VideoEntity updateVideo =  video.get();
+
         updateVideo.setUrl(videoMessage.getUrl());
         videoRepository.save(updateVideo); // save updated video
+
+        // update videoUrl  in movie collection
+        Optional<MovieEntity> movie = movierepository.findById(Integer.parseInt(videoMessage.getMovieId()));
+        if (!movie.isPresent()){
+            throw new ResourceNotFoundException("movie with id: " + videoMessage.getMovieId() + " not found");
+        }
+        MovieEntity movieNew = movie.get();
+        movieNew.getVideos().forEach(vid -> {
+            if (vid.getId() == videoMessage.getId()) {
+                vid.setUrl(videoMessage.getUrl());
+            }
+        });
+
+        movierepository.save(movieNew);
+
         return;
     }
 

@@ -38,7 +38,7 @@ public class CqrsVideoRequestListener {
         LOG.info("get video message from movie-service!");
         if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(),
                 OutboxEventType.ADD_VIDEO_TO_MOVIE, OutboxEventType.UPDATE_VIDEO_FROM_MOVIE,
-                OutboxEventType.ADD_VIDEO_AND_UPLOAD)) {
+                OutboxEventType.ADD_VIDEO_AND_UPLOAD, OutboxEventType.UPDATE_VIDEO_URL)) {
             var addVideoMessage = objectMapper.readValue(outboxMessage.getPayload().getPayload(),
                     AddVideoMessage.class);
 

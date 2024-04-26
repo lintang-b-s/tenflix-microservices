@@ -28,6 +28,9 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://keycloak-tenflix:8080/realms/tenflix/protocol/openid-connect/certs
+  # for kafka
+  
+
   kafka:
     listener:
       missing-topics-fatal: false
@@ -38,7 +41,6 @@ spring:
     consumer:
       bootstrap-servers: kafka:29092
       group-id: movie-service-cg
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring:
           json:
