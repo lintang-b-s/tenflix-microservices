@@ -12,7 +12,7 @@ services:
       POSTGRES_PASSWORD: netflik
     ports:
       - 5431:5432
-    platform: linux/arm64/v8
+    platform: linux/amd64
 
 
   rabbitmq:
@@ -21,7 +21,7 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
-    platform: linux/arm64/v8
+    platform: linux/amd64
 
 
   pg-admin:
@@ -45,7 +45,7 @@ services:
       - "27017"
     volumes:
       - ./mongo-data:/data/db
-    platform: linux/arm64/v8
+    platform: linux/amd64
   
 
 

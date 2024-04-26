@@ -1,470 +1,473 @@
----
-version: "3"
-networks:
- net:
-  name: net
-  driver: bridge
-  ipam:
-    config:
-      - subnet: 172.1.1.0/24
+# pindah ke docker-compose-order-test
+ # atau ke docker-compose-all-test.yaml
 
-services:
+# ---
+# version: "3"
+# networks:
+#  net:
+#   name: net
+#   driver: bridge
+#   ipam:
+#     config:
+#       - subnet: 172.1.1.0/24
 
-
-  kong-database:
-    container_name: kong-database
-    image: postgres:11-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: kong
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "kong"]
-      interval: 30s
-      timeout: 3s
-      retries: 5
-    networks:
-      net:
-        ipv4_address: 172.1.1.16
-    depends_on:
-      - consul-tenflix
-
-  kong-migration:
-    container_name: kong-migration
-    image: kong:2.1.4-alpine
-    command: "kong migrations bootstrap"
-    restart: on-failure
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: kong-database
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: password
-    networks:
-      - net
-    links:
-      - kong-database
-    depends_on:
-      - kong-database
-
-  kong:
-    container_name: kong
-    image: kong:2.1.4-alpine
-    restart: unless-stopped
-    environment:
-      KONG_DATABASE: postgres
-      KONG_PG_HOST: 172.1.1.16
-      KONG_PG_USER: kong
-      KONG_PG_PASSWORD: password
-      KONG_ADMIN_LISTEN: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
-      KONG_DB_UPDATE_FREQUENCY: 1m
-      KONG_PROXY_ACCESS_LOG: /dev/stdout
-      KONG_ADMIN_ACCESS_LOG: /dev/stdout
-      KONG_PROXY_ERROR_LOG: /dev/stderr
-      KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_DNS_RESOLVER: 172.1.1.17:8600
-    networks:
-      net:
-        ipv4_address: 172.1.1.40
-    depends_on:
-      - kong-migration
-      - consul-tenflix
-    ports:
-      - "8001:8001"
-      - "8444:8444"
-      - "8000:8000"
-      - "8443:8443"
-
-  konga-prepare:
-    container_name: konga-prepare
-    image: pantsel/konga:0.14.9
-    command: "-c prepare -a postgres -u postgresql://kong:password@kong-database:5432/konga_db"
-    restart: on-failure
-    networks:
-      - net
-    links:
-      - kong-database
-    depends_on:
-      - kong-database
-
-  konga:
-    container_name: konga
-    image: pantsel/konga:latest
-    restart: unless-stopped
-    environment:
-      DB_ADAPTER: postgres
-      DB_HOST: kong-database
-      DB_USER: kong
-      DB_PASSWORD: password
-      DB_DATABASE: konga_db
-      # any string will OK for token
-      TOKEN_SECRET: iu7YDcPLiZkozQXzZ9kka3Ee1Vid5ZgQ
-      NODE_ENV: development
-    networks:
-      - net
-    depends_on:
-      - konga-prepare
-    ports:
-      - "1337:1337"
+# services:
 
 
-  #consul service discovery
-  consul-tenflix:
-    image: consul:1.15.4
-    container_name: consul-tenflix
-    restart: always
-    ports:
-      - 8500:8500
-      - 8600:8600
-      - 8600:8600/udp
-    networks:
-      net:
-        ipv4_address: 172.1.1.17
+#   kong-database:
+#     container_name: kong-database
+#     image: postgres:11-alpine
+#     restart: unless-stopped
+#     environment:
+#       POSTGRES_USER: kong
+#       POSTGRES_PASSWORD: password
+#     ports:
+#       - "5432:5432"
+#     healthcheck:
+#       test: ["CMD", "pg_isready", "-U", "kong"]
+#       interval: 30s
+#       timeout: 3s
+#       retries: 5
+#     networks:
+#       net:
+#         ipv4_address: 172.1.1.16
+#     depends_on:
+#       - consul-tenflix
+
+#   kong-migration:
+#     container_name: kong-migration
+#     image: kong:2.1.4-alpine
+#     command: "kong migrations bootstrap"
+#     restart: on-failure
+#     environment:
+#       KONG_DATABASE: postgres
+#       KONG_PG_HOST: kong-database
+#       KONG_PG_USER: kong
+#       KONG_PG_PASSWORD: password
+#     networks:
+#       - net
+#     links:
+#       - kong-database
+#     depends_on:
+#       - kong-database
+
+#   kong:
+#     container_name: kong
+#     image: kong:2.1.4-alpine
+#     restart: unless-stopped
+#     environment:
+#       KONG_DATABASE: postgres
+#       KONG_PG_HOST: 172.1.1.16
+#       KONG_PG_USER: kong
+#       KONG_PG_PASSWORD: password
+#       KONG_ADMIN_LISTEN: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
+#       KONG_DB_UPDATE_FREQUENCY: 1m
+#       KONG_PROXY_ACCESS_LOG: /dev/stdout
+#       KONG_ADMIN_ACCESS_LOG: /dev/stdout
+#       KONG_PROXY_ERROR_LOG: /dev/stderr
+#       KONG_ADMIN_ERROR_LOG: /dev/stderr
+#       KONG_DNS_RESOLVER: 172.1.1.17:8600
+#     networks:
+#       net:
+#         ipv4_address: 172.1.1.40
+#     depends_on:
+#       - kong-migration
+#       - consul-tenflix
+#     ports:
+#       - "8001:8001"
+#       - "8444:8444"
+#       - "8000:8000"
+#       - "8443:8443"
+
+#   konga-prepare:
+#     container_name: konga-prepare
+#     image: pantsel/konga:0.14.9
+#     command: "-c prepare -a postgres -u postgresql://kong:password@kong-database:5432/konga_db"
+#     restart: on-failure
+#     networks:
+#       - net
+#     links:
+#       - kong-database
+#     depends_on:
+#       - kong-database
+
+#   konga:
+#     container_name: konga
+#     image: pantsel/konga:latest
+#     restart: unless-stopped
+#     environment:
+#       DB_ADAPTER: postgres
+#       DB_HOST: kong-database
+#       DB_USER: kong
+#       DB_PASSWORD: password
+#       DB_DATABASE: konga_db
+#       # any string will OK for token
+#       TOKEN_SECRET: iu7YDcPLiZkozQXzZ9kka3Ee1Vid5ZgQ
+#       NODE_ENV: development
+#     networks:
+#       - net
+#     depends_on:
+#       - konga-prepare
+#     ports:
+#       - "1337:1337"
 
 
-
-  ngrok:
-    image: ngrok/ngrok:latest
-    volumes:
-     - ./ngrok.yml:/etc/ngrok.yml
-    ports:
-      - 4040:4040
-    networks:
-      - net
-    environment:
-      - NGROK_AUTH=${NGROK_AUTH}
-    command: ["start", "--none", "--authtoken", "${NGROK_AUTH}"]
-
-  order-aggregator-service:
-    container_name: order-aggregator-service
-    build: ./order-aggregator-service
-    ports:
-      - 9900:9900
-    depends_on:
-      - keycloak-tenflix
-      - payment-service
-      - order-service
-      - subscription-service
-      - consul-tenflix
-    networks:
-      net:
-        ipv4_address: 172.1.1.11
-    platform: linux/arm64/v8
-
-  subscription-service:
-    container_name: subscription-service
-    build: ./subscription-service
-    ports:
-      - 9100:9100
-      - 5008:5008
-    # env_file:
-    #   - config-repo/subscription-service.env
-    environment:
-      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008 #remote debugging
-    networks:
-      net:
-        ipv4_address: 172.1.1.12
-    depends_on:
-      - postgres-subscription
-
-    platform: linux/arm64/v8
-
-  postgres-subscription:
-    container_name: postgres-subscription
-    image: postgres
-    ports:
-      - 5430:5432
-    environment:
-      POSTGRES_DB: subscription
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-    volumes:
-      - postgres-subscription:/var/lib/postgresql/data
-      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
-    networks:
-      - net
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
-
-  order-service:
-    container_name: order-service
-    build: ./order-service
-    ports:
-      - 9600:9600
-      - 5007:5007
-    # env_file:
-    #   - config-repo/order-service.env
-    environment:
-      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 # remote debugging
-    networks:
-      net:
-        ipv4_address: 172.1.1.13
-    depends_on:
-      - postgres-order
-    platform: linux/arm64/v8
-
-  postgres-order:
-    container_name: postgres-order
-    image: postgres
-    ports:
-      - 5434:5432
-    environment:
-      POSTGRES_DB: order
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-    volumes:
-      - postgres-order:/var/lib/postgresql/data
-      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
-    networks:
-      - net
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
-
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    container_name: zookeeper
-    restart: unless-stopped
-    ports:
-      - 2181:2181
-    networks:
-      - net
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-
-  kafka:
-    image: wurstmeister/kafka:latest
-    container_name: kafka
-    restart: unless-stopped
-    ports:
-      - 9092:9092
-    environment:
-      KAFKA_BROKER_ID: 1 # identifier
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # replikasi setiap partisi topik
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 # zookeper address
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: DOCKER_INTERNAL:PLAINTEXT,DOCKER_EXTERNAL:PLAINTEXT
-      KAFKA_LISTENERS: DOCKER_INTERNAL://:29092,DOCKER_EXTERNAL://:9092 # yang bisa dikonek client internal , external dari docker network
-      KAFKA_ADVERTISED_LISTENERS: DOCKER_INTERNAL://kafka:29092,DOCKER_EXTERNAL://localhost:9092 # metadata yg dikasih ke client  ( yang bisa dikonek client internal , external dari docker network)
-      KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER_INTERNAL
-      ALLOW_PLAINTEXT_LISTENER: "yes"
-      KAFKA_CREATE_TOPICS: t.saga.order.outbox.subscription.response:1:1,t.saga.order.outbox.order.request:1:1,t.saga.order.outbox.payment-validate.response:1:1,t.saga.order.outbox.payment-validate.request:1:1,t.saga.order.outbox.subscription.request:1:1
-
-    networks:
-      - net
-    depends_on:
-      - zookeeper
-
-  kafka-connect:
-    image: debezium/connect:latest
-    container_name: kafka-connect
-    restart: unless-stopped
-    ports:
-      - 8083:8083
-    environment:
-      BOOTSTRAP_SERVERS: kafka:29092 # kafka-connect perlu konek ke 1 bootstrap server yg adad di docker network agar dapat konek ke kafka cluster
-      GROUP_ID: 1
-      CONFIG_STORAGE_TOPIC: ms_connect_configs
-      OFFSET_STORAGE_TOPIC: ms_connect_offsets
-      STATUS_STORAGE_TOPIC: ms_connect_statuses
-    networks:
-      - net
-    depends_on:
-      - kafka
-
-  payment-service:
-    container_name: payment-service
-    build: ./payment-service
-    ports:
-      - 8800:8800
-      - 5006:5006 # debug port
-    # env_file:
-    #   - config-repo/payment-service.env
-    environment:
-      - MIDTRANS_SERVERKEY=${MIDTRANS_SERVERKEY}
-      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 # remote debugging
-    networks:
-      net:
-        ipv4_address: 172.1.1.14
-    depends_on:
-      - postgres-payment
-
-    platform: linux/arm64/v8
-
-  postgres-payment:
-    container_name: postgres-payment
-    image: postgres
-    ports:
-      - 5435:5432
-    environment:
-      POSTGRES_DB: payment
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-    volumes:
-      - postgres-payment:/var/lib/postgresql/data
-      - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
-    networks:
-      - net
-    command: postgres -c config_file=/etc/postgresql/postgresql.conf
+#   #consul service discovery
+#   consul-tenflix:
+#     image: consul:1.15.4
+#     container_name: consul-tenflix
+#     restart: always
+#     ports:
+#       - 8500:8500
+#       - 8600:8600
+#       - 8600:8600/udp
+#     networks:
+#       net:
+#         ipv4_address: 172.1.1.17
 
 
 
+#   ngrok:
+#     image: ngrok/ngrok:3
+#     volumes:
+#      - ./ngrok.yml:/etc/ngrok.yml
+#     ports:
+#       - 4040:4040
+#     networks:
+#       - net
+#     environment:
+#       - NGROK_AUTH=${NGROK_AUTH}
+#     command: ["start", "--none", "--authtoken", "${NGROK_AUTH}"]
 
-  keycloak-mysql:
-    container_name: keycloak-mysql
-    image: mysql:latest
-    volumes:
-      - ./mysql_keycloak_data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: keycloak
-      MYSQL_USER: keycloak
-      MYSQL_PASSWORD: password
-    networks:
-      - net
-    platform: linux/arm64/v8
+#   order-aggregator-service:
+#     container_name: order-aggregator-service
+#     build: ./order-aggregator-service
+#     ports:
+#       - 9900:9900
+#     depends_on:
+#       - keycloak-tenflix
+#       - payment-service
+#       - order-service
+#       - subscription-service
+#       - consul-tenflix
+#     networks:
+#       net:
+#         ipv4_address: 172.1.1.11
+#     platform: linux/amd64
 
-  keycloak-tenflix:
-    container_name: keycloak-tenflix
-    image: quay.io/keycloak/keycloak:18.0.0
-    command: ["start-dev", "--import-realm"]
-    environment:
-      DB_VENDOR: MYSQL
-      DB_ADDR: mysql
-      DB_DATABASE: keycloak
-      DB_USER: keycloak
-      DB_PASSWORD: password
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-      KC_HOSTNAME_STRICT_HTTPS: false
-    ports:
-      - 8080:8080
-    volumes:
-      - ./realms/tenflix-realm.json:/opt/keycloak/data/import/tenflix-realm.json:ro
-    networks:
-      - net
-    depends_on:
-      - keycloak-mysql
-    platform: linux/arm64/v8
+#   subscription-service:
+#     container_name: subscription-service
+#     build: ./subscription-service
+#     ports:
+#       - 9100:9100
+#       - 5008:5008
+#     # env_file:
+#     #   - config-repo/subscription-service.env
+#     environment:
+#       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008 #remote debugging
+#     networks:
+#       net:
+#         ipv4_address: 172.1.1.12
+#     depends_on:
+#       - postgres-subscription
+
+#     platform: linux/amd64
+
+#   postgres-subscription:
+#     container_name: postgres-subscription
+#     image: postgres
+#     ports:
+#       - 5430:5432
+#     environment:
+#       POSTGRES_DB: subscription
+#       POSTGRES_USER: root
+#       POSTGRES_PASSWORD: root
+#     volumes:
+#       - postgres-subscription:/var/lib/postgresql/data
+#       - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
+#     networks:
+#       - net
+#     command: postgres -c config_file=/etc/postgresql/postgresql.conf
+
+#   order-service:
+#     container_name: order-service
+#     build: ./order-service
+#     ports:
+#       - 9600:9600
+#       - 5007:5007
+#     # env_file:
+#     #   - config-repo/order-service.env
+#     environment:
+#       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 # remote debugging
+#     networks:
+#       net:
+#         ipv4_address: 172.1.1.13
+#     depends_on:
+#       - postgres-order
+#     platform: linux/amd64
+
+#   postgres-order:
+#     container_name: postgres-order
+#     image: postgres
+#     ports:
+#       - 5434:5432
+#     environment:
+#       POSTGRES_DB: order
+#       POSTGRES_USER: root
+#       POSTGRES_PASSWORD: root
+#     volumes:
+#       - postgres-order:/var/lib/postgresql/data
+#       - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
+#     networks:
+#       - net
+#     command: postgres -c config_file=/etc/postgresql/postgresql.conf
 
 
-  postgres-movie:
-    container_name: postgres-movie
-    image: postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: netflik
-      POSTGRES_USER: netflik
-      POSTGRES_PASSWORD: netflik
-    ports:
-      - 5431:5432
-    networks:
-      - net
-    platform: linux/arm64/v8
+#   zookeeper:
+#     image: confluentinc/cp-zookeeper:latest
+#     container_name: zookeeper
+#     restart: unless-stopped
+#     ports:
+#       - 2181:2181
+#     networks:
+#       - net
+#     environment:
+#       ZOOKEEPER_CLIENT_PORT: 2181
 
-  pg-admin:
-    image: dpage/pgadmin4
-    environment:
-      - PGADMIN_DEFAULT_EMAIL=admin@email.com
-      - PGADMIN_DEFAULT_PASSWORD=admin
-      - PGADMIN_LISTEN_PORT=5050
-    ports:
-      - 5050:5050
-    networks:
-      - net
-    depends_on:
-      - postgres-movie
+#   kafka:
+#     image: wurstmeister/kafka:latest
+#     container_name: kafka
+#     restart: unless-stopped
+#     ports:
+#       - 9092:9092
+#     environment:
+#       KAFKA_BROKER_ID: 1 # identifier
+#       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # replikasi setiap partisi topik
+#       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181 # zookeper address
+#       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: DOCKER_INTERNAL:PLAINTEXT,DOCKER_EXTERNAL:PLAINTEXT
+#       KAFKA_LISTENERS: DOCKER_INTERNAL://:29092,DOCKER_EXTERNAL://:9092 # yang bisa dikonek client internal , external dari docker network
+#       KAFKA_ADVERTISED_LISTENERS: DOCKER_INTERNAL://kafka:29092,DOCKER_EXTERNAL://localhost:9092 # metadata yg dikasih ke client  ( yang bisa dikonek client internal , external dari docker network)
+#       KAFKA_INTER_BROKER_LISTENER_NAME: DOCKER_INTERNAL
+#       ALLOW_PLAINTEXT_LISTENER: "yes"
+#       KAFKA_CREATE_TOPICS: t.saga.order.outbox.subscription.response:1:1,t.saga.order.outbox.order.request:1:1,t.saga.order.outbox.payment-validate.response:1:1,t.saga.order.outbox.payment-validate.request:1:1,t.saga.order.outbox.subscription.request:1:1
 
-  mongo-movie-query:
-    container_name: mongo-movie-query
-    image: mongo:4.4.14-rc0-focal
-    restart: unless-stopped
-    ports:
-      - "27017:27017"
-    expose:
-      - "27017"
-    volumes:
-      - ./mongo-data:/data/db
-    networks:
-      net:
-        ipv4_address: 172.1.1.15
-    platform: linux/arm64/v8
+#     networks:
+#       - net
+#     depends_on:
+#       - zookeeper
 
-  rabbitmq:
-    container_name: rabbitmq
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"
-    networks:
-      - net
-    platform: linux/arm64/v8
+#   kafka-connect:
+#     image: debezium/connect:2.2
+#     container_name: kafka-connect
+#     restart: unless-stopped
+#     ports:
+#       - 8083:8083
+#     environment:
+#       BOOTSTRAP_SERVERS: kafka:29092 # kafka-connect perlu konek ke 1 bootstrap server yg adad di docker network agar dapat konek ke kafka cluster
+#       GROUP_ID: 1
+#       CONFIG_STORAGE_TOPIC: ms_connect_configs
+#       OFFSET_STORAGE_TOPIC: ms_connect_offsets
+#       STATUS_STORAGE_TOPIC: ms_connect_statuses
+#     networks:
+#       - net
+#     depends_on:
+#       - kafka
 
-  movie-service:
-    container_name: movie-service
-    build: ./movie-service
-    env_file:
-      - config-repo/movieservice.env
-    environment:
-      - CLOUDINARY_URL=${CLOUDINARY_URL}
-    networks:
-      net:
-        ipv4_address: 172.1.1.16
-    ports:
-      - 8200:8200
-    depends_on:
-      - postgres-movie
-      - rabbitmq
-      - consul-tenflix
-      - kong
-      - keycloak-tenflix
-    platform: linux/arm64/v8
+#   payment-service:
+#     container_name: payment-service
+#     build: ./payment-service
+#     ports:
+#       - 8800:8800
+#       - 5006:5006 # debug port
+#     # env_file:
+#     #   - config-repo/payment-service.env
+#     environment:
+#       - MIDTRANS_SERVERKEY=${MIDTRANS_SERVERKEY}
+#       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006 # remote debugging
+#     networks:
+#       net:
+#         ipv4_address: 172.1.1.14
+#     depends_on:
+#       - postgres-payment
 
-  movie-query-service:
-    container_name: movie-query-service
-    build: ./movie-query-service
-    ports:
-      - 8100:8100
-    # env_file:
-    #   - config-repo/movie-query-service.env
-    depends_on:
-      - mongo-movie-query
-      - rabbitmq
-      - kong
-      - consul-tenflix
-      - keycloak-tenflix
-    networks:
-      net:
-        ipv4_address: 172.1.1.17
-    platform: linux/arm64/v8
+#     platform: linux/amd64
 
-  notification-service:
-    container_name: notification-service
-    build: ./notificationservice
-    ports:
-      - 8300:8300
-    # env_file:
-    #   - config-repo/notificationservice.env
-    depends_on:
-      - mongo-movie-query
-      - rabbitmq
-      - kong
-      - consul-tenflix
-      - keycloak-tenflix
-    environment:
-      - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
-      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
-    networks:
-      net:
-        ipv4_address: 172.1.1.18
-    platform: linux/arm64/v8
+#   postgres-payment:
+#     container_name: postgres-payment
+#     image: postgres
+#     ports:
+#       - 5435:5432
+#     environment:
+#       POSTGRES_DB: payment
+#       POSTGRES_USER: root
+#       POSTGRES_PASSWORD: root
+#     volumes:
+#       - postgres-payment:/var/lib/postgresql/data
+#       - "./postgres/postgresql.conf:/etc/postgresql/postgresql.conf"
+#     networks:
+#       - net
+#     command: postgres -c config_file=/etc/postgresql/postgresql.conf
 
-volumes:
-  postgres-movie:
-  postgres-auth-server:
-    driver: local
-  keycloak-tenflix:
-  postgres-payment:
-  postgres-order:
-  postgres-subscription:
-  zookeeper-data:
-  kafka-data:
-  bitnami-kafka-data:
+
+
+
+#   keycloak-mysql:
+#     container_name: keycloak-mysql
+#     image: mysql:8.0-bullseye
+#     volumes:
+#       - ./mysql_keycloak_data:/var/lib/mysql
+#     environment:
+#       MYSQL_ROOT_PASSWORD: root
+#       MYSQL_DATABASE: keycloak
+#       MYSQL_USER: keycloak
+#       MYSQL_PASSWORD: password
+#     networks:
+#       - net
+#     platform: linux/amd64
+
+#   keycloak-tenflix:
+#     container_name: keycloak-tenflix
+#     image: quay.io/keycloak/keycloak:18.0.0
+#     command: ["start-dev", "--import-realm"]
+#     environment:
+#       DB_VENDOR: MYSQL
+#       DB_ADDR: mysql
+#       DB_DATABASE: keycloak
+#       DB_USER: keycloak
+#       DB_PASSWORD: password
+#       KEYCLOAK_ADMIN: admin
+#       KEYCLOAK_ADMIN_PASSWORD: admin
+#       KC_HOSTNAME_STRICT_HTTPS: false
+#     ports:
+#       - 8080:8080
+#     volumes:
+#       - ./realms/tenflix-realm.json:/opt/keycloak/data/import/tenflix-realm.json:ro
+#     networks:
+#       - net
+#     depends_on:
+#       - keycloak-mysql
+#     platform: linux/amd64
+
+
+#   postgres-movie:
+#     container_name: postgres-movie
+#     image: postgres
+#     restart: unless-stopped
+#     environment:
+#       POSTGRES_DB: netflik
+#       POSTGRES_USER: netflik
+#       POSTGRES_PASSWORD: netflik
+#     ports:
+#       - 5431:5432
+#     networks:
+#       - net
+#     platform: linux/amd64
+
+#   pg-admin:
+#     image: dpage/pgadmin4
+#     environment:
+#       - PGADMIN_DEFAULT_EMAIL=admin@email.com
+#       - PGADMIN_DEFAULT_PASSWORD=admin
+#       - PGADMIN_LISTEN_PORT=5050
+#     ports:
+#       - 5050:5050
+#     networks:
+#       - net
+#     depends_on:
+#       - postgres-movie
+
+#   mongo-movie-query:
+#     container_name: mongo-movie-query
+#     image: mongo:4.4.14-rc0-focal
+#     restart: unless-stopped
+#     ports:
+#       - "27017:27017"
+#     expose:
+#       - "27017"
+#     volumes:
+#       - ./mongo-data:/data/db
+#     networks:
+#       net:
+#         ipv4_address: 172.1.1.15
+#     platform: linux/amd64
+
+#   rabbitmq:
+#     container_name: rabbitmq
+#     image: rabbitmq:3-management
+#     ports:
+#       - "5672:5672"
+#       - "15672:15672"
+#     networks:
+#       - net
+#     platform: linux/amd64
+
+#   movie-service:
+#     container_name: movie-service
+#     build: ./movie-service
+#     env_file:
+#       - config-repo/movieservice.env
+#     environment:
+#       - CLOUDINARY_URL=${CLOUDINARY_URL}
+#     networks:
+#       net:
+#         ipv4_address: 172.1.1.16
+#     ports:
+#       - 8200:8200
+#     depends_on:
+#       - postgres-movie
+#       - rabbitmq
+#       - consul-tenflix
+#       - kong
+#       - keycloak-tenflix
+#     platform: linux/amd64
+
+#   movie-query-service:
+#     container_name: movie-query-service
+#     build: ./movie-query-service
+#     ports:
+#       - 8100:8100
+#     # env_file:
+#     #   - config-repo/movie-query-service.env
+#     depends_on:
+#       - mongo-movie-query
+#       - rabbitmq
+#       - kong
+#       - consul-tenflix
+#       - keycloak-tenflix
+#     networks:
+#       net:
+#         ipv4_address: 172.1.1.17
+#     platform: linux/amd64
+
+#   notification-service:
+#     container_name: notification-service
+#     build: ./notificationservice
+#     ports:
+#       - 8300:8300
+#     # env_file:
+#     #   - config-repo/notificationservice.env
+#     depends_on:
+#       - mongo-movie-query
+#       - rabbitmq
+#       - kong
+#       - consul-tenflix
+#       - keycloak-tenflix
+#     environment:
+#       - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
+#       - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
+#     networks:
+#       net:
+#         ipv4_address: 172.1.1.18
+#     platform: linux/amd64
+
+# volumes:
+#   postgres-movie:
+#   postgres-auth-server:
+#     driver: local
+#   keycloak-tenflix:
+#   postgres-payment:
+#   postgres-order:
+#   postgres-subscription:
+#   zookeeper-data:
+#   kafka-data:
+#   bitnami-kafka-data:

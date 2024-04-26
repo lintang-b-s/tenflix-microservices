@@ -12,6 +12,11 @@ curl --location 'http://localhost:8083/connectors' \
 --header 'Content-Type: application/json' \
 --data @./debezium-subscription.json
 
+echo &&
+curl --location 'http://localhost:8083/connectors' \
+--header 'Content-Type: application/json' \
+--data @./debezium-movie.json
+
 
 # curl -i -X DELETE localhost:8083/connectors/process-order-connector
 # curl -i -X DELETE localhost:8083/connectors/process-payment-connector

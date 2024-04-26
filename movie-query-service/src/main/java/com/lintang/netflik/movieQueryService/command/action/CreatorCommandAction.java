@@ -6,6 +6,8 @@ import com.lintang.netflik.movieQueryService.entity.CreatorEntity;
 import com.lintang.netflik.movieQueryService.repository.MovieRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -15,12 +17,19 @@ import org.springframework.stereotype.Component;
 import java.util.HashSet;
 import java.util.Set;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Component
 public class CreatorCommandAction {
     private MongoTemplate mongoTemplate;
     private MovieRepository movieRepository;
+
+    @Autowired
+    public CreatorCommandAction(
+        MongoTemplate  mongoTemplate,
+        MovieRepository movieRepository
+    ) {
+        this.mongoTemplate = mongoTemplate;
+        this.movieRepository = movieRepository;
+    }
 
     public void updateCreator(UpdateCreatorMessage message) {
         Set<CreatorEntity> oldCreators = new HashSet<>();

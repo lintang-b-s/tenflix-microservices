@@ -14,7 +14,6 @@ import com.lintang.netflik.movieQueryService.util.entityMapper.CreatorEntityMapp
 import com.lintang.netflik.movieQueryService.util.entityMapper.MovieEntityMapper;
 import com.lintang.netflik.movieQueryService.util.entityMapper.VideoEntityMapper;
 import com.lintang.netflik.movieQueryService.util.eventMapper.MovieEventMapper;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +28,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Service
 public class MovieCommandService {
 
-    @Autowired
     private MovieCommandAction movieCommandAction;
+
+    @Autowired
+    public MovieCommandService(MovieCommandAction movieCommandAction) {
+        this.movieCommandAction = movieCommandAction;
+    }
 
     public MovieEntity addMovie( AddMovieMessage newMovie) {
         MovieEntity newMovieEntity = movieCommandAction.addMovie(newMovie);

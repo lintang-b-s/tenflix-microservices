@@ -17,6 +17,7 @@ public class MovieQueryServiceApplication {
 	@Bean
 	public ObjectMapper scmsObjectMapper() {
 		com.fasterxml.jackson.databind.ObjectMapper responseMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+		responseMapper.findAndRegisterModules();
 		return responseMapper;
 	}
 

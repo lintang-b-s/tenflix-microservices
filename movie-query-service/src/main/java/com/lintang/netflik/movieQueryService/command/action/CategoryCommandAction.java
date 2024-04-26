@@ -6,7 +6,6 @@ import com.lintang.netflik.movieQueryService.broker.message.UpdateCategoryMessag
 import com.lintang.netflik.movieQueryService.entity.CategoryEntity;
 import com.lintang.netflik.movieQueryService.repository.MovieRepository;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -19,15 +18,24 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-@AllArgsConstructor
-@NoArgsConstructor
+
 @Component
 public class CategoryCommandAction {
 
-    @Autowired
     private MovieRepository movieRepository;
 
     private MongoTemplate mongoTemplate;
+
+    @Autowired
+    public CategoryCommandAction(
+        MovieRepository movieRepository,
+        MongoTemplate mongoTemplate
+    ) {
+        this.movieRepository = movieRepository;
+        this.mongoTemplate = mongoTemplate;
+    }
+
+
 
     public void updateCategory(UpdateCategoryMessage message) {
         Set<CategoryEntity> oldCategories = new HashSet<>();

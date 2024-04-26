@@ -7,6 +7,8 @@ import com.lintang.netflik.movieQueryService.entity.TagEntity;
 import com.lintang.netflik.movieQueryService.repository.MovieRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -20,13 +22,22 @@ import java.util.Set;
 import static com.mongodb.client.model.Filters.where;
 
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Component
 public class TagCommandAction {
 
     private MovieRepository movieRepository;
     private  MongoTemplate mongoTemplate;
+
+
+    @Autowired
+    public TagCommandAction(
+        MovieRepository movieRepository,
+        MongoTemplate mongoTemplate
+    ) {
+        this.movieRepository = movieRepository;
+        this.mongoTemplate = mongoTemplate;
+    }
+
     public void updateTag(UpdateTagMessage message) {
         Set<TagEntity> oldTags = new HashSet<>();
         TagEntity oldTag = TagEntity.builder().id(message.getId()).name(message.getOldname()).build();

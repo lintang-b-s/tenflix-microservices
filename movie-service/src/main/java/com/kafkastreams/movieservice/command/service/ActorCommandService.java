@@ -24,7 +24,6 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-
 @NoArgsConstructor
 @Transactional
 public class ActorCommandService {

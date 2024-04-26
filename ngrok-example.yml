@@ -1,0 +1,6 @@
+authtoken: isi dengan auth token ngrok anda
+version: 2
+tunnels:
+  order-aggregator-service:
+    addr: 172.1.1.19:9900
+    proto: http

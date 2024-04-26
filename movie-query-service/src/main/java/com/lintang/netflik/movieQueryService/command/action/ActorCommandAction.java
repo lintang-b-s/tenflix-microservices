@@ -17,15 +17,23 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Component
 public class ActorCommandAction {
 
-    @Autowired
     private MovieRepository movieRepository;
 
     private MongoTemplate mongoTemplate;
+
+    @Autowired
+    public ActorCommandAction(
+        MovieRepository movieRepository,
+        MongoTemplate  mongoTemplate
+    ){
+        this.movieRepository = movieRepository;
+        this.mongoTemplate = mongoTemplate;
+    }
+
+
 
     public void updateActor(UpdateActorMessage message) {
         Set<ActorEntity> oldActors = new HashSet<>();

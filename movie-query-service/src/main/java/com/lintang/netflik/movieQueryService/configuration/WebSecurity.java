@@ -38,6 +38,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 //
 //        return http.build();
 
+        //  ini harusnya di movie-service deh wkwkwk lupa
+        
          http
                  .cors().disable().csrf().disable().authorizeRequests()
                 .antMatchers( "/api/v1/movie-service/movies").hasAnyRole("admin", "user", "default-roles-tenflix")

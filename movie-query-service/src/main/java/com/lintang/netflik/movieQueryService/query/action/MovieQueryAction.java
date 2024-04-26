@@ -10,9 +10,10 @@ import com.lintang.netflik.movieQueryService.repository.MovieRepository;
 
 import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +21,6 @@ import java.util.List;
 import java.util.Optional;
 
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Component
 public class MovieQueryAction {
 
@@ -31,7 +30,14 @@ public class MovieQueryAction {
     @GrpcClient("subscription-service")
     private SubscriptionServiceGrpc.SubscriptionServiceBlockingStub subscriptionStub;
 
-
+    @Autowired
+    public MovieQueryAction(
+        SubscriptionServiceGrpc.SubscriptionServiceBlockingStub subscriptionStub,
+         MovieRepository repository
+    ) {
+        this.subscriptionStub = subscriptionStub;
+        this.repository = repository;
+    }
 
     public MovieEntity getMovieById(int movieId, String userId) {
         GetUserCurrentSubscriptionRequest req =

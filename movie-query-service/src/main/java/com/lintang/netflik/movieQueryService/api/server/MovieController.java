@@ -6,6 +6,8 @@ import com.lintang.netflik.movieQueryService.command.service.MovieCommandService
 import com.lintang.netflik.movieQueryService.query.service.MovieQueryService;
 import com.lintang.netflik.movieQueryService.util.DtoMapper.MovieDtoMapper;
 import lombok.AllArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,13 +20,19 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/api/v1/movie-query/movies")
-@AllArgsConstructor
 @PreAuthorize("hasAuthority('ROLE_user')")
 public class MovieController {
     private MovieDtoMapper mapper;
     private MovieCommandService movieService;
 
     private MovieQueryService movieQueryService;
+
+    @Autowired
+    public MovieController(MovieDtoMapper mapper, MovieCommandService movieCommandService, MovieQueryService movieQueryService) {
+        this.mapper = mapper;
+        this.movieService = movieCommandService;
+        this.movieQueryService = movieQueryService;
+    }
 
 
     // @Summary     Get all movies

@@ -4,7 +4,7 @@ services:
 
   keycloak-mysql:
     container_name: keycloak-mysql
-    image: mysql:latest
+    image: mysql:8.0-bullseye
     volumes:
       - ./mysql_keycloak_data:/var/lib/mysql
     environment:
@@ -12,7 +12,7 @@ services:
       MYSQL_DATABASE: keycloak
       MYSQL_USER: keycloak
       MYSQL_PASSWORD: password
-    platform: linux/arm64/v8
+    platform: linux/amd64
 
   keycloak-tenflix:
     container_name: keycloak-tenflix
@@ -32,4 +32,4 @@ services:
       - ./realms/tenflix-realm.json:/opt/keycloak/data/import/tenflix-realm.json:ro
     depends_on:
       - keycloak-mysql
-    platform: linux/arm64/v8
+    platform: linux/amd64

@@ -10,7 +10,7 @@ networks:
 
 services:
   ngrok:
-    image: ngrok/ngrok:latest
+    image: ngrok/ngrok:3
     mem_limit: "200mb"
     cpus: 0.2
     volumes:
@@ -21,7 +21,20 @@ services:
       - net
     environment:
       - NGROK_AUTH=${NGROK_AUTH}
-    command: ["start", "--none", "--authtoken", "${NGROK_AUTH}"]
+    command: ["start", "--all", "--config", "/etc/ngrok.yml"]
+  # ngrok:
+  #   image: ngrok/ngrok:3
+  #   mem_limit: "200mb"
+  #   cpus: 0.2
+  #   volumes:
+  #    - ./ngrok.yml:/etc/ngrok.yml
+  #   ports:
+  #     - 4040:4040
+  #   networks:
+  #     - net
+  #   environment:
+  #     - NGROK_AUTH=${NGROK_AUTH}
+  #   command: ["start", "--none", "--authtoken", "${NGROK_AUTH}"]
 
   payment-service:
     container_name: payment-service
@@ -49,7 +62,7 @@ services:
     depends_on:
       - postgres-payment
 
-    platform: linux/arm64/v8
+    platform: linux/amd64
 
   order-service:
     container_name: order-service
@@ -72,7 +85,7 @@ services:
       - SPRING_CLOUD_CONSUL_SERVICENAME=orderService
       - SPRING_CLOUD_CONSUL_ENABLED=true
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 # remote debugging
-    platform: linux/arm64/v8
+    platform: linux/amd64
 
 #      golang
   order-aggregator-service:
@@ -125,7 +138,7 @@ services:
         ipv4_address: 172.1.1.12
     depends_on:
       - postgres-subscription
-    platform: linux/arm64/v8
+    platform: linux/amd64
 
   kong-database:
     container_name: kong-database
@@ -151,7 +164,7 @@ services:
 
   kong-migration:
     container_name: kong-migration
-    image: kong:3.0.1-alpine
+    image: kong:3.2.2-alpine
     command: "kong migrations bootstrap"
     restart: on-failure
     mem_limit: "400mb"
@@ -170,7 +183,7 @@ services:
 
   kong:
     container_name: kong
-    image: kong:3.0.1-alpine
+    image: kong:3.2.2-alpine
     restart: unless-stopped
     mem_limit: "600mb"
     cpus: 0.5
@@ -279,7 +292,7 @@ services:
 
   keycloak-mysql:
     container_name: keycloak-mysql
-    image: mysql:latest
+    image: mysql:8.0-bullseye
     mem_limit: "700mb"
     cpus: 0.5
     ports:
@@ -291,7 +304,7 @@ services:
       MYSQL_PASSWORD: password
     networks:
       - net
-    platform: linux/arm64/v8
+    platform: linux/amd64
 
   keycloak-tenflix:
     container_name: keycloak-tenflix
@@ -382,7 +395,7 @@ services:
 
 
   kafdrop:
-    image: obsidiandynamics/kafdrop
+    image: obsidiandynamics/kafdrop:3.31.0
     container_name: kafdrop
     restart: "no"
     mem_limit: "300mb"
@@ -402,7 +415,7 @@ services:
 
 # versi debezium
   kafka-connect:
-    image: debezium/connect:latest
+    image: debezium/connect:2.2
     container_name: kafka-connect
     mem_limit: "800mb"
     cpus: 0.6
@@ -468,7 +481,7 @@ volumes:
 #    networks:
 #      net:
 #        ipv4_address: 172.1.1.15
-#    platform: linux/arm64/v8
+#    platform: linux/amd64
 
 
 

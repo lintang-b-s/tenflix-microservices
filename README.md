@@ -43,10 +43,8 @@ This project provides an example of the Saga distributed transactions pattern.
 
 ### setting payment midtrans
 ```
-    docker exec -it tenflix-microservices-ngrok-1 bash
-    
-    ngrok http 172.1.1.19:9900
-    
+
+    cek dashboard ngrok anda di bagian menul tunnel, copy link tunnel ngrok nya buat 172.1.1.19:9900
     tulis redirect url https yang dikasih ngrok  di dashboard midtrans sandbox di settings-configuration-payment notification url
     write the https redirect url given by ngrok on the midtrans dashboard sandbox in settings-configuration-payment notification url
     <URLNGROK>/api/v1/orders/notificationMidtrans

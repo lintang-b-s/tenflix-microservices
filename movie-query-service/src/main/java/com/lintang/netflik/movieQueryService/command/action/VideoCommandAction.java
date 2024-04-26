@@ -24,6 +24,8 @@ import io.grpc.StatusRuntimeException;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import net.devh.boot.grpc.client.inject.GrpcClient;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +34,6 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Component
 public class VideoCommandAction {
 
@@ -52,7 +52,28 @@ public class VideoCommandAction {
 
 
 
-
+    @Autowired
+    public VideoCommandAction(
+        MovieRepository movieRepository,
+        ActorEntityMapper actorEntityMapper,
+        CreatorEntityMapper creatorEntityMapper,
+        MovieEntityMapper movieEntityMapper,
+        VideoEntityMapper videoEntityMapper,
+        VideoRepository videoRepository,
+        MovieEventMapper movieEventMapper,
+        ViewRepository viewRepository,
+        SubscriptionServiceGrpc.SubscriptionServiceBlockingStub subscriptionStub
+    ){
+        this.movierepository = movieRepository;
+        this.actorEntityMapper = actorEntityMapper;
+        this.creatorEntityMapper = creatorEntityMapper;
+        this.movieEntityMapper = movieEntityMapper;
+        this.videoEntityMapper = videoEntityMapper;
+        this.videoRepository = videoRepository;
+        this.movieEventMapper  = movieEventMapper;
+        this.viewRepository  = viewRepository;
+        this.subscriptionStub = subscriptionStub;
+    }
 
     public VideoEntity addVideoToMovie(AddVideoMessage videoMessage) {
 //         id video di movie-service sama id video di movie-query-service harus sama

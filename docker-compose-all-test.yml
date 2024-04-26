@@ -10,7 +10,7 @@ networks:
 
 services:
   ngrok:
-    image: ngrok/ngrok:latest
+    image: ngrok/ngrok:3
     mem_limit: "200mb"
     cpus: 0.2
     volumes:
@@ -21,12 +21,12 @@ services:
       - net
     environment:
       - NGROK_AUTH=${NGROK_AUTH}
-    command: ["start", "--none", "--authtoken", "${NGROK_AUTH}"]
+    command: ["start", "--all", "--config", "/etc/ngrok.yml"]
 
   payment-service:
     container_name: payment-service
     build: ./payment-service
-    mem_limit: "400mb"
+    mem_limit: "500mb"
     cpus: 0.5
     ports:
       - 8800:8800
@@ -49,13 +49,13 @@ services:
     depends_on:
       - postgres-payment
 
-    platform: linux/arm64/v8
+    platform: linux/amd64
 
   order-service:
     container_name: order-service
     build: ./order-service
     mem_limit: "500mb"
-    cpus: 0.5
+    cpus: 0.4
     ports:
       - 9600:9600
       - 5007:5007
@@ -72,7 +72,7 @@ services:
       - SPRING_CLOUD_CONSUL_SERVICENAME=orderService
       - SPRING_CLOUD_CONSUL_ENABLED=true
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007 # remote debugging
-    platform: linux/arm64/v8
+    platform: linux/amd64
 
 #      golang
   order-aggregator-service:
@@ -108,7 +108,7 @@ services:
     container_name: subscription-service
     build: ./subscription-service
     mem_limit: "500mb"
-    cpus: 0.5
+    cpus: 0.4
     ports:
       - 9100:9100
       - 5008:5008
@@ -125,7 +125,7 @@ services:
         ipv4_address: 172.1.1.12
     depends_on:
       - postgres-subscription
-    platform: linux/arm64/v8
+    platform: linux/amd64
 
   kong-database:
     container_name: kong-database
@@ -149,9 +149,10 @@ services:
     depends_on:
       - consul-tenflix
 
+  ### kong
   kong-migration:
     container_name: kong-migration
-    image: kong:3.0.1-alpine
+    image: kong:3.2.2-alpine
     command: "kong migrations bootstrap"
     restart: on-failure
     mem_limit: "400mb"
@@ -170,10 +171,10 @@ services:
 
   kong:
     container_name: kong
-    image: kong:3.0.1-alpine
+    image: kong:3.2.2-alpine
     restart: unless-stopped
-    mem_limit: "600mb"
-    cpus: 0.5
+    mem_limit: "750mb"
+    cpus: 0.6
     environment:
       KONG_DATABASE: postgres
       KONG_PG_HOST: 172.1.1.16
@@ -198,6 +199,20 @@ services:
       - "8000:8000"
       - "8443:8443"
 
+  konga:
+    container_name: konga
+    image: pantsel/konga:0.14.9
+    cpus: 0.3
+    mem_limit: "300mb"
+    networks:
+      net:
+        ipv4_address: 172.1.1.42
+    ports:
+      - "1337:1337"
+    environment:
+      - NODE_ENV=development
+
+  
   #consul service discovery
   consul-tenflix:
     image: consul:1.15.4
@@ -277,7 +292,7 @@ services:
 
   keycloak-mysql:
     container_name: keycloak-mysql
-    image: mysql:latest
+    image: mysql:8.0-bullseye
     mem_limit: "700mb"
     cpus: 0.5
     ports:
@@ -289,7 +304,7 @@ services:
       MYSQL_PASSWORD: password
     networks:
       - net
-    platform: linux/arm64/v8
+    platform: linux/amd64
 
   keycloak-tenflix:
     container_name: keycloak-tenflix
@@ -380,7 +395,7 @@ services:
 
 # versi debezium
   kafka-connect:
-    image: debezium/connect:latest
+    image: debezium/connect:2.2 # 2.6
     container_name: kafka-connect
     mem_limit: "800mb"
     cpus: 0.6
@@ -419,8 +434,8 @@ services:
   movie-service:
     container_name: movie-service
     build: ./movie-service
-    mem_limit: "300mb"
-    cpus: 0.4
+    mem_limit: "500mb"
+    cpus: 0.5
     environment:
       - CLOUDINARY_URL=${CLOUDINARY_URL}
       - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5009 # remote debugging
@@ -512,6 +527,24 @@ services:
           ipv4_address: 172.1.1.35
 
 
+  kafdrop:
+    image: obsidiandynamics/kafdrop:3.31.0
+    container_name: kafdrop
+    restart: "no"
+    mem_limit: "300mb"
+    cpus: 0.3
+    ports:
+      - "9001:9000"
+    environment:
+      KAFKA_BROKERCONNECT: "kafka:29092"
+#      JVM_OPTS: "-Xms16M -Xmx48M -Xss180K -XX:-TieredCompilation -XX:+UseStringDeduplication -noverify"
+      CMD_ARGS: "--message.format=AVRO --schemaregistry.connect=http://schema-registry:8081"
+    depends_on:
+      - kafka
+    networks:
+      - net
+
+
 volumes:
   postgres-order: {}
   postgres-payment: {}
@@ -543,7 +576,7 @@ volumes:
 #    networks:
 #      net:
 #        ipv4_address: 172.1.1.15
-#    platform: linux/arm64/v8
+#    platform: linux/amd64
 
   # kafka_manager:
   #   image: hlebalbau/kafka-manager:stable
@@ -636,7 +669,7 @@ volumes:
 
 
 #   kafdrop:
-#     image: obsidiandynamics/kafdrop
+#     image: obsidiandynamics/kafdrop:3.31.0
 #     container_name: kafdrop
 #     restart: "no"
 #     mem_limit: "300mb"

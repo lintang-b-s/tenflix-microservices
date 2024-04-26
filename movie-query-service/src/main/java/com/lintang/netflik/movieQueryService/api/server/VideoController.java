@@ -8,6 +8,8 @@ import com.lintang.netflik.movieQueryService.command.service.VideoCommandService
 
 import com.lintang.netflik.movieQueryService.util.DtoMapper.VideoDtoMapper;
 import lombok.AllArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,11 +22,17 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/api/v1/movie-query/videos")
-@AllArgsConstructor
 @PreAuthorize("hasAuthority('ROLE_user')")
 public class VideoController {
     private VideoDtoMapper mapper;
     private VideoCommandService videoService;
+
+
+    @Autowired
+    public VideoController(VideoDtoMapper mapper, VideoCommandService videoCommandService) {
+        this.mapper = mapper;
+        this.videoService = videoCommandService;
+    }
 
 
     // @Summary     Get all videos by movie id

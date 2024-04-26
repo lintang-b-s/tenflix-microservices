@@ -7,9 +7,10 @@ import com.lintang.netflik.movieQueryService.entity.VideoEntity;
 import com.lintang.netflik.movieQueryService.repository.MovieRepository;
 import com.lintang.netflik.movieQueryService.repository.VideoRepository;
 import com.lintang.netflik.movieQueryService.util.entityMapper.VideoEntityMapper;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +18,17 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 @Slf4j
-@AllArgsConstructor
-@NoArgsConstructor
 @Service
 public class VideoCommandService {
 
     private VideoCommandAction videoCommandAction;
+
+    @Autowired
+    public VideoCommandService(
+        VideoCommandAction videoCommandAction
+    ) {
+        this.videoCommandAction = videoCommandAction;
+    }
 
 
     public Iterable<VideoEntity> getVideosByMovieId(@NotNull @Valid int movieId, String userId) {

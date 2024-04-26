@@ -51,7 +51,7 @@ services:
 
 
   kafka-connect:
-    image: debezium/connect:latest
+    image: debezium/connect:2.2
     container_name: kafka-connect
     restart: unless-stopped
     ports:

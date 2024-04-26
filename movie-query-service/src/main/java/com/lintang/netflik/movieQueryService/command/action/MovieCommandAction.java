@@ -13,6 +13,8 @@ import com.lintang.netflik.movieQueryService.util.entityMapper.VideoEntityMapper
 import com.lintang.netflik.movieQueryService.util.eventMapper.MovieEventMapper;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.validation.Valid;
@@ -25,8 +27,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Component
 public class MovieCommandAction {
 
@@ -37,6 +37,25 @@ public class MovieCommandAction {
     private VideoEntityMapper videoEntityMapper;
     private VideoRepository videoRepository;
     private MovieEventMapper movieEventMapper;
+
+    //  constructor to inject dependencies
+    @Autowired
+    public MovieCommandAction(MovieRepository repository,
+        ActorEntityMapper actorEntityMapper,
+        CreatorEntityMapper creatorEntityMapper,
+        MovieEntityMapper movieEntityMapper,
+        VideoEntityMapper videoEntityMapper,
+        VideoRepository videoRepository,
+        MovieEventMapper movieEventMapper
+    ) {
+        this.repository = repository;
+        this.actorEntityMapper = actorEntityMapper;
+        this.creatorEntityMapper = creatorEntityMapper;
+        this.movieEntityMapper = movieEntityMapper;
+        this.videoEntityMapper = videoEntityMapper;
+        this.videoRepository = videoRepository;
+        this.movieEventMapper = movieEventMapper;
+    }
 
 
     public MovieEntity addMovie(AddMovieMessage newMovie) {

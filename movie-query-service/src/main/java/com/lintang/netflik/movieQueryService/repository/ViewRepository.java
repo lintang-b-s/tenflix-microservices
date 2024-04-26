@@ -7,6 +7,4 @@ import java.util.Optional;
 
 public interface ViewRepository extends MongoRepository<ViewEntity, Integer> {
     Optional<ViewEntity> findByVideoIdAndUserId(int videoId, String userId);
-
-
 }

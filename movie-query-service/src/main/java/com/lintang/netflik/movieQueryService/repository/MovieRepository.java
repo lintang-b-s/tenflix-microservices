@@ -13,8 +13,4 @@ public interface MovieRepository extends MongoRepository<MovieEntity, Integer> {
     Optional<MovieEntity> findMovieEntitiesById(int movieId);
     Optional<MovieEntity> findById(int movieId);
     String deleteById(int movieId);
-
-
-
-
 }

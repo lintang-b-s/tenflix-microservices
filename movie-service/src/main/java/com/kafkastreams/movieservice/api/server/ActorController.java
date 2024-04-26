@@ -17,7 +17,6 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/api/v1/movie-service/actors")
-
 public class ActorController {
     private static final Logger log = LoggerFactory.getLogger(ActorController.class);
     private ActorCommandService actorService;
