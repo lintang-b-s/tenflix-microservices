@@ -487,12 +487,10 @@ services:
       # - net
       net:
           ipv4_address: 172.1.1.34
-    # depends_on:
-    #   - kafka
+    depends_on:
+      - kafka
     #   - movie-service
-    #   - consul-tenflix
-    #   - kong
-  
+      - consul-tenflix
 
   postgres-movie:
     container_name: postgres-movie

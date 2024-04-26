@@ -32,10 +32,8 @@ public class MovieQueryAction {
 
     @Autowired
     public MovieQueryAction(
-        SubscriptionServiceGrpc.SubscriptionServiceBlockingStub subscriptionStub,
          MovieRepository repository
     ) {
-        this.subscriptionStub = subscriptionStub;
         this.repository = repository;
     }
 

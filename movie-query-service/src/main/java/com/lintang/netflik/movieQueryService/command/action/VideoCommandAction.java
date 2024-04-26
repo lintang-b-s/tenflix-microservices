@@ -61,8 +61,7 @@ public class VideoCommandAction {
         VideoEntityMapper videoEntityMapper,
         VideoRepository videoRepository,
         MovieEventMapper movieEventMapper,
-        ViewRepository viewRepository,
-        SubscriptionServiceGrpc.SubscriptionServiceBlockingStub subscriptionStub
+        ViewRepository viewRepository
     ){
         this.movierepository = movieRepository;
         this.actorEntityMapper = actorEntityMapper;
@@ -72,7 +71,6 @@ public class VideoCommandAction {
         this.videoRepository = videoRepository;
         this.movieEventMapper  = movieEventMapper;
         this.viewRepository  = viewRepository;
-        this.subscriptionStub = subscriptionStub;
     }
 
     public VideoEntity addVideoToMovie(AddVideoMessage videoMessage) {
