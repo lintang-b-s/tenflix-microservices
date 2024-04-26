@@ -11,6 +11,7 @@ import com.lintang.netflik.movieQueryService.entity.Platform;
 import com.lintang.netflik.movieQueryService.entity.VideoEntity;
 import com.lintang.netflik.movieQueryService.entity.ViewEntity;
 import com.lintang.netflik.movieQueryService.exception.ResourceNotFoundException;
+import com.lintang.netflik.movieQueryService.exception.UnauthorizedError;
 import com.lintang.netflik.movieQueryService.repository.MovieRepository;
 import com.lintang.netflik.movieQueryService.repository.VideoRepository;
 import com.lintang.netflik.movieQueryService.repository.ViewRepository;
@@ -28,6 +29,7 @@ import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException.Unauthorized;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -89,8 +91,6 @@ public class VideoCommandAction {
     }
 
 
-
-
     public void updateVideo(AddVideoMessage videoMessage) {
         Optional<VideoEntity> video = videoRepository.findById(Integer.valueOf(videoMessage.getId()));
         if (!video.isPresent()){
@@ -146,7 +146,7 @@ public class VideoCommandAction {
 
         } catch (StatusRuntimeException e) {
             if (e.getStatus().getCode() == Status.Code.FAILED_PRECONDITION){
-                throw new ResourceNotFoundException(e.getMessage());
+                throw new UnauthorizedError(e.getMessage());
             }
         }
         return videoRepository.findByMovieId(movieId);
@@ -164,7 +164,7 @@ public class VideoCommandAction {
 
         } catch (StatusRuntimeException e) {
             if (e.getStatus().getCode() == Status.Code.FAILED_PRECONDITION){
-                throw new ResourceNotFoundException(e.getMessage());
+                throw new UnauthorizedError(e.getMessage());
             }
         }
 
