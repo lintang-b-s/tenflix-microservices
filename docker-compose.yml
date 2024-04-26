@@ -391,15 +391,15 @@
 #         ipv4_address: 172.1.1.15
 #     platform: linux/amd64
 
-#   rabbitmq:
-#     container_name: rabbitmq
-#     image: rabbitmq:3-management
-#     ports:
-#       - "5672:5672"
-#       - "15672:15672"
-#     networks:
-#       - net
-#     platform: linux/amd64
+  # rabbitmq:
+  #   container_name: rabbitmq
+  #   image: rabbitmq:3-management
+  #   ports:
+  #     - "5672:5672"
+  #     - "15672:15672"
+  #   networks:
+  #     - net
+  #   platform: linux/amd64
 
 #   movie-service:
 #     container_name: movie-service
@@ -439,26 +439,26 @@
 #         ipv4_address: 172.1.1.17
 #     platform: linux/amd64
 
-#   notification-service:
-#     container_name: notification-service
-#     build: ./notificationservice
-#     ports:
-#       - 8300:8300
-#     # env_file:
-#     #   - config-repo/notificationservice.env
-#     depends_on:
-#       - mongo-movie-query
-#       - rabbitmq
-#       - kong
-#       - consul-tenflix
-#       - keycloak-tenflix
-#     environment:
-#       - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
-#       - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
-#     networks:
-#       net:
-#         ipv4_address: 172.1.1.18
-#     platform: linux/amd64
+  # notification-service:
+  #   container_name: notification-service
+  #   build: ./notificationservice
+  #   ports:
+  #     - 8300:8300
+  #   # env_file:
+  #   #   - config-repo/notificationservice.env
+  #   depends_on:
+  #     - mongo-movie-query
+  #     - rabbitmq
+  #     - kong
+  #     - consul-tenflix
+  #     - keycloak-tenflix
+  #   environment:
+      # - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
+      # - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
+  #   networks:
+  #     net:
+  #       ipv4_address: 172.1.1.18
+  #   platform: linux/amd64
 
 # volumes:
 #   postgres-movie:

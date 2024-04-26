@@ -20,25 +20,25 @@ public class RabbitMQConfig {
     @Value("${rabbitmq.queue.email.name}")
     private String emailQueue;
 
-    @Value("${rabbitmq.exchange.name}")
-    private String exchange;
+    // @Value("${rabbitmq.exchange.name}")
+    // private String exchange;
 
-    @Value("${rabbitmq.binding.email.routing.key}")
-    private String emailRoutingKey;
+    // @Value("${rabbitmq.binding.email.routing.key}")
+    // private String emailRoutingKey;
 
-    // for movie query service
-    @Value("${rabbitmq.queue.movie.add}")
-    private String addMovieQueue;
-    @Value("${rabbitmq.binding.movieAdd.routing.key}")
-    private String addMovieRoutingKey;
-    @Value("${rabbitmq.queue.movie.update}")
-    private String updateMovieQueue;
-    @Value("${rabbitmq.binding.movieUpdate.routing.key}")
-    private String updateMovieRoutingKey;
-    @Value("${rabbitmq.queue.movie.delete}")
-    private String deleteMovieQueue;
-    @Value("${rabbitmq.binding.movieDelete.routing.key}")
-    private String deleteMovieRoutingKey;
+    // // for movie query service
+    // @Value("${rabbitmq.queue.movie.add}")
+    // private String addMovieQueue;
+    // @Value("${rabbitmq.binding.movieAdd.routing.key}")
+    // private String addMovieRoutingKey;
+    // @Value("${rabbitmq.queue.movie.update}")
+    // private String updateMovieQueue;
+    // @Value("${rabbitmq.binding.movieUpdate.routing.key}")
+    // private String updateMovieRoutingKey;
+    // @Value("${rabbitmq.queue.movie.delete}")
+    // private String deleteMovieQueue;
+    // @Value("${rabbitmq.binding.movieDelete.routing.key}")
+    // private String deleteMovieRoutingKey;
 
 
 
@@ -47,57 +47,57 @@ public class RabbitMQConfig {
     public Queue emailQueue(){
         return new Queue(emailQueue);
     }
-    @Bean
-    public Queue addMovieQueue() {
-        return new Queue(addMovieQueue);
-    }
-    @Bean
-    public Queue updateMovieQueue() {
-        return new Queue(updateMovieQueue);
-    }
-    @Bean
-    public Queue deleteMovieQueue() {
-        return new Queue(deleteMovieQueue);
-    }
+    // @Bean
+    // public Queue addMovieQueue() {
+    //     return new Queue(addMovieQueue);
+    // }
+    // @Bean
+    // public Queue updateMovieQueue() {
+    //     return new Queue(updateMovieQueue);
+    // }
+    // @Bean
+    // public Queue deleteMovieQueue() {
+    //     return new Queue(deleteMovieQueue);
+    // }
 
-    // spring bean for exchange
-    @Bean
-    public TopicExchange exchange(){
-        return new TopicExchange(exchange);
-    }
+    // // spring bean for exchange
+    // @Bean
+    // public TopicExchange exchange(){
+    //     return new TopicExchange(exchange);
+    // }
 
 
     // spring bean for binding between exchange and queue using routing key
-    @Bean
-    public Binding emailBinding(){
-        return BindingBuilder
-                .bind(emailQueue())
-                .to(exchange())
-                .with(emailRoutingKey);
-    }
+    // @Bean
+    // public Binding emailBinding(){
+    //     return BindingBuilder
+    //             .bind(emailQueue())
+    //             .to(exchange())
+    //             .with(emailRoutingKey);
+    // }
 
-    @Bean
-    public Binding addMovieBinding(){
-        return BindingBuilder
-                .bind(addMovieQueue())
-                .to(exchange())
-                .with(addMovieRoutingKey);
-    }
+    // @Bean
+    // public Binding addMovieBinding(){
+    //     return BindingBuilder
+    //             .bind(addMovieQueue())
+    //             .to(exchange())
+    //             .with(addMovieRoutingKey);
+    // }
 
-    @Bean
-    public Binding updateMovieBinding(){
-        return BindingBuilder
-                .bind(updateMovieQueue())
-                .to(exchange())
-                .with(updateMovieRoutingKey);
-    }
-    @Bean
-    public Binding deleteMovieBinding() {
-        return BindingBuilder
-                .bind(deleteMovieQueue())
-                .to(exchange())
-                .with(deleteMovieRoutingKey);
-    }
+    // @Bean
+    // public Binding updateMovieBinding(){
+    //     return BindingBuilder
+    //             .bind(updateMovieQueue())
+    //             .to(exchange())
+    //             .with(updateMovieRoutingKey);
+    // }
+    // @Bean
+    // public Binding deleteMovieBinding() {
+    //     return BindingBuilder
+    //             .bind(deleteMovieQueue())
+    //             .to(exchange())
+    //             .with(deleteMovieRoutingKey);
+    // }
 
     // message converter
 //    @Bean

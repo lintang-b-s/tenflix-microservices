@@ -73,7 +73,7 @@ public class VideoCommandAction {
 
 
 
-    public VideoEntity addVideoAndUpload(  AddVideoReq newVideo) {
+    public VideoEntity addVideoAndUpload( AddVideoReq newVideo) {
          Optional<VideoEntity> opVideo = repository.findByTitle(newVideo.getTitle());
          if (opVideo.isPresent()){
             throw new BadRequestException("Video with name: " + newVideo.getTitle() + " already in database");
@@ -81,12 +81,24 @@ public class VideoCommandAction {
 
         MovieEntity movie = movieQueryAction.getMovieById(newVideo.getMovieId());
 
-        return repository.save(mapper.toEntityBeforeUpload(newVideo, movie));
+        return repository.save(mapper.toEntityBeforeUpload(newVideo, movie)); 
     }
 
 
     public VideoEntity getVideoByMovieIdAndId( int movieId, int videoId) {
-        return repository.getVideoEntitiesByMovie_IdAndId(movieId, videoId).get();
+        Optional<VideoEntity> optionalVideo = repository.getVideoEntitiesByMovie_IdAndId(movieId, videoId);
+        if (!optionalVideo.isPresent()) {
+            throw new ResourceNotFoundException("video dengan id: " + videoId + " tidak ditemukan dalam database");
+        }
+        return optionalVideo.get();
+    }
+
+    public VideoEntity getVideoById(int videoId) {
+        Optional<VideoEntity> optionalVid = repository.getVideoEntitiesById(videoId);
+        if (!optionalVid.isPresent()) {
+            throw new ResourceNotFoundException("video dengan id: " + videoId + " tidak ditemukan dalam database");
+        }
+        return optionalVid.get();
     }
 
 

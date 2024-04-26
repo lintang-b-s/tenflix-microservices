@@ -28,7 +28,7 @@ public class VideoEntityMapper {
         return entity
                 .setPublicId(videoDto.getPublicId())
                 .setLength(videoDto.getLength()) .setTitle(videoDto.getTitle()).setSynopsis(videoDto.getSynopsis())
-                .setMovie(movie).setPublicId(videoDto.getPublicId());
+                .setMovie(movie).setPublicId(videoDto.getPublicId()); // gak ada url nya karena lagi upload di media-service
     }
 
     public VideoEntity videoDtoToEntity(Video video, MovieEntity movie) {

@@ -54,7 +54,24 @@ public class VideoCommandService {
 
     public VideoEntity save(@Valid AddVideoReq newVideo) {
 
-        return videoCommandAction.saveReq(newVideo);
+        VideoEntity savedVideo =  videoCommandAction.saveReq(newVideo);
+
+        AddVideoMessage videoMessageToQuerySvc  = videoMessageMapper.videoEntityToMessage(savedVideo);
+
+        OutboxEntity videoOutbox = null;
+        try {
+            videoOutbox = outboxAction.insertOutbox(
+                "video.request",
+                String.valueOf(savedVideo.getId()),
+                OutboxEventType.ADD_VIDEO_TO_MOVIE, videoMessageToQuerySvc);
+        } catch (JsonProcessingException e) {
+            throw new InternalServerEx("error json processing : " + e.getMessage());
+        }
+        outboxAction.deleteOutbox(videoOutbox);
+        LOG.info("sending add_video_to_movie message with  id +  " + String.valueOf(savedVideo.getId())
+                + " to movie-query-service!!");
+        
+        return savedVideo;
     }
 
     public Iterable<VideoEntity> getVideosByMovieId(@NotNull @Valid int movieId) {
@@ -62,7 +79,25 @@ public class VideoCommandService {
     }
 
     public void updateVideoUrl(String videoUrl, int videoId) {
-        videoCommandAction.updateVideoUrl(videoUrl, videoId);
+        videoCommandAction.updateVideoUrl(videoUrl, videoId); // update video url in movie-command-service database
+
+        // save to outbox table & send update video Url to movie-query-service by debezium
+        VideoEntity video =  videoCommandAction.getVideoById(videoId);
+        AddVideoMessage videoMessageToQuerySvc = videoMessageMapper.videoEntityToMessage(video);
+        OutboxEntity videoOutbox = null;
+        try {
+            videoOutbox = outboxAction.insertOutbox(
+                    "video.request",
+                    String.valueOf(video.getId()),
+                    OutboxEventType.UPDATE_VIDEO_URL, videoMessageToQuerySvc);
+        }catch (JsonProcessingException e) {
+            throw new InternalServerEx("error json processing : " + e.getMessage());
+        }
+        
+        outboxAction.deleteOutbox(videoOutbox);
+        LOG.info("sending update_video_url message with  id +  " + String.valueOf(video.getId())
+                + " to movie-query-service!!");
+
     }
 
     public VideoEntity addVideoAndUpload(@Valid AddVideoReq newVideo, MultipartFile file) {
@@ -80,6 +115,24 @@ public class VideoCommandService {
                 .build();
 
         mediaPublisher.publishToMediaService(message);
+
+        // save to outbox table & send message to movie-query-service by debezium
+        AddVideoMessage videoMessage = videoMessageMapper.videoEntityToMessage(video);
+        OutboxEntity videoOutbox = null;
+        try {
+            videoOutbox = outboxAction.insertOutbox(
+                    "video.request",
+                    String.valueOf(video.getId()),
+                    OutboxEventType.ADD_VIDEO_AND_UPLOAD, videoMessage);
+        }catch (JsonProcessingException e) {
+            throw new InternalServerEx("error json processing : " + e.getMessage());
+        }
+
+        outboxAction.deleteOutbox(videoOutbox);
+        LOG.info("sending add_video_upload message with  id +  " + String.valueOf(video.getId())
+                + " to movie-query-service!!");
+
+
         return video;
     }
 

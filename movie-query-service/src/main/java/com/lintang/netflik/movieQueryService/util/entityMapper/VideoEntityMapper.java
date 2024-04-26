@@ -38,5 +38,12 @@ public class VideoEntityMapper {
                 .setPublicId(videoDto.getPublicId());
     }
 
+    public VideoEntity saveMessageEntityWithoutUrl(AddVideoMessage videoDto) {
+        VideoEntity entity = new VideoEntity();
+        return entity.setId(videoDto.getId())
+                .setLength(videoDto.getLength()) .setTitle(videoDto.getTitle()).setSynopsis(videoDto.getSynopsis())
+                .setPublicId(videoDto.getPublicId());
+    }
+
 
 }

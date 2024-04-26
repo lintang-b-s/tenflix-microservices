@@ -17,6 +17,8 @@ public interface VideoRepository extends JpaRepository<VideoEntity, Integer> {
 
      Optional<VideoEntity> getVideoEntitiesByMovie_IdAndId(int movieId, int videoId);
 
+     Optional<VideoEntity> getVideoEntitiesById(int videoId);
+
      String deleteVideoEntitiesByMovie_IdAndId(int movieId, int videoId);
 
      Optional<VideoEntity> findById(int videoId);

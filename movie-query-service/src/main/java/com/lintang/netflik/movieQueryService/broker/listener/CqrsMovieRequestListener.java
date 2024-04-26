@@ -47,14 +47,17 @@ public class CqrsMovieRequestListener {
             var addMovieMessage = objectMapper.readValue(outboxMessage.getPayload().getPayload(),
                     AddMovieMessage.class);
 
+
+            // get videos data from movie event
+            int  n = addMovieMessage.getVideos().size();
+            Video vids[] = new Video[n];
+            System.arraycopy(addMovieMessage.getVideos().toArray(), 0, vids, 0, n);
             switch (outboxMessage.getPayload().getEventType()) {
+                
                 case OutboxEventType.ADD_MOVIE:
                     movieCommandService.addMovie(addMovieMessage); // add movie to mongodb
 
                     // add movie videos to mongodb
-                    int  n = addMovieMessage.getVideos().size();
-                    Video vids[] = new Video[n];
-                    System.arraycopy(addMovieMessage.getVideos().toArray(), 0, vids, 0, n);
                     for (int i=0; i < n ; i++ ){
                        Video  video =  vids[i];
                         AddVideoMessage addVideoMessage = AddVideoMessage.builder().id(video.getId())
@@ -67,10 +70,21 @@ public class CqrsMovieRequestListener {
                     LOG.info("add movie with id : " + addMovieMessage.getId() + " to movie-query database!" );
                     break;
                 case OutboxEventType.UPDATE_MOVIE:
-                    movieCommandService.updateMovie(addMovieMessage.getId(), addMovieMessage);
+
+                    movieCommandService.updateMovie(addMovieMessage.getId(), addMovieMessage); // update movie in mongodb
+                    // update movie videos in mongodb    
+                     for (int i=0; i < n ; i++ ){
+                        Video  video =  vids[i];
+                         AddVideoMessage addVideoMessage = AddVideoMessage.builder().id(video.getId())
+                             .url(video.getUrl()).publicId(video.getPublicId()).length(video.getLength())
+                             .title(video.getTitle()).synopsis(video.getSynopsis()).movieId(String.valueOf( video.getMovieId()))
+                             .build();
+                        videoCommandAction.addVideoToMovie(addVideoMessage);
+                     }
                     LOG.info("update movie with id : " + addMovieMessage.getId() + " in movie-query database!" );
                     break;
-
+                
+                
             }
         } else if(StringUtils.equalsAny(outboxMessage.getPayload().getEventType(), OutboxEventType.DELETE_MOVIE)) {
             var deleteMovieMessage = objectMapper.readValue(outboxMessage.getPayload().getPayload(),
@@ -78,9 +92,6 @@ public class CqrsMovieRequestListener {
             movieCommandService.deleteMovie(deleteMovieMessage.getId());
             LOG.info("delete movie with id : " + deleteMovieMessage.getId() + " in movie-query database!" );
         }
-
     }
-
-
 
 }

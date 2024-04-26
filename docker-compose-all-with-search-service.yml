@@ -552,8 +552,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     networks:
-      net:
-        ipv4_address: 172.1.1.47
+      - net:
+          ipv4_address: 172.1.1.47
     platform: linux/amd64
 
 
@@ -563,16 +563,21 @@ services:
     mem_limit: "300mb"
     cpus: 0.4
     environment:
-      - EMAIL_DESTINATION=${EMAIL_DESTINATION}
+      - SPRING_MAIL_USERNAME=${SPRING_MAIL_USERNAME}
+      - SPRING_MAIL_PASSWORD=${SPRING_MAIL_PASSWORD}
     ports:
       - 8099:8099
     depends_on:
       - movie-service
       - rabbitmq
     networks:
-      net:
-        ipv4_address: 172.1.1.48
-    
+      - net:
+          ipv4_address: 172.1.1.48
+  
+
+  #  for search service works (kafka streams,elasticsearch, and search-service)
+
+
 
   
     

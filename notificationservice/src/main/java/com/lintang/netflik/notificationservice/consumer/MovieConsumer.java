@@ -5,6 +5,7 @@ import com.lintang.netflik.notificationservice.dto.ResponseMessage;
 import com.lintang.netflik.notificationservice.service.EmailConsumerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.messaging.Message;
@@ -18,6 +19,8 @@ public class MovieConsumer {
 
 //    private WebClient webClient;
     private  EmailConsumerService emailService;
+
+    @Autowired
     public MovieConsumer( EmailConsumerService emailService) {this.emailService =  emailService;}
 
     @RabbitListener(queues = "${rabbitmq.queue.email.name}")

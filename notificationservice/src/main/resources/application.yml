@@ -28,6 +28,11 @@ rabbitmq:
     email:
       routing:
         key: email_routing_key
+  
+
+
+email:
+  to: ${EMAIL_DESTINATION}
     
 
 

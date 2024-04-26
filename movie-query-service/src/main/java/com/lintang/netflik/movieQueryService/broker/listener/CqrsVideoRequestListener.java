@@ -37,18 +37,27 @@ public class CqrsVideoRequestListener {
         var outboxMessage = objectMapper.readValue(message, OutboxMessage.class);
         LOG.info("get video message from movie-service!");
         if (StringUtils.equalsAny(outboxMessage.getPayload().getEventType(),
-                OutboxEventType.ADD_VIDEO_TO_MOVIE, OutboxEventType.UPDATE_VIDEO_FROM_MOVIE)) {
+                OutboxEventType.ADD_VIDEO_TO_MOVIE, OutboxEventType.UPDATE_VIDEO_FROM_MOVIE,
+                OutboxEventType.ADD_VIDEO_AND_UPLOAD)) {
             var addVideoMessage = objectMapper.readValue(outboxMessage.getPayload().getPayload(),
                     AddVideoMessage.class);
 
             switch (outboxMessage.getPayload().getEventType()) {
                 case OutboxEventType.ADD_VIDEO_TO_MOVIE:
-                    VideoEntity video=videoCommandService.addVideoToMovie(addVideoMessage);
+                    VideoEntity video =videoCommandService.addVideoToMovie(addVideoMessage);
                     LOG.info("add video with id "+ addVideoMessage.getId() + " to movie " + addVideoMessage.getMovieId());
                     break;
                 case OutboxEventType.UPDATE_VIDEO_FROM_MOVIE:
                     videoCommandService.updateVideoFromMovie(addVideoMessage);
                     LOG.info("update video with id "+ addVideoMessage.getId() + " to movie " + addVideoMessage.getMovieId());
+                    break;
+                case OutboxEventType.ADD_VIDEO_AND_UPLOAD:
+                    videoCommandService.addVideoAndUpload(addVideoMessage);
+                    LOG.info("add video without url with id "+ addVideoMessage.getId() + " to movie " + addVideoMessage.getMovieId());
+                    break;
+                case OutboxEventType.UPDATE_VIDEO_URL:
+                    videoCommandService.updateVideoUrl(addVideoMessage);
+                    LOG.info("update video url  with id "+ addVideoMessage.getId() + " to movie " + addVideoMessage.getMovieId());
                     break;
             }
         } else if(StringUtils.equalsAny(outboxMessage.getPayload().getEventType(),

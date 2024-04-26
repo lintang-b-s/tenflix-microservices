@@ -70,5 +70,16 @@ public class VideoCommandService {
         return;
     }
 
+    @Transactional
+    public void addVideoAndUpload(AddVideoMessage videoMessage) {
+        videoCommandAction.addVideoAndUpload(videoMessage);
+        return ;
+    }
+
+    @Transactional
+    public void updateVideoUrl(AddVideoMessage videoMessage) {
+        videoCommandAction.updateVideoUrl(videoMessage);
+        return ;
+    }
 
 }

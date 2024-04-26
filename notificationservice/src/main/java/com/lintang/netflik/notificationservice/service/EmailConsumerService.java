@@ -3,6 +3,8 @@ package com.lintang.netflik.notificationservice.service;
 import io.rocketbase.mail.EmailTemplateBuilder;
 import com.lintang.netflik.notificationservice.dto.MovieEvent;
 import com.lintang.netflik.notificationservice.email.EmailSenderServiceImpl;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -19,11 +21,14 @@ public class EmailConsumerService {
   }
 
 
+  @Value("${email.to}")
+  private String emailDestination;
+
 
   public void emailNotifNewMovie(MovieEvent message) {
-    String messageContentBody = "film" +  message.getName() + "telah tersedia di tenfix. " + message.getSynopsis();
+    String messageContentBody = "film" +  message.getName() + "telah tersedia di tenflix. " + message.getSynopsis();
 
-    emailService.send("uyayiu123@gmail.com", message.getName(),
+    emailService.send(emailDestination, message.getName(),
       buildEmail(message.getName(), messageContentBody,
       message.getImage()));
     return ;

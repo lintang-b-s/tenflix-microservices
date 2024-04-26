@@ -27,6 +27,7 @@ import lombok.NoArgsConstructor;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.aggregation.ArithmeticOperators.Add;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException.Unauthorized;
@@ -119,7 +120,7 @@ public class VideoCommandAction {
             updateVideo.setMovie(movieNew);
         }
 
-        videoRepository.save(updateVideo);
+        videoRepository.save(updateVideo); // save updated video
         if (Integer.parseInt(videoMessage.getMovieId()) != updateVideo.getMovie().getId()) {
             oldMovie.deleteVideo(updateVideo);
             movierepository.save(oldMovie);
@@ -127,11 +128,34 @@ public class VideoCommandAction {
             movierepository.save(movieNew);
         }
 
-            return;
+        return;
     }
 
-//    public void deleteVideo
+    public void addVideoAndUpload(AddVideoMessage videoMessage) {
+        VideoEntity video = videoRepository.save(videoEntityMapper.saveMessageEntityWithoutUrl(videoMessage));
+        Optional<MovieEntity> movie = movierepository.findById(Integer.parseInt(videoMessage.getMovieId()));
+        if (!movie.isPresent()){
+            throw new ResourceNotFoundException("movie with id: " + videoMessage.getMovieId() + " not found");
+        }
+        MovieEntity movieNew = movie.get();
+        video.addMovie(movieNew);
+        videoRepository.save(video);
+        movieNew.addVideos(video);
+        movierepository.save(movieNew);
+        return ;
+    }
 
+    public void updateVideoUrl(AddVideoMessage videoMessage) {
+        Optional<VideoEntity> video = videoRepository.findById(Integer.valueOf(videoMessage.getId()));
+        if (!video.isPresent()){
+            throw new ResourceNotFoundException("video with id: "+ videoMessage.getId() + " not found!");
+        }
+
+        VideoEntity updateVideo =  video.get();
+        updateVideo.setUrl(videoMessage.getUrl());
+        videoRepository.save(updateVideo); // save updated video
+        return;
+    }
 
 
     public Iterable<VideoEntity> getVideosByMovieId(@NotNull @Valid int movieId, String userId) {

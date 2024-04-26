@@ -38,10 +38,6 @@ public class CqrsCreatorRequestListener {
             var updateCreatorMessage = objectMapper.readValue(outboxMessage.getPayload().getPayload(),
                     UpdateCreatorMessage.class);
             creatorCommandService.updateCreator(updateCreatorMessage);
-
-
         }
-
     }
-
 }
