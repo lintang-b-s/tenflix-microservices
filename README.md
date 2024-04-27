@@ -1,5 +1,5 @@
 # Description
-movie streaming microservices like netflix, built using microservices architecture, Saga distributed transactions pattern, kafka, grpc, concurrency, cdc debezium, keycloak oauth server, kong api gateway, consul service discovery, etc.
+Movie Streaming microservices like Netflix, built using microservices architecture, Saga distributed transactions patternm , CQRS, Outbox Pattern, kafka, grpc, concurrency, CDC debezium, keycloak oauth server, kong api gateway, consul service discovery, etc.
 
 
 This project provides an example of the Saga distributed transactions pattern.
@@ -10,10 +10,42 @@ This project provides an example of the Saga distributed transactions pattern.
 
 
 ### Saga Distributed Transactions Pattern
-![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1692205447/tenflix_copy_kd6pos.png)
+![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1714240559/tenflix_copy_j4zm4v.png)
 
 ### concurrency
 [https://github.com/lintang-b-s/tenflix-microservices/blob/main/order-aggregator-service-go/internal/usecase/order.go]  getOrderDetail usecase using concurrency to call the other three services
+
+### Microservice
+1. Movie-command-service: This microservice writes and updates movie data.Movies data is stored in Postgres. Movie data also saved as payload in outbox table movie-command-service. Debezium read/listen data from write-ahead log outbox table in postgres and then send movie data to kafka.
+
+2. Movie-Query-service: This microservices reads movie data from mongodb. The movies data is obtained from Kafka, where the Kafka event message is sent by debezium, and the movie data from the movie-command-service database. When a user wants to see a movie, the user sends a request to this microservice, then this microservice checks whether the user has a subscription by sending a GRPC request to the subscription service. If the user has a subscription, the video movie data is sent to the user
+
+3. Media-service: This microservice receives video data from Kafka, where video data is sent by movie-command-service when the admin adds and uploads movie videos.
+
+4. Notification-service: This microservices sends notifications to certain users every time the admin adds a new movie in the movie-command-service.
+
+5. Order-aggregator-service: When a user wants to buy a Tenflix subscription plan, the user places an order in the system, making the order is done by this microservice. Order creation involves requests to payment and subscription microservices. The return from createOrder is a midtrans snap link. This microservice also provides a midtrans notification endpoint, if midtrans sends a notification to this microservice, a saga transaction will be executed to complete the order. This microservice also provides an endpoint to display user order data.
+
+6. Order-Service: The microservice also performs CRUD on order data stored in the Postgres order-service database.
+
+7. Payment-service: This microservice interacts directly with the midtrans api. This microservice also stores payment data from Midtrans into its database.
+
+8. Subcription-Service: This microservice performs CRUD on its database. The subscription-service database stores user subscription data and subscription plans on Tenflix.
+
+
+### Choreography-based Saga Transaction Flow
+Sending data in here using outbox pattern & cdc. The data that the publisher wants to send is saved to the outbox table, then debezium listens for changes to the outbox table data (via Postgres write-ahead-log) and sends the data to Kafka every time there is new data in the outbox table.
+#### Happy Case (Payment PAID/Accepted)
+1. order-aggregator-service receives notification from midtrans, then it sends a GRPC request to order-service so that order-service, subscription-service, payment-service carry out choreography saga transactions.
+2. order-service receives a GRPC request from order-aggregator-service, then it checks whether the order data from the midtrans orderId field exists in the database. If there is, order-service sends payment message from order-aggregator-service to payment-service via kafka. Sending data using outbox pattern & cdc. The data that the order-service wants to send is saved to the outbox table, then debezium listens for changes to the outbox table data (via Postgres write-ahead-log) and sends the data to Kafka every time there is new data in the outbox table.
+3. The payment service receives payment message from order-service (via Kafka), then checks the Midtrans payment status on the payment data. In this case the payment status is "accept", then the payment data is saved to the payment database. and payment -service sends a ValidatedPayment message to order-service
+4. order-service receives a message from payment-service (via kafka), then updates the order status to PAID , then sends an Add_Subscription message to subscription-service
+5. subscription-service receives the AddedSubscription Message from order-service, then saves the user's subscription data to its database, then sends the AddedSubscription message to order-service
+6. order-service receives the AddedSubscription message from subscription-service , then it sends a CompleteOrder Message to the order-request topic in kafka.
+7. order-service receives a message from the kafka order-request topic, then it updates the order status to "COMPLETED".
+
+#### Bad Case 1 (The subscription plan ordered by the user does not exist in the subscription-service database )
+besok , dah ngantuk 
 
 # Quick Start
 
@@ -27,7 +59,7 @@ This project provides an example of the Saga distributed transactions pattern.
 
 ### start application
 ```
-    fill the env file 
+    fill the env file  & .ngrok.yml file
     bash ./bootstrap.sh
     
     docker compose -f docker-compose-all-test.yml up -d, wait until all container up & running
