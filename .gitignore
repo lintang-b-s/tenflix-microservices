@@ -80,4 +80,4 @@ data/
 .env
 
 mysql_keycloak_data/
-ngrok.yml
+.ngrok.yml

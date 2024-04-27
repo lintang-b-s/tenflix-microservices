@@ -27,7 +27,7 @@ public class MovieQueryAction {
 
     private MovieRepository repository;
 
-    @GrpcClient("subscription-service")
+    @GrpcClient("subscriptionService")
     private SubscriptionServiceGrpc.SubscriptionServiceBlockingStub subscriptionStub;
 
     @Autowired

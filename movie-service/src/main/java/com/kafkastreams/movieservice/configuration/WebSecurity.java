@@ -1,4 +1,4 @@
-package com.lintang.netflik.movieQueryService.configuration;
+package com.kafkastreams.movieservice.configuration;
 
 
 import org.springframework.context.annotation.Bean;

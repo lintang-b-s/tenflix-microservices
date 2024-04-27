@@ -1,13 +1,12 @@
 # Description
-microservices orders and payments (it's actually a movie streaming microservices, but it's not finished yet), built using microservices architecture, Saga distributed transactions pattern, kafka, grpc, concurrency, api gateway, service discovery, etc.
+movie streaming microservices like netflix, built using microservices architecture, Saga distributed transactions pattern, kafka, grpc, concurrency, cdc debezium, keycloak oauth server, kong api gateway, consul service discovery, etc.
 
 
 This project provides an example of the Saga distributed transactions pattern.
 
 
 # Architecture
-![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1692240124/tenflix_6_qi5mma.png)
-
+![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1714231729/tenflix_2_lb3slg.png)
 
 
 ### Saga Distributed Transactions Pattern
@@ -22,13 +21,16 @@ This project provides an example of the Saga distributed transactions pattern.
 1. install protobuf compiler
 2. install apache maven
 3. install docker & docker compose
+4. free RAM memory on your PC  >= 10gb
+5. min cpu: 6 core 12 thread (same as my laptop)
+
 
 ### start application
 ```
     fill the env file 
     bash ./bootstrap.sh
     
-    docker-compose -f docker-compose-order-test.yml up -d, wait until all container up & running
+    docker compose -f docker-compose-all-test.yml up -d, wait until all container up & running
     cd configuration
      bash ./consul-register.sh
     if kafka-connect is not running or kong, execute the above command again
@@ -72,8 +74,18 @@ This project provides an example of the Saga distributed transactions pattern.
     10. open get order history, paste accces token. send the request
 ```
 
-note:  you must provide an access token to each protected endpoint
+note:  you must provide an access token to each protected endpoint using oauth2 postman
 note: if order-aggregator-service container not running , start container again and run bash ./kong-order.sh
+
+### Insert Movie, Upload Movie video, Watch Movie
+```
+1. Make sure your account has purchased a subscription using the method I explained above.
+2. cd configuration && bash ./kong-order.sh
+3. make sure media-service up & running (check with 'docker ps -a -f "status=exited" ), if not running , restart the container (make sure kafka is up & running too)
+4. Execute all http request in the movie_folder postman, make sure it is in the order from top to bottom & dont create duplicate category
+5. Read movie & video data in movie query folder postman
+```
+
 
 ### 2. register
 ![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1692204057/1_idxpen.png )
@@ -104,6 +116,5 @@ note: if order-aggregator-service container not running , start container again 
 ![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1692205283/9_fkxizj.png)
 
 
-
-
-
+### 10. Execute all http request in the movie_folder postman
+![get movie](https://res.cloudinary.com/tutorial-lntng/image/upload/v1714232170/Screenshot_from_2024-04-27_22-35-55_wphyzv.png)

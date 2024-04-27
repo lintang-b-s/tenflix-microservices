@@ -9,6 +9,7 @@ import com.kafkastreams.movieservice.api.response.Video;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,6 +17,7 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/api/v1/movie-service/videos")
+@PreAuthorize("hasAuthority('ROLE_user')")
 public class VideoController {
     private VideoDtoMapper mapper;
     private VideoCommandService videoService;

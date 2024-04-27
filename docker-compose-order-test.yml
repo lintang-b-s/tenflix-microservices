@@ -14,7 +14,7 @@ services:
     mem_limit: "200mb"
     cpus: 0.2
     volumes:
-     - ./ngrok.yml:/etc/ngrok.yml
+     - ./.ngrok.yml:/etc/ngrok.yml
     ports:
       - 4040:4040
     networks:

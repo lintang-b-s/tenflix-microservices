@@ -57,7 +57,7 @@ public class VideoCommandAction {
 
     private ViewRepository viewRepository;
 
-    @GrpcClient("subscription-service")
+    @GrpcClient("subscriptionService")
     private SubscriptionServiceGrpc.SubscriptionServiceBlockingStub subscriptionStub;
 
 

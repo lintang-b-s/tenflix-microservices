@@ -10,12 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
+@PreAuthorize("hasAuthority('ROLE_user')")
 @RequestMapping("/api/v1/movie-service/actors")
 public class ActorController {
     private static final Logger log = LoggerFactory.getLogger(ActorController.class);

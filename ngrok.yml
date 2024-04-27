@@ -1,6 +1,0 @@
-authtoken: 2Zi4Zjo3myTpFNGlTy8754TrSJk_5gm6c5CB3fgmxHQ7Y92Pk
-version: 2
-tunnels:
-  order-aggregator-service:
-    addr: 172.1.1.19:9900
-    proto: http
