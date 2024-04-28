@@ -2,6 +2,7 @@ package com.kafkastreams.movieservice.command.action;
 
 import com.kafkastreams.movieservice.api.request.AddMovieReq;
 import com.kafkastreams.movieservice.entity.*;
+import com.kafkastreams.movieservice.exception.BadRequestException;
 import com.kafkastreams.movieservice.exception.ResourceNotFoundException;
 
 import com.kafkastreams.movieservice.query.action.*;
@@ -88,6 +89,9 @@ public class MovieCommandAction {
     public MovieEntity addMovie(@Valid AddMovieReq newMovie) {
         MovieEntity newMovieEntity = movieEntityMapper.toEntity(newMovie);
         Optional<MovieEntity> opMovie = repository.findByName(newMovie.getName());
+        if (!opMovie.isEmpty()) {
+                        throw new BadRequestException("movie with name: " + newMovie.getName() + " already in database");
+        }
         newMovieEntity.setActors(newMovie.getActors().stream()
                 .map(actor -> {
                     Optional<ActorEntity> actorOptional;

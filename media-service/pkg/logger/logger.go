@@ -2,10 +2,11 @@ package logger
 
 import (
 	"fmt"
-	"github.com/segmentio/kafka-go"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/segmentio/kafka-go"
 
 	"github.com/rs/zerolog"
 )
@@ -70,7 +71,7 @@ func (l *Logger) Info(message string, args ...interface{}) {
 // KafkaInfo -.
 func (l *Logger) KafkaInfo(message kafka.Message, workerId int, args ...interface{}) {
 	//TODO implement me
-	l.log(fmt.Sprintf("Processing Kafka Message, topic: %v , partition: %v, message :%v, workerId: %v, Offset: %v, Time: %v", message.Topic, message.Partition, string(message.Value), workerId, message.Offset, message.Time), args...)
+	l.log(fmt.Sprintf("Processing Kafka Message, topic: %v , partition: %v,  workerId: %v, Offset: %v, Time: %v", message.Topic, message.Partition, workerId, message.Offset, message.Time), args...)
 }
 
 func (l *Logger) KafkaLogCommittedMessage(topic string, partition int, offset int64) {

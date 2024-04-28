@@ -45,11 +45,13 @@ func (c *CloudinaryWebAPI) Upload(ctx context.Context, m entity.UploadVideoMessa
 		return entity.UploadedVideoMessage{}, fmt.Errorf("CloudinaryWebAPI - Upload - cld.Upload.Upload: %w", err)
 	}
 
+	var hlsHdVideoUrl = resp.Eager[1].SecureURL
+
 	uMessage := entity.UploadedVideoMessage{
-		Url:      resp.SecureURL,
+		Url:      hlsHdVideoUrl,
 		PublicId: resp.PublicID,
 		Id:       m.Id,
 	}
-	fmt.Println("url cloudinary video: ", resp.SecureURL, " publicId: ", resp.PublicID)
+	fmt.Println("url cloudinary video: ", resp.SecureURL, " publicId: ", resp.PublicID, " Streaming Url: ", hlsHdVideoUrl)
 	return uMessage, nil
 }

@@ -101,7 +101,7 @@
 								},
 								{
 									"key": "code",
-									"value": "657edfc5-586b-4080-91ac-5620eb1682aa.5fa0d1ae-972b-4b8f-9a16-14578e6aa0d4.3f6103bf-5806-4d65-b16f-27e0520ffba0",
+									"value": "0d16fd17-238d-4ff2-82ff-467ba980f1c2.b033fcde-09e2-40c8-a9d7-1cf5e4fc879b.3f6103bf-5806-4d65-b16f-27e0520ffba0",
 									"type": "text"
 								},
 								{
@@ -502,7 +502,7 @@
 							"raw": ""
 						},
 						"url": {
-							"raw": "http://localhost:8000/api/v1/orders/2fe6ed51-a2ea-43c7-8668-d407b1999b82",
+							"raw": "http://localhost:8000/api/v1/orders/171bdb61-1d9c-4618-97f7-73ea6bd80386",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -512,7 +512,7 @@
 								"api",
 								"v1",
 								"orders",
-								"2fe6ed51-a2ea-43c7-8668-d407b1999b82"
+								"171bdb61-1d9c-4618-97f7-73ea6bd80386"
 							]
 						}
 					},
@@ -1207,486 +1207,6 @@
 					]
 				},
 				{
-					"name": "add video Copy",
-					"item": [
-						{
-							"name": "create videos and video to movie",
-							"request": {
-								"auth": {
-									"type": "oauth2",
-									"oauth2": [
-										{
-											"key": "addTokenTo",
-											"value": "header",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Joker: Folie a Deux 5\",\n        \"synopsis\": \"Joker: Folie a Deux\",\n        \"publicId\": \"uYPbbksJxIg\",\n        \"movieId\": 1\n    }",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8200/api/v1/movie-service/videos",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8200",
-									"path": [
-										"api",
-										"v1",
-										"movie-service",
-										"videos"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "upload video & add video to movie",
-							"request": {
-								"auth": {
-									"type": "oauth2",
-									"oauth2": [
-										{
-											"key": "addTokenTo",
-											"value": "header",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "formdata",
-									"formdata": [
-										{
-											"key": "file",
-											"contentType": "audio/mp4",
-											"type": "file",
-											"src": "/home/lintangbs/Downloads/joker.mp4"
-										},
-										{
-											"key": "body",
-											"value": "{ \n  \"length\": 180,\n  \"title\": \"Joker: Folie a Deux\",\n  \"synopsis\": \"Joker: Folie a Deux synopsis\",\n  \"movieId\": 1\n}",
-											"contentType": "application/json",
-											"type": "text"
-										}
-									]
-								},
-								"url": {
-									"raw": "http://localhost:8200/api/v1/movie-service/videos/addUpload",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8200",
-									"path": [
-										"api",
-										"v1",
-										"movie-service",
-										"videos",
-										"addUpload"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "create videos and video to movie Copy",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Oppenheimer\",\n        \"synopsis\": \"Oppenheimer\",\n        \"publicId\": \"uYPbbksJxIg\",\n        \"movieId\": 1\n    }",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8200/api/v1/movie-service/videos",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8200",
-									"path": [
-										"api",
-										"v1",
-										"movie-service",
-										"videos"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "delete video",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:8200/api/v1/movie-service/videos/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8200",
-									"path": [
-										"api",
-										"v1",
-										"movie-service",
-										"videos",
-										"1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "update video",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Oppenheimerss\",\n        \"synopsis\": \"Oppenheimer\",\n        \"publicId\": \"uYPbbksJxIg\"\n\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8200/api/v1/movie-service/videos/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8200",
-									"path": [
-										"api",
-										"v1",
-										"movie-service",
-										"videos",
-										"1"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "movie",
-					"item": [
-						{
-							"name": "create movie (Joker: Folie a Deux)",
-							"request": {
-								"auth": {
-									"type": "oauth2",
-									"oauth2": [
-										{
-											"key": "accessTokenUrl",
-											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
-											"type": "string"
-										},
-										{
-											"key": "clientSecret",
-											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
-											"type": "string"
-										},
-										{
-											"key": "scope",
-											"value": "openid offline_access",
-											"type": "string"
-										},
-										{
-											"key": "clientId",
-											"value": "spring-cloud-client",
-											"type": "string"
-										},
-										{
-											"key": "grant_type",
-											"value": "client_credentials",
-											"type": "string"
-										},
-										{
-											"key": "authUrl",
-											"value": "http://localhost:5005/auth/login",
-											"type": "string"
-										},
-										{
-											"key": "tokenName",
-											"value": "token",
-											"type": "string"
-										},
-										{
-											"key": "addTokenTo",
-											"value": "header",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\": \"Joker: Folie a Deux 4\",\n    \"type\": \"Movie\",\n    \"synopsis\": \"Joker: Folie a Deux\",\n    \"mpaRating\": \"TEEN\",\n    \"rYear\": \"2023-06-20\",\n    \"idmbRating\": 8,\n    \"actors\":[{\n\n        \"name\": \"Cillian Murphy\"\n    },{\n\n        \"name\": \"Robert Downey Jr.\"\n    }\n    \n    ],\n    \"creators\":[ {\n\n        \"name\": \"Christopher Nolan\"\n    }],\n    \n    \"categories\": [\n         {\n   \n            \"name\": \"history\"\n        }\n      \n    ],\n    \"image\": \"https://www.play.id/wp-content/uploads/2023/07/oppenheimer-movie.jpg\",\n    \"notification\": false\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8200/api/v1/movie-service/movies",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8200",
-									"path": [
-										"api",
-										"v1",
-										"movie-service",
-										"movies"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "create movie  Copy",
-							"request": {
-								"auth": {
-									"type": "oauth2",
-									"oauth2": [
-										{
-											"key": "accessTokenUrl",
-											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
-											"type": "string"
-										},
-										{
-											"key": "clientSecret",
-											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
-											"type": "string"
-										},
-										{
-											"key": "scope",
-											"value": "openid offline_access",
-											"type": "string"
-										},
-										{
-											"key": "clientId",
-											"value": "spring-cloud-client",
-											"type": "string"
-										},
-										{
-											"key": "grant_type",
-											"value": "client_credentials",
-											"type": "string"
-										},
-										{
-											"key": "authUrl",
-											"value": "http://localhost:5005/auth/login",
-											"type": "string"
-										},
-										{
-											"key": "tokenName",
-											"value": "token",
-											"type": "string"
-										},
-										{
-											"key": "addTokenTo",
-											"value": "header",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\": \"Oppenheimer\",\n    \"type\": \"Movie\",\n    \"synopsis\": \"Oppenheimer\",\n    \"mpaRating\": \"TEEN\",\n    \"rYear\": \"2023-06-20\",\n    \"idmbRating\": 8,\n    \"actors\":[{\n        \"id\": 2,\n        \"name\": \"Cillian Murphy\"\n    },{\n        \"id\": 3,\n        \"name\": \"Robert Downey Jr.\"\n    }\n    \n    ],\n    \"creators\":[ {\n        \"id\": 1,\n        \"name\": \"Christopher Nolan\"\n    }],\n   \n    \"categories\": [\n        {\n        \"id\": 1,\n        \"name\":  \"history\"\n        }\n      \n    ],\n    \"image\": \"https://www.play.id/wp-content/uploads/2023/07/oppenheimer-movie.jpg\",\n    \"notification\": true\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8200/api/v1/movie-service/movies",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8200",
-									"path": [
-										"api",
-										"v1",
-										"movie-service",
-										"movies"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "create movie  Copy 2",
-							"request": {
-								"auth": {
-									"type": "oauth2",
-									"oauth2": [
-										{
-											"key": "accessTokenUrl",
-											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
-											"type": "string"
-										},
-										{
-											"key": "clientSecret",
-											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
-											"type": "string"
-										},
-										{
-											"key": "scope",
-											"value": "openid offline_access",
-											"type": "string"
-										},
-										{
-											"key": "clientId",
-											"value": "spring-cloud-client",
-											"type": "string"
-										},
-										{
-											"key": "grant_type",
-											"value": "client_credentials",
-											"type": "string"
-										},
-										{
-											"key": "authUrl",
-											"value": "http://localhost:5005/auth/login",
-											"type": "string"
-										},
-										{
-											"key": "tokenName",
-											"value": "token",
-											"type": "string"
-										},
-										{
-											"key": "addTokenTo",
-											"value": "header",
-											"type": "string"
-										}
-									]
-								},
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n        \"name\": \"Magic Camp\",\n        \"type\": \"Movie\",\n        \"mpaRating\": \"TEEN\",\n        \"synopsis\": \"Andy, at the urging of his former mentor and Magic Camp owner Roy Preston, returns to the camp of his youth hoping to reignite his career. Instead, he finds inspiration in his ragtag bunch of rookie magicians.\",\n        \"rYear\": 2020,\n        \"idmbRating\": 6.913,\n        \"image\": \"https://image.tmdb.org/t/p/original//wCkltGkEGe6mgXBuTdoyRuCMYXt.jpg\",\n        \"notification\": false,\n        \"actors\": [\n            {\n                \"id\": 1,\n                \"name\": \"Adam DeVine\"\n            },\n            {\n                \"id\": 2,\n                \"name\": \"Jeffrey Tambor\"\n            },\n            {\n                \"id\": 3,\n                \"name\": \"Gillian Jacobs\"\n            },\n            {\n                \"id\": 4,\n                \"name\": \"Nathaniel Logan McIntyre\"\n            },\n            {\n                \"id\": 5,\n                \"name\": \"Cole Sand\"\n            }\n        ],\n        \"creators\": [\n            {\n                \"id\": 1,\n                \"name\": \"Mark Waters\"\n            }\n        ],\n        \"categories\": [\n            {\n                \"id\": 1,\n                \"name\": \"Family\"\n            },\n            {\n                \"id\": 2,\n                \"name\": \"Fantasy\"\n            },\n            {\n                \"id\": 3,\n                \"name\": \"Comedy\"\n            }\n        ]\n    }",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8200/api/v1/movie-service/movies",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8200",
-									"path": [
-										"api",
-										"v1",
-										"movie-service",
-										"movies"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "delete movie",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:8200/api/v1/movie-service/movies/4",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8200",
-									"path": [
-										"api",
-										"v1",
-										"movie-service",
-										"movies",
-										"4"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "update movie",
-							"request": {
-								"auth": {
-									"type": "oauth2",
-									"oauth2": [
-										{
-											"key": "addTokenTo",
-											"value": "header",
-											"type": "string"
-										}
-									]
-								},
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n    \"name\": \"Oppenheimer\",\n    \"type\": \"Movie\",\n    \"synopsis\": \"Oppenheimer\",\n    \"mpaRating\": \"TEEN\",\n    \"rYear\": \"2023-06-20\",\n    \"idmbRating\": 8,\n    \"actors\":[{\n        \"id\": 2,\n        \"name\": \"Cillian Murphy\"\n    },{\n        \"id\": 3,\n        \"name\": \"Robert Downey Jr.\"\n    }\n    \n    ],\n    \"creators\":[ {\n        \"id\": 1,\n        \"name\": \"Christopher Nolan\"\n    }],\n    \"videos\": [\n        {\n        \"id\": 5,\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"publicId\": \"uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Oppenheimer\",\n        \"synopsis\": \"Oppenheimer\",\n        \"movieId\": 0\n        },\n         {\n        \"id\": 8,\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"publicId\": \"uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Oppenheimer\",\n        \"synopsis\": \"Oppenheimer\",\n        \"movieId\": 0\n        }\n    ],\n    \"categories\": [\n        {\n        \"id\": 1,\n        \"name\":  \"history\"\n        }\n      \n    ],\n    \"image\": \"https://www.play.id/wp-content/uploads/2023/07/oppenheimer-movie.jpg\",\n    \"notification\": true\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "http://localhost:8200/api/v1/movie-service/movies/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8200",
-									"path": [
-										"api",
-										"v1",
-										"movie-service",
-										"movies",
-										"1"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
 					"name": "movie from kong",
 					"item": [
 						{
@@ -1990,6 +1510,884 @@
 					]
 				},
 				{
+					"name": "movie",
+					"item": [
+						{
+							"name": "create movie (Joker: Folie a Deux)",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Joker: Folie a Deux 5\",\n    \"type\": \"Movie\",\n    \"synopsis\": \"Joker: Folie a Deux\",\n    \"mpaRating\": \"TEEN\",\n    \"rYear\": \"2023-06-20\",\n    \"idmbRating\": 8,\n    \"actors\":[{\n\n        \"name\": \"Cillian Murphy\"\n    },{\n\n        \"name\": \"Robert Downey Jr.\"\n    }\n    \n    ],\n    \"creators\":[ {\n\n        \"name\": \"Christopher Nolan\"\n    }],\n    \n    \"categories\": [\n         {\n   \n            \"name\": \"action\"\n        }\n      \n    ],\n    \"image\": \"https://www.play.id/wp-content/uploads/2023/07/oppenheimer-movie.jpg\",\n    \"notification\": false\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8200/api/v1/movie-service/movies",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8200",
+									"path": [
+										"api",
+										"v1",
+										"movie-service",
+										"movies"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create movie  Copy",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Oppenheimer\",\n    \"type\": \"Movie\",\n    \"synopsis\": \"Oppenheimer\",\n    \"mpaRating\": \"TEEN\",\n    \"rYear\": \"2023-06-20\",\n    \"idmbRating\": 8,\n    \"actors\":[{\n        \"id\": 2,\n        \"name\": \"Cillian Murphy\"\n    },{\n        \"id\": 3,\n        \"name\": \"Robert Downey Jr.\"\n    }\n    \n    ],\n    \"creators\":[ {\n        \"id\": 1,\n        \"name\": \"Christopher Nolan\"\n    }],\n   \n    \"categories\": [\n        {\n        \"id\": 1,\n        \"name\":  \"history\"\n        }\n      \n    ],\n    \"image\": \"https://www.play.id/wp-content/uploads/2023/07/oppenheimer-movie.jpg\",\n    \"notification\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8200/api/v1/movie-service/movies",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8200",
+									"path": [
+										"api",
+										"v1",
+										"movie-service",
+										"movies"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create movie  Copy 2",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n        \"name\": \"Magic Camp\",\n        \"type\": \"Movie\",\n        \"mpaRating\": \"TEEN\",\n        \"synopsis\": \"Andy, at the urging of his former mentor and Magic Camp owner Roy Preston, returns to the camp of his youth hoping to reignite his career. Instead, he finds inspiration in his ragtag bunch of rookie magicians.\",\n        \"rYear\": 2020,\n        \"idmbRating\": 6.913,\n        \"image\": \"https://image.tmdb.org/t/p/original//wCkltGkEGe6mgXBuTdoyRuCMYXt.jpg\",\n        \"notification\": false,\n        \"actors\": [\n            {\n                \"id\": 1,\n                \"name\": \"Adam DeVine\"\n            },\n            {\n                \"id\": 2,\n                \"name\": \"Jeffrey Tambor\"\n            },\n            {\n                \"id\": 3,\n                \"name\": \"Gillian Jacobs\"\n            },\n            {\n                \"id\": 4,\n                \"name\": \"Nathaniel Logan McIntyre\"\n            },\n            {\n                \"id\": 5,\n                \"name\": \"Cole Sand\"\n            }\n        ],\n        \"creators\": [\n            {\n                \"id\": 1,\n                \"name\": \"Mark Waters\"\n            }\n        ],\n        \"categories\": [\n            {\n                \"id\": 1,\n                \"name\": \"Family\"\n            },\n            {\n                \"id\": 2,\n                \"name\": \"Fantasy\"\n            },\n            {\n                \"id\": 3,\n                \"name\": \"Comedy\"\n            }\n        ]\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8200/api/v1/movie-service/movies",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8200",
+									"path": [
+										"api",
+										"v1",
+										"movie-service",
+										"movies"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete movie",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8200/api/v1/movie-service/movies/4",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8200",
+									"path": [
+										"api",
+										"v1",
+										"movie-service",
+										"movies",
+										"4"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update movie",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Oppenheimer\",\n    \"type\": \"Movie\",\n    \"synopsis\": \"Oppenheimer\",\n    \"mpaRating\": \"TEEN\",\n    \"rYear\": \"2023-06-20\",\n    \"idmbRating\": 8,\n    \"actors\":[{\n        \"id\": 2,\n        \"name\": \"Cillian Murphy\"\n    },{\n        \"id\": 3,\n        \"name\": \"Robert Downey Jr.\"\n    }\n    \n    ],\n    \"creators\":[ {\n        \"id\": 1,\n        \"name\": \"Christopher Nolan\"\n    }],\n    \"videos\": [\n        {\n        \"id\": 5,\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"publicId\": \"uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Oppenheimer\",\n        \"synopsis\": \"Oppenheimer\",\n        \"movieId\": 0\n        },\n         {\n        \"id\": 8,\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"publicId\": \"uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Oppenheimer\",\n        \"synopsis\": \"Oppenheimer\",\n        \"movieId\": 0\n        }\n    ],\n    \"categories\": [\n        {\n        \"id\": 1,\n        \"name\":  \"history\"\n        }\n      \n    ],\n    \"image\": \"https://www.play.id/wp-content/uploads/2023/07/oppenheimer-movie.jpg\",\n    \"notification\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8200/api/v1/movie-service/movies/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8200",
+									"path": [
+										"api",
+										"v1",
+										"movie-service",
+										"movies",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "add video Frpm Kong",
+					"item": [
+						{
+							"name": "upload video & add video to movie",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"contentType": "audio/mp4",
+											"type": "file",
+											"src": "/home/lintangbs/Downloads/Joker_ Folie à Deux _ Official Teaser Trailer (1).mp4"
+										},
+										{
+											"key": "body",
+											"value": "{ \n  \"length\": 180,\n  \"title\": \"Joker: Folie a Deux 6\",\n  \"synopsis\": \"Joker: Folie a Deux 6 synopsis\",\n  \"movieId\": 1\n}",
+											"contentType": "application/json",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8000/movie-command/api/v1/movie-service/videos/addUpload",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"movie-command",
+										"api",
+										"v1",
+										"movie-service",
+										"videos",
+										"addUpload"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create videos and video to movie",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Joker: Folie a Deux 5\",\n        \"synopsis\": \"Joker: Folie a Deux\",\n        \"publicId\": \"uYPbbksJxIg\",\n        \"movieId\": 1\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000/movie-command/api/v1/movie-service/videos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"movie-command",
+										"api",
+										"v1",
+										"movie-service",
+										"videos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create videos and video to movie Copy",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Oppenheimer\",\n        \"synopsis\": \"Oppenheimer\",\n        \"publicId\": \"uYPbbksJxIg\",\n        \"movieId\": 1\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000/movie-command/api/v1/movie-service/videos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"movie-command",
+										"api",
+										"v1",
+										"movie-service",
+										"videos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete video",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/movie-command/api/v1/movie-service/videos/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"movie-command",
+										"api",
+										"v1",
+										"movie-service",
+										"videos",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update video",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Oppenheimerss\",\n        \"synopsis\": \"Oppenheimer\",\n        \"publicId\": \"uYPbbksJxIg\"\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8000/movie-command/api/v1/movie-service/videos/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"movie-command",
+										"api",
+										"v1",
+										"movie-service",
+										"videos",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "add video from video service",
+					"item": [
+						{
+							"name": "upload video & add video to movie",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "file",
+											"contentType": "audio/mp4",
+											"type": "file",
+											"src": "/home/lintangbs/Downloads/Joker_ Folie à Deux _ Official Teaser Trailer (1).mp4"
+										},
+										{
+											"key": "body",
+											"value": "{ \n  \"length\": 180,\n  \"title\": \"Joker: Folie a Deux 6\",\n  \"synopsis\": \"Joker: Folie a Deux 6 synopsis\",\n  \"movieId\": 5\n}",
+											"contentType": "application/json",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "http://localhost:8200/api/v1/movie-service/videos/addUpload",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8200",
+									"path": [
+										"api",
+										"v1",
+										"movie-service",
+										"videos",
+										"addUpload"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create videos and video to movie",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Joker: Folie a Deux 5\",\n        \"synopsis\": \"Joker: Folie a Deux\",\n        \"publicId\": \"uYPbbksJxIg\",\n        \"movieId\": 1\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8200/api/v1/movie-service/videos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8200",
+									"path": [
+										"api",
+										"v1",
+										"movie-service",
+										"videos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "create videos and video to movie Copy",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Oppenheimer\",\n        \"synopsis\": \"Oppenheimer\",\n        \"publicId\": \"uYPbbksJxIg\",\n        \"movieId\": 1\n    }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8200/api/v1/movie-service/videos",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8200",
+									"path": [
+										"api",
+										"v1",
+										"movie-service",
+										"videos"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete video",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8200/api/v1/movie-service/videos/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8200",
+									"path": [
+										"api",
+										"v1",
+										"movie-service",
+										"videos",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update video",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n        \"url\": \"https://youtu.be/uYPbbksJxIg\",\n        \"length\": 180,\n        \"title\": \"Oppenheimerss\",\n        \"synopsis\": \"Oppenheimer\",\n        \"publicId\": \"uYPbbksJxIg\"\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8200/api/v1/movie-service/videos/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8200",
+									"path": [
+										"api",
+										"v1",
+										"movie-service",
+										"videos",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "movie query From Kong",
+					"item": [
+						{
+							"name": "get movies",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/movie-query/api/v1/movie-query/movies",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"movie-query",
+										"api",
+										"v1",
+										"movie-query",
+										"movies"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get movies By ID",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "accessTokenUrl",
+											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
+											"type": "string"
+										},
+										{
+											"key": "clientSecret",
+											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
+											"type": "string"
+										},
+										{
+											"key": "scope",
+											"value": "openid offline_access",
+											"type": "string"
+										},
+										{
+											"key": "clientId",
+											"value": "spring-cloud-client",
+											"type": "string"
+										},
+										{
+											"key": "grant_type",
+											"value": "client_credentials",
+											"type": "string"
+										},
+										{
+											"key": "authUrl",
+											"value": "http://localhost:5005/auth/login",
+											"type": "string"
+										},
+										{
+											"key": "tokenName",
+											"value": "token",
+											"type": "string"
+										},
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/movie-query/api/v1/movie-query/movies/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"movie-query",
+										"api",
+										"v1",
+										"movie-query",
+										"movies",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "get movie video",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/movie-query/api/v1/movie-query/videos/3",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"movie-query",
+										"api",
+										"v1",
+										"movie-query",
+										"videos",
+										"3"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "view video",
+							"request": {
+								"auth": {
+									"type": "oauth2",
+									"oauth2": [
+										{
+											"key": "addTokenTo",
+											"value": "header",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://localhost:8000/movie-query/api/v1/movie-query/videos/1/1",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8000",
+									"path": [
+										"movie-query",
+										"api",
+										"v1",
+										"movie-query",
+										"videos",
+										"1",
+										"1"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "movie query",
 					"item": [
 						{
@@ -2183,217 +2581,6 @@
 									],
 									"port": "8100",
 									"path": [
-										"api",
-										"v1",
-										"movie-query",
-										"videos",
-										"1",
-										"1"
-									]
-								}
-							},
-							"response": []
-						}
-					]
-				},
-				{
-					"name": "movie query From Kong",
-					"item": [
-						{
-							"name": "get movies",
-							"request": {
-								"auth": {
-									"type": "oauth2",
-									"oauth2": [
-										{
-											"key": "accessTokenUrl",
-											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
-											"type": "string"
-										},
-										{
-											"key": "clientSecret",
-											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
-											"type": "string"
-										},
-										{
-											"key": "scope",
-											"value": "openid offline_access",
-											"type": "string"
-										},
-										{
-											"key": "clientId",
-											"value": "spring-cloud-client",
-											"type": "string"
-										},
-										{
-											"key": "grant_type",
-											"value": "client_credentials",
-											"type": "string"
-										},
-										{
-											"key": "authUrl",
-											"value": "http://localhost:5005/auth/login",
-											"type": "string"
-										},
-										{
-											"key": "tokenName",
-											"value": "token",
-											"type": "string"
-										},
-										{
-											"key": "addTokenTo",
-											"value": "header",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:8000/movie-query/api/v1/movie-query/movies",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8000",
-									"path": [
-										"movie-query",
-										"api",
-										"v1",
-										"movie-query",
-										"movies"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "get movies By ID",
-							"request": {
-								"auth": {
-									"type": "oauth2",
-									"oauth2": [
-										{
-											"key": "accessTokenUrl",
-											"value": "http://keycloak:8080/realms/spring-boot-microservices-realm/protocol/openid-connect/token",
-											"type": "string"
-										},
-										{
-											"key": "clientSecret",
-											"value": "OlLIrucXOXgDap2kcGPiCvJzXgekWWuw",
-											"type": "string"
-										},
-										{
-											"key": "scope",
-											"value": "openid offline_access",
-											"type": "string"
-										},
-										{
-											"key": "clientId",
-											"value": "spring-cloud-client",
-											"type": "string"
-										},
-										{
-											"key": "grant_type",
-											"value": "client_credentials",
-											"type": "string"
-										},
-										{
-											"key": "authUrl",
-											"value": "http://localhost:5005/auth/login",
-											"type": "string"
-										},
-										{
-											"key": "tokenName",
-											"value": "token",
-											"type": "string"
-										},
-										{
-											"key": "addTokenTo",
-											"value": "header",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:8000/movie-query/api/v1/movie-query/movies/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8000",
-									"path": [
-										"movie-query",
-										"api",
-										"v1",
-										"movie-query",
-										"movies",
-										"1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "get movie video",
-							"request": {
-								"auth": {
-									"type": "oauth2",
-									"oauth2": [
-										{
-											"key": "addTokenTo",
-											"value": "header",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:8000/movie-query/api/v1/movie-query/videos/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8000",
-									"path": [
-										"movie-query",
-										"api",
-										"v1",
-										"movie-query",
-										"videos",
-										"1"
-									]
-								}
-							},
-							"response": []
-						},
-						{
-							"name": "view video",
-							"request": {
-								"auth": {
-									"type": "oauth2",
-									"oauth2": [
-										{
-											"key": "addTokenTo",
-											"value": "header",
-											"type": "string"
-										}
-									]
-								},
-								"method": "GET",
-								"header": [],
-								"url": {
-									"raw": "http://localhost:8000/movie-query/api/v1/movie-query/videos/1/1",
-									"protocol": "http",
-									"host": [
-										"localhost"
-									],
-									"port": "8000",
-									"path": [
-										"movie-query",
 										"api",
 										"v1",
 										"movie-query",

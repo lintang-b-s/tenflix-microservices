@@ -30,16 +30,12 @@ public class CategoryCommandAction {
     }
 
 
-    public CategoryEntity save(Category newCategory) {
+  
+    public CategoryEntity saveReq(AddCategoryReq newCategory){
         Optional<CategoryEntity> opCategory = categoryRepository.findByName(newCategory.getName());
         if (!opCategory.isEmpty()){
             throw new BadRequestException("category with name: " + newCategory.getName() + " already in database");
         }
-        CategoryEntity category= categoryRepository.save(categoryEntityMapper.toEntity(newCategory.getName()));
-        return category;
-    }
-
-    public CategoryEntity saveReq(AddCategoryReq newCategory){
         CategoryEntity category = categoryRepository.save(categoryEntityMapper.toEntity(newCategory.getName()));
         return category;
     }

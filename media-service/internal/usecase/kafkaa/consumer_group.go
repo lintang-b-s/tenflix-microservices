@@ -3,10 +3,11 @@ package kafkaa
 import (
 	"context"
 	"fmt"
-	"github.com/segmentio/kafka-go"
 	"tenflix/lintang/order-aggregator-service/config"
 	"tenflix/lintang/order-aggregator-service/internal/usecase"
 	"tenflix/lintang/order-aggregator-service/pkg/logger"
+
+	"github.com/segmentio/kafka-go"
 
 	"sync"
 )

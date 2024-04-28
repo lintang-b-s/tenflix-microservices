@@ -1,6 +1,7 @@
 # Description
 Movie Streaming microservices like Netflix, built using microservices architecture, Saga distributed transactions patternm , CQRS, Outbox Pattern, kafka, grpc, concurrency, CDC debezium, keycloak oauth server, kong api gateway, consul service discovery, etc.
 
+The video streaming protocol that Tenflix uses is HLS. HLS is a streaming protocol that is often used on video streaming services such as Netflix, YouTube, Amazon Prime. Media-service uploads video movies to cloudinary and cloudinary provides the video url in the form of the HLS protocol.
 
 This project provides an example of the Saga distributed transactions pattern.
 
@@ -13,7 +14,7 @@ This project provides an example of the Saga distributed transactions pattern.
 
 2. Movie-Query-service: This microservices reads movie data from mongodb. The movies data is obtained from Kafka, where the Kafka event message is sent by debezium, and the movie data from the movie-command-service database. When a user wants to see a movie, the user sends a request to this microservice, then this microservice checks whether the user has a subscription by sending a GRPC request to the subscription service. If the user has a subscription, the video movie data is sent to the user
 
-3. Media-service: This microservice receives video data from Kafka, where video data is sent by movie-command-service when the admin adds and uploads movie videos.
+3. Media-service: This microservice receives video data from Kafka, where video data is sent by movie-command-service when the admin adds and uploads movie videos. Then this service uploads the video to Cloudinary in Adaptive Bitrate Streaming HLS format (https://cloudinary.com/documentation/adaptive_bitrate_streaming). HLS is a streaming protocol that is often used on video streaming services such as Netflix, YouTube, Amazon Prime (https://bytebytego.com/courses/system-design-interview/design-youtube).
 
 4. Notification-service: This microservices sends notifications to certain users every time the admin adds a new movie in the movie-command-service.
 
@@ -71,22 +72,24 @@ Sending data in here using outbox pattern & cdc. The data that the publisher wan
 4. free RAM memory on your PC  >= 10gb
 5. min cpu: 6 core 12 thread (same as my laptop)
 6. install openjdk 17 
+7. linux os w/ amd64 architecture
 
 
 ### start application
 ```
-    fill the env file  & .ngrok.yml file
-    bash ./bootstrap.sh
+   -  fill the env file  & .ngrok.yml file
+   -  bash ./bootstrap.sh
     
-    docker compose -f docker-compose-all-test.yml up -d, wait until all container up & running
-    cd configuration
-     bash ./consul-register.sh
-    if kafka-connect is not running or kong, execute the above command again
-    bash ./kong-order.sh
-    check all service registered in localhost:8500, wait until order-service, subscription-service, paymentservice registered in consul
+   -  docker compose -f docker-compose-all-test.yml up -d, wait until all container up & running
+    - if it show Error response from daemon: Address already in use, do " docker compose  -f docker-compose-all-test.yml  down &&  sudo systemctl restart docker", then do  docker compose -f docker-compose-all-test.yml up -d , repeat these steps until address already in use error not show again
+   -  cd configuration
+   -   bash ./consul-register.sh
+   -  if kafka-connect is not running or kong, execute the above command again
+   -  bash ./kong-order.sh
+   -  check all service registered in localhost:8500, wait until order-service, subscription-service, paymentservice registered in consul
     wait until kafka-connect load all plugin
-    bash ./kafka-connect-debezium.sh
-    docker exec -it zookeeper kafka-configs --bootstrap-server kafka:29092 --alter --entity-type topics --entity-name t.upload.request --add-config max.message.bytes=104858800
+   -  bash ./kafka-connect-debezium.sh
+   -  docker exec -it zookeeper kafka-configs --bootstrap-server kafka:29092 --alter --entity-type topics --entity-name t.upload.request --add-config max.message.bytes=104858800
 
 ```
 
@@ -103,9 +106,12 @@ Sending data in here using outbox pattern & cdc. The data that the publisher wan
 ```
 
 
+### Note
+all endpoints must be provided with Oauth2 auth with the access token obtained in the login endpoint response
+
 ### register && login, create order & get order
 ```
-   import postman collection  in docs/Tenflix - now version.postman_collection
+   - import postman collection  in docs/Tenflix - now version.postman_collection
     1. open auth&user copyfolder
     2. register in auth code postman request
     for example register using email: tes@gmail.com, password: tes
@@ -125,13 +131,24 @@ Sending data in here using outbox pattern & cdc. The data that the publisher wan
 note:  you must provide an access token to each protected endpoint using oauth2 postman
 note: if order-aggregator-service container not running , start container again and run bash ./kong-order.sh
 
-### Insert Movie, Upload Movie video, Watch Movie
+### Insert Movie, Upload Movie video,
 ```
 1. Make sure your account has purchased a subscription using the method I explained above.
-2. cd configuration && bash ./kong-order.sh
+2. cd configuration && bash ./kong-movie.sh
 3. make sure media-service up & running (check with 'docker ps -a -f "status=exited" ), if not running , restart the container (make sure kafka is up & running too)
 4. Execute all http request in the movie_folder postman, make sure it is in the order from top to bottom & dont create duplicate category
 5. Read movie & video data in movie query folder postman
+```
+
+###  Watch Movie
+```
+1. insert movie & upload movie video in endpoints:  http://localhost:8000/movie-command/api/v1/movie-service/movies   , http://localhost:8000/api/v1/movie-service/videos/addUpload
+and then wait for video uploaded to cloudinary &&  movie, videos data replicated to movie-query service (ussualy takes 1 minute)
+2. request to http://localhost:8000/movie-query/api/v1/movie-query/movies in postman  
+3. copy hls video url (like https://res.cloudinary.com/tutorial-lntng/video/upload/sp_hd/f_m3u8/v1714300742/blgzqfi3r42rycnkaqbt.m3u8)
+4. open https://players.akamai.com/players/hlsjs
+5. wait until hls video ready to play  (usually takes 5-10 minutes)
+6. paste hls video url to akamai player 
 ```
 
 
@@ -165,4 +182,4 @@ note: if order-aggregator-service container not running , start container again 
 
 
 ### 10. Execute all http request in the movie_folder postman
-![get movie](https://res.cloudinary.com/tutorial-lntng/image/upload/v1714232170/Screenshot_from_2024-04-27_22-35-55_wphyzv.png)
+![get movie](https://res.cloudinary.com/tutorial-lntng/image/upload/v1714301423/Screenshot_from_2024-04-28_17-48-03_ooknsx.png)
