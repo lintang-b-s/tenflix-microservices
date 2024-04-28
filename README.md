@@ -107,7 +107,7 @@ Sending data in here using outbox pattern & cdc. The data that the publisher wan
 
 
 ### Note
-all endpoints must be provided with Oauth2 auth with the access token obtained in the login endpoint response
+protected endpoints must be provided with Oauth2 auth with the access token obtained in the login endpoint response
 
 ### register && login, create order & get order
 ```
