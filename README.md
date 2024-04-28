@@ -9,9 +9,6 @@ This project provides an example of the Saga distributed transactions pattern.
 ![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1714231729/tenflix_2_lb3slg.png)
 
 
-### Saga Distributed Transactions Pattern
-![alt text](https://res.cloudinary.com/tutorial-lntng/image/upload/v1714240559/tenflix_copy_j4zm4v.png)
-
 ### concurrency
 [https://github.com/lintang-b-s/tenflix-microservices/blob/main/order-aggregator-service-go/internal/usecase/order.go]  getOrderDetail usecase using concurrency to call the other three services
 
@@ -34,18 +31,34 @@ This project provides an example of the Saga distributed transactions pattern.
 
 
 ### Choreography-based Saga Transaction Flow
+![saga transaction](https://res.cloudinary.com/tutorial-lntng/image/upload/v1714271416/SAGA-TENFLIX_qjrd89.png)
+
 Sending data in here using outbox pattern & cdc. The data that the publisher wants to send is saved to the outbox table, then debezium listens for changes to the outbox table data (via Postgres write-ahead-log) and sends the data to Kafka every time there is new data in the outbox table.
 #### Happy Case (Payment PAID/Accepted)
 1. order-aggregator-service receives notification from midtrans, then it sends a GRPC request to order-service so that order-service, subscription-service, payment-service carry out choreography saga transactions.
 2. order-service receives a GRPC request from order-aggregator-service, then it checks whether the order data from the midtrans orderId field exists in the database. If there is, order-service sends payment message from order-aggregator-service to payment-service via kafka. Sending data using outbox pattern & cdc. The data that the order-service wants to send is saved to the outbox table, then debezium listens for changes to the outbox table data (via Postgres write-ahead-log) and sends the data to Kafka every time there is new data in the outbox table.
 3. The payment service receives payment message from order-service (via Kafka), then checks the Midtrans payment status on the payment data. In this case the payment status is "accept", then the payment data is saved to the payment database. and payment -service sends a ValidatedPayment message to order-service
-4. order-service receives a message from payment-service (via kafka), then updates the order status to PAID , then sends an Add_Subscription message to subscription-service
-5. subscription-service receives the AddedSubscription Message from order-service, then saves the user's subscription data to its database, then sends the AddedSubscription message to order-service
-6. order-service receives the AddedSubscription message from subscription-service , then it sends a CompleteOrder Message to the order-request topic in kafka.
-7. order-service receives a message from the kafka order-request topic, then it updates the order status to "COMPLETED".
+4. order-service receives a message from payment-service (via kafka), then updates the order status to PAID , then sends an ADD_SUBSCRIPTION message to subscription-service
+5. subscription-service receives the ADD_SUBSCRIPTION Message from order-service, then saves the user's subscription data to its database, then sends the AddedSubscription message to order-service
+6. order-service receives the AddedSubscription message from subscription-service , then it sends a CompleteOrder Message to the t.saga.order.outbox.order.request topic in kafka.
+7. order-service receives a message from the kafka t.saga.order.outbox.order.request topic, then it updates the order status to "COMPLETED".
 
-#### Bad Case 1 (The subscription plan ordered by the user does not exist in the subscription-service database )
-besok , dah ngantuk 
+#### Bad Case 1 (  user still has an active subscription Or The subscription plan ordered by the user does not exist in the subscription-service database )
+1. order-aggregator-service receives notification from midtrans, then it sends a GRPC request to order-service so that order-service, subscription-service, payment-service carry out choreography saga transactions.
+2. order-service receives a GRPC request from order-aggregator-service, then it checks whether the order data from the midtrans orderId field exists in the database. If there is, order-service sends payment message from order-aggregator-service to payment-service via kafka. Sending data using outbox pattern & cdc. The data that the order-service wants to send is saved to the outbox table, then debezium listens for changes to the outbox table data (via Postgres write-ahead-log) and sends the data to Kafka every time there is new data in the outbox table.
+3. The payment service receives payment message from order-service (via Kafka), then checks the Midtrans payment status on the payment data. In this case the payment status is "accept", then the payment data is saved to the payment database. and payment -service sends a ValidatedPayment message to order-service
+4. order-service receives a message from payment-service (via kafka), then updates the order status to PAID , then sends an Add_Subscription message to subscription-service
+5. subscription-service receives the AddedSubscription Message from order-service, subscription-service receives the added subscription message from order-service, then he checks whether the subscription plan is in the database and he also checks whether the user still has an active subscription plan. If the subscription plan does not exist in the database or the user still has an active subscription, he sends a SUBSCRIPTION_ERROR message to order-service.
+6. order-service receives SUBSCRIPTION_ERROR message from subscription-service, then it sends COMPENSATING_ORDER_SUBSCRIPTION_ERROR message to payment-service and  send the same message to topic t.saga.order.outbox.order.request in kafka.
+7. payment-service receives a COMPENSATING_ORDER_SUBSCRIPTION_ERROR message from order-service, then he sends a refund http request to midtrans (https://api.sandbox.midtrans.com/v2/orderId/refund) so that midtrans returns the subscription payment money to the user.
+8. order-service receives COMPENSATING_ORDER_SUBSCRIPTION_ERROR message from kafka topic t.saga.order.outbox.order.request, then it updates the user's order status to "CANCELLED"
+
+#### Bad Case 2 (payment status from midtrans is "cancel" or "expired" or "deny" / payment status from midtrans is captured/settled but the fraud status is "challenge")
+1. order-aggregator-service receives notification from midtrans, then it sends a GRPC request to order-service so that order-service, subscription-service, payment-service carry out choreography saga transactions.
+2. order-service receives a GRPC request from order-aggregator-service, then it checks whether the order data from the midtrans orderId field exists in the database. If there is, order-service sends payment message from order-aggregator-service to payment-service via kafka. Sending data using outbox pattern & cdc. The data that the order-service wants to send is saved to the outbox table, then debezium listens for changes to the outbox table data (via Postgres write-ahead-log) and sends the data to Kafka every time there is new data in the outbox table.
+3. The payment service receives payment message from order-service (via Kafka), then checks the Midtrans payment status on the payment data. In this case payment status from midtrans is "cancel" or "expired" or "deny" / payment status from midtrans is captured/settled but the fraud status is "challenge". then he sent the message CANCELLED PAYMENT in order-service
+4. order-service receives the message CANCELLED_PAYMENT from payment-service, then it updates the order status to CANCELLED
+
 
 # Quick Start
 
@@ -55,6 +68,7 @@ besok , dah ngantuk
 3. install docker & docker compose
 4. free RAM memory on your PC  >= 10gb
 5. min cpu: 6 core 12 thread (same as my laptop)
+6. install openjdk 17 
 
 
 ### start application

@@ -72,6 +72,19 @@ public class SubscriptionSagaService {
                     addedSubscriptionMessage, SagaStatus.PROCESSING
             );
             outboxAction.deleteOutbox(subscriptionOutbox);
+        }else {
+                // user masih punya subscription yang aktif -> do compensating saga action
+                AddSubscriptionErrorMessage addSubscriptionErrorMessage = AddSubscriptionErrorMessage.builder()
+                .errorMessage("User " + addSubscriptionMessage.getUserId() + "still have an active subscription : " + addSubscriptionMessage.getPlanId() ).grossAmount(addSubscriptionMessage.getPrice().toString())
+                .orderId(addSubscriptionMessage.getOrderId())
+                .build();
+                var subscriptionOutbox = outboxAction.insertOutbox(
+                        "subscription.response",
+                        addSubscriptionErrorMessage.getOrderId(),
+                        OutboxEventType.SUBSCRIPTION_ERROR,
+                        addSubscriptionErrorMessage, SagaStatus.COMPENSATING
+                );
+                outboxAction.deleteOutbox(subscriptionOutbox);
         }
 
     }
